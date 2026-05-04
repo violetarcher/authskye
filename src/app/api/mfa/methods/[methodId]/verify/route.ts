@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 
-interface RouteParams {
-  params: {
-    methodId: string;
-  };
-}
 
 /**
  * POST /api/mfa/methods/[methodId]/verify
@@ -32,7 +27,7 @@ interface RouteParams {
  */
 export const POST = withApiAuthRequired(async function POST(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { methodId: string } }
 ) {
   try {
     const session = await getSession();
@@ -56,7 +51,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { methodId } = params;
+    const { methodId } = context.params;
     const body = await request.json();
     const { code, credential, authn_response, auth_session } = body;
 

@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 
-interface RouteParams {
-  params: {
-    methodId: string;
-  };
-}
 
 /**
  * DELETE /api/mfa/methods/[methodId]
@@ -20,7 +15,7 @@ interface RouteParams {
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { methodId: string } }
 ) {
   try {
     const session = await getSession();
@@ -44,7 +39,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { methodId } = params;
+    const { methodId } = context.params;
 
     console.log('🗑️ Deleting MFA method via My Account API:', methodId, 'for user:', user.sub);
 

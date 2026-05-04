@@ -10,11 +10,6 @@ import {
   formatDocId,
 } from '@/lib/fga-service';
 
-interface RouteParams {
-  params: {
-    documentId: string;
-  };
-}
 
 /**
  * POST /api/documents/[documentId]/share
@@ -22,7 +17,7 @@ interface RouteParams {
  */
 export const POST = withApiAuthRequired(async function POST(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -35,7 +30,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { documentId } = params;
+    const { documentId } = context.params;
 
     // Check if user can share this document
     const fgaUserId = formatUserId(user.sub);
@@ -92,7 +87,7 @@ export const POST = withApiAuthRequired(async function POST(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -105,7 +100,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { documentId } = params;
+    const { documentId } = context.params;
 
     // Check if user can share this document
     const fgaUserId = formatUserId(user.sub);

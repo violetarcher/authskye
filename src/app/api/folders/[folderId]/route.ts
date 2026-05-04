@@ -11,11 +11,6 @@ import {
   formatFolderId,
 } from '@/lib/fga-service';
 
-interface RouteParams {
-  params: {
-    folderId: string;
-  };
-}
 
 /**
  * GET /api/folders/[folderId]
@@ -23,7 +18,7 @@ interface RouteParams {
  */
 export const GET = withApiAuthRequired(async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -36,7 +31,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { folderId } = params;
+    const { folderId } = context.params;
 
     // Check if user can view this folder
     const fgaUserId = formatUserId(user.sub);
@@ -89,7 +84,7 @@ export const GET = withApiAuthRequired(async function GET(
  */
 export const PUT = withApiAuthRequired(async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -102,7 +97,7 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { folderId } = params;
+    const { folderId } = context.params;
 
     // Check if user owns this folder (only owner can update)
     const fgaUserId = formatUserId(user.sub);
@@ -170,7 +165,7 @@ export const PUT = withApiAuthRequired(async function PUT(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -183,7 +178,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { folderId } = params;
+    const { folderId } = context.params;
 
     // Check if user owns this folder (only owner can delete)
     const fgaUserId = formatUserId(user.sub);

@@ -11,11 +11,6 @@ import {
   formatDocId,
 } from '@/lib/fga-service';
 
-interface RouteParams {
-  params: {
-    documentId: string;
-  };
-}
 
 /**
  * GET /api/documents/[documentId]
@@ -23,7 +18,7 @@ interface RouteParams {
  */
 export const GET = withApiAuthRequired(async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -36,7 +31,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { documentId } = params;
+    const { documentId } = context.params;
 
     // Check if user can read this document
     const fgaUserId = formatUserId(user.sub);
@@ -96,7 +91,7 @@ export const GET = withApiAuthRequired(async function GET(
  */
 export const PUT = withApiAuthRequired(async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -109,7 +104,7 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { documentId } = params;
+    const { documentId } = context.params;
 
     // Check if user can write to this document
     const fgaUserId = formatUserId(user.sub);
@@ -178,7 +173,7 @@ export const PUT = withApiAuthRequired(async function PUT(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -191,7 +186,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { documentId } = params;
+    const { documentId } = context.params;
 
     // Check if user owns this document (only owner can delete)
     const fgaUserId = formatUserId(user.sub);

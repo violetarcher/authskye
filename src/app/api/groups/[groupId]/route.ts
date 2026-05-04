@@ -5,11 +5,6 @@ import { updateGroupSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
 import { readTuples, deleteTuples, formatGroupId } from '@/lib/fga-service';
 
-interface RouteParams {
-  params: {
-    groupId: string;
-  };
-}
 
 /**
  * GET /api/groups/[groupId]
@@ -17,7 +12,7 @@ interface RouteParams {
  */
 export const GET = withApiAuthRequired(async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -30,7 +25,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     // Fetch group from Firestore
     const groupRef = db.collection('groups').doc(groupId);
@@ -66,7 +61,7 @@ export const GET = withApiAuthRequired(async function GET(
  */
 export const PUT = withApiAuthRequired(async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -88,7 +83,7 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     const body = await request.json();
     const validation = updateGroupSchema.safeParse(body);
@@ -144,7 +139,7 @@ export const PUT = withApiAuthRequired(async function PUT(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -166,7 +161,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     // Delete group from Firestore
     const groupRef = db.collection('groups').doc(groupId);

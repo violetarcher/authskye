@@ -11,11 +11,6 @@ import {
   removeGroupFromFolder,
 } from '@/lib/fga-service';
 
-interface RouteParams {
-  params: {
-    folderId: string;
-  };
-}
 
 /**
  * POST /api/folders/[folderId]/share-group
@@ -23,7 +18,7 @@ interface RouteParams {
  */
 export const POST = withApiAuthRequired(async function POST(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -36,7 +31,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { folderId } = params;
+    const { folderId } = context.params;
 
     // Check if user owns this folder (only owner can share)
     const fgaUserId = formatUserId(user.sub);
@@ -114,7 +109,7 @@ export const POST = withApiAuthRequired(async function POST(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -127,7 +122,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { folderId } = params;
+    const { folderId } = context.params;
 
     // Check if user owns this folder (only owner can manage sharing)
     const fgaUserId = formatUserId(user.sub);
