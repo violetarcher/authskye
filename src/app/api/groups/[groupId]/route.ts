@@ -181,9 +181,6 @@ export const DELETE = withApiAuthRequired(async function DELETE(
 
     const groupData = group.data();
 
-    // Check if group belongs to user's organization
-    }
-
     await groupRef.delete();
 
     // Delete all tuples related to this group from FGA

@@ -210,9 +210,6 @@ export const DELETE = withApiAuthRequired(async function DELETE(
 
     const folderData = folder.data();
 
-    // Check if folder belongs to user's organization
-    }
-
     await folderRef.delete();
 
     // Delete all tuples related to this folder from FGA
