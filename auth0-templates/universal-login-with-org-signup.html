@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Sign In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+</head>
+<body>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding-left: 100px;
+      /* Split background: Navy blue on left 40%, white on right 60% */
+      background: linear-gradient(to right, #0a1d73 0%, #0a1d73 40%, #ffffff 40%, #ffffff 100%);
+    }
+
+    /* Features background section (right side) */
+    .features-background {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 60%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .features-grid {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .features-title {
+      color: #0a1d73;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+
+    .features-subtitle {
+      color: #64748b;
+      font-size: 18px;
+      margin-bottom: 40px;
+      text-align: left;
+    }
+
+    .feature-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .feature-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+
+    .feature-icon.orange {
+      background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    }
+
+    .feature-icon.teal {
+      background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+    }
+
+    .feature-icon.purple {
+      background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+    }
+
+    .feature-title {
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .feature-list li {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 10px;
+      padding-left: 24px;
+      position: relative;
+    }
+
+    .feature-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    /* Widget container */
+    #prompt-logo-center {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Organization signup link below widget */
+    .org-signup-container {
+      position: relative;
+      z-index: 10;
+      margin-top: 24px;
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .org-signup-card {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .org-signup-text {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .org-signup-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+
+    .org-signup-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    }
+
+    .org-signup-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      body {
+        background: #ffffff;
+        justify-content: center;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      .features-background {
+        display: none;
+      }
+
+      .org-signup-container {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  </style>
+
+  <!-- Background features section on right side -->
+  <div class="features-background">
+    <div class="features-grid">
+      <h2 class="features-title">Healthcare Benefits Made Simple</h2>
+      <p class="features-subtitle">Manage your health, access care, and track coverage in one place</p>
+
+      <!-- Feature 1: Virtual Care -->
+      <div class="feature-card">
+        <div class="feature-icon orange">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+          </svg>
+        </div>
+        <div class="feature-title">Virtual Care</div>
+        <ul class="feature-list">
+          <li>24/7 access to healthcare providers</li>
+          <li>Video consultations from anywhere</li>
+        </ul>
+      </div>
+
+      <!-- Feature 2: Track Coverage -->
+      <div class="feature-card">
+        <div class="feature-icon teal">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.516 2.17a.75.75 0 00-1.032 0 11.209 11.209 0 01-7.877 3.08.75.75 0 00-.722.515A12.74 12.74 0 002.25 9.75c0 5.942 4.064 10.933 9.563 12.348a.749.749 0 00.374 0c5.499-1.415 9.563-6.406 9.563-12.348 0-1.39-.223-2.73-.635-3.985a.75.75 0 00-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08zm3.094 8.016a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="feature-title">Track Coverage</div>
+        <ul class="feature-list">
+          <li>View ID cards and claims</li>
+          <li>Access explanation of benefits</li>
+        </ul>
+      </div>
+
+      <!-- Feature 3: Care Team -->
+      <div class="feature-card">
+        <div class="feature-icon purple">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.25 6.75a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0zM15.75 9.75a3 3 0 116 0 3 3 0 01-6 0zM2.25 9.75a3 3 0 116 0 3 3 0 01-6 0zM6.31 15.117A6.745 6.745 0 0112 12a6.745 6.745 0 016.709 7.498.75.75 0 01-.372.568A12.696 12.696 0 0112 21.75c-2.305 0-4.47-.612-6.337-1.684a.75.75 0 01-.372-.568 6.787 6.787 0 011.019-4.38z" clip-rule="evenodd" />
+            <path d="M5.082 14.254a8.287 8.287 0 00-1.308 5.135 9.687 9.687 0 01-1.764-.44l-.115-.04a.563.563 0 01-.373-.487l-.01-.121a3.75 3.75 0 013.57-4.047zM20.226 19.389a8.287 8.287 0 00-1.308-5.135 3.75 3.75 0 013.57 4.047l-.01.121a.563.563 0 01-.373.486l-.115.04c-.567.2-1.156.349-1.764.441z" />
+          </svg>
+        </div>
+        <div class="feature-title">Care Team</div>
+        <ul class="feature-list">
+          <li>Connect with support and guidance</li>
+          <li>Coordinate your care journey</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth0 Widget -->
+  {%- auth0:widget -%}
+
+  <!-- Organization Signup Link (below widget) -->
+  <div class="org-signup-container">
+    <div class="org-signup-card">
+      <p class="org-signup-text">New to SecureHealth? Create your organization</p>
+      <a href="{{ organization.metadata.app_url | default: 'https://localhost:4020' }}/organizations/signup" class="org-signup-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M4.5 2.25a.75.75 0 000 1.5v16.5h-.75a.75.75 0 000 1.5h16.5a.75.75 0 000-1.5h-.75V3.75a.75.75 0 000-1.5h-15zM9 6a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H9zm-.75 3.75A.75.75 0 019 9h1.5a.75.75 0 010 1.5H9a.75.75 0 01-.75-.75zM9 12a.75.75 0 000 1.5h1.5a.75.75 0 000-1.5H9zm3.75-5.25A.75.75 0 0113.5 6H15a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM13.5 9a.75.75 0 000 1.5H15A.75.75 0 0015 9h-1.5zm-.75 3.75a.75.75 0 01.75-.75H15a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zM9 19.5v-2.25a.75.75 0 01.75-.75h4.5a.75.75 0 01.75.75v2.25a.75.75 0 01-.75.75h-4.5A.75.75 0 019 19.5z" clip-rule="evenodd" />
+        </svg>
+        Create Organization
+      </a>
+    </div>
+  </div>
+</body>
+</html>

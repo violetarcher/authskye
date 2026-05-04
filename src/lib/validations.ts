@@ -154,3 +154,30 @@ export const updateMfaMethodSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters').optional(),
   preferred: z.boolean().optional(),
 });
+
+// Organization signup and management schemas
+export const organizationSignupSchema = z.object({
+  organizationName: z.string().min(2, 'Organization name must be at least 2 characters').max(100, 'Organization name must be less than 100 characters'),
+  adminEmail: z.string().email('Valid email is required'),
+});
+
+export const updateOrganizationSettingsSchema = z.object({
+  name: z.string().min(2, 'Organization name must be at least 2 characters').max(100).optional(),
+  display_name: z.string().min(2).max(100).optional(),
+  logo_url: z.union([z.string().url('Valid URL is required'), z.literal('')]).optional(),
+  website: z.union([z.string().url('Valid URL is required'), z.literal('')]).optional(),
+  industry: z.string().max(100).optional(),
+});
+
+export const claimDomainSchema = z.object({
+  domain: z.string()
+    .toLowerCase()
+    .regex(
+      /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/,
+      'Invalid domain format'
+    ),
+});
+
+export const ssoTicketSchema = z.object({
+  returnUrl: z.string().url('Valid return URL is required').optional(),
+});

@@ -83,31 +83,31 @@ export default function AnalyticsPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Reports</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Generation</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
+            <div className="text-2xl font-bold">12,450 GWh</div>
             <p className="text-xs text-muted-foreground">+12% from last month</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Active Plants</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
-            <p className="text-xs text-muted-foreground">+5% from last month</p>
+            <div className="text-2xl font-bold">77</div>
+            <p className="text-xs text-muted-foreground">+2 from last month</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">Capacity Factor</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12.5%</div>
+            <div className="text-2xl font-bold">87.3%</div>
             <p className="text-xs text-muted-foreground">+2.1% from last month</p>
           </CardContent>
         </Card>
@@ -117,7 +117,7 @@ export default function AnalyticsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231</div>
+            <div className="text-2xl font-bold">$4.5B</div>
             <p className="text-xs text-muted-foreground">+8.2% from last month</p>
           </CardContent>
         </Card>
@@ -126,8 +126,8 @@ export default function AnalyticsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Report Analytics</CardTitle>
-            <CardDescription>Detailed analytics for report generation and usage</CardDescription>
+            <CardTitle>Generation Analytics</CardTitle>
+            <CardDescription>Detailed analytics for power generation and efficiency</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">Advanced analytics charts and data visualizations would go here.</p>
@@ -135,11 +135,11 @@ export default function AnalyticsPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>User Behavior</CardTitle>
-            <CardDescription>Insights into user interaction patterns</CardDescription>
+            <CardTitle>Grid Performance</CardTitle>
+            <CardDescription>Insights into grid reliability and dispatch patterns</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">User behavior analytics would be displayed here.</p>
+            <p className="text-muted-foreground">Grid performance analytics would be displayed here.</p>
           </CardContent>
         </Card>
       </div>

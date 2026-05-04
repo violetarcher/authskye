@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    /* SecureHealth Portal Branding - Dark Navy Blue (#0a1d73) */
+    /* SaaS Consumer Branding - Modern Purple/Blue (#6366f1) */
     --background: 0 0% 100%;
-    --foreground: 230 40% 15%;
+    --foreground: 240 10% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 230 40% 15%;
+    --card-foreground: 240 10% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 230 40% 15%;
-    --primary: 230 84% 25%;
+    --popover-foreground: 240 10% 15%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 230 60% 95%;
-    --secondary-foreground: 230 40% 15%;
-    --muted: 230 15% 95%;
-    --muted-foreground: 230 15% 45%;
-    --accent: 230 75% 92%;
-    --accent-foreground: 230 75% 25%;
+    --secondary: 240 10% 96%;
+    --secondary-foreground: 240 10% 15%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 280 65% 60%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 230 15% 88%;
-    --input: 230 15% 88%;
-    --ring: 230 84% 25%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 239 84% 67%;
     --radius: 0.5rem;
   }
  

@@ -144,9 +144,6 @@ export const PUT = withApiAuthRequired(async function PUT(
 
     const folderData = folder.data();
 
-    // Check if folder belongs to user's organization
-    }
-
     await folderRef.update(updates);
 
     // Fetch updated folder

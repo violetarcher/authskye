@@ -14,7 +14,8 @@ import {
   FolderOpen,
   Shield,
   User,
-  ClipboardList
+  Activity,
+  Building2
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -57,8 +58,8 @@ export function SidebarNav({ roles }: SidebarNavProps) {
         className="w-full justify-start"
       >
         <Link href="/claims">
-          <ClipboardList className="mr-2 h-4 w-4" />
-          Claims
+          <Activity className="mr-2 h-4 w-4" />
+          Operations
         </Link>
       </Button>
 
@@ -124,9 +125,9 @@ export function SidebarNav({ roles }: SidebarNavProps) {
       {/* Admin-only navigation items */}
       {isAdmin && (
         <>
-          <Button 
-            asChild 
-            variant={pathname === '/admin' ? 'secondary' : 'ghost'} 
+          <Button
+            asChild
+            variant={pathname === '/admin' ? 'secondary' : 'ghost'}
             className="w-full justify-start"
           >
             <Link href="/admin">
@@ -134,15 +135,26 @@ export function SidebarNav({ roles }: SidebarNavProps) {
               Admin Dashboard
             </Link>
           </Button>
-          
-          <Button 
-            asChild 
-            variant={pathname === '/admin/sessions' ? 'secondary' : 'ghost'} 
+
+          <Button
+            asChild
+            variant={pathname === '/admin/sessions' ? 'secondary' : 'ghost'}
             className="w-full justify-start"
           >
             <Link href="/admin/sessions">
               <Monitor className="mr-2 h-4 w-4" />
               Session Management
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant={pathname === '/organization-management' ? 'secondary' : 'ghost'}
+            className="w-full justify-start"
+          >
+            <Link href="/organization-management">
+              <Building2 className="mr-2 h-4 w-4" />
+              Organization Settings
             </Link>
           </Button>
         </>

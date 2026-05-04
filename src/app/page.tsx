@@ -22,22 +22,22 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { DollarSign, CheckCircle, LogIn, AlertTriangle, CreditCard, Calendar, Heart } from "lucide-react"
+import { Activity, LogIn, AlertTriangle, Building2, Zap, Radio } from "lucide-react"
 
 // Fictitious data for the dashboard
 const kpiData = [
-  { title: "Out-of-Pocket Remaining", value: "$1,250.00", change: "-$285.00 paid", icon: DollarSign, color: "text-blue-600" },
-  { title: "Deductible Met", value: "85%", change: "$1,700 of $2,000", icon: CheckCircle, color: "text-green-600" },
-  { title: "Claims This Month", value: "3", change: "+1 pending", icon: Heart, color: "text-purple-600" },
-  { title: "Coverage Status", value: "Active", change: "Renews Dec 31", icon: CreditCard, color: "text-blue-500" },
+  { title: "Active Users", value: "12,847", change: "+18% from last month", icon: Activity, color: "text-indigo-600" },
+  { title: "Team Collaboration", value: "94.2%", change: "Engagement rate", icon: Building2, color: "text-teal-600" },
+  { title: "Projects", value: "156", change: "23 completed this month", icon: Zap, color: "text-purple-600" },
+  { title: "System Health", value: "Excellent", change: "99.9% uptime", icon: Radio, color: "text-indigo-500" },
 ];
 
-const recentTransactions = [
-  { id: "CLM-1047", payee: "Dr. Sarah Chen - Therapy", amount: 285.00, status: "Approved" },
-  { id: "CLM-1046", payee: "City General Hospital - Lab Work", amount: 425.00, status: "Pending" },
-  { id: "CLM-1045", payee: "Dr. Michael Torres - Consultation", amount: 315.00, status: "Approved" },
-  { id: "CLM-1044", payee: "Westside Pharmacy - Prescriptions", amount: 198.00, status: "Denied" },
-  { id: "CLM-1043", payee: "Advanced Imaging Center - MRI", amount: 1340.00, status: "Approved" },
+const recentOperations = [
+  { id: "PROJ-1047", facility: "Q4 Marketing Campaign - In Progress", output: "85%", status: "Online" },
+  { id: "PROJ-1046", facility: "Mobile App Redesign - Review Phase", output: "92%", status: "Ramping" },
+  { id: "PROJ-1045", facility: "Customer Portal v2.0 - Launched", output: "100%", status: "Online" },
+  { id: "PROJ-1044", facility: "Analytics Dashboard - Maintenance", output: "0%", status: "Offline" },
+  { id: "PROJ-1043", facility: "API Integration - Development", output: "67%", status: "Online" },
 ];
 
 export default function HomePage() {
@@ -73,30 +73,19 @@ export default function HomePage() {
     );
   }
 
-  // Not logged in - show login prompt
+  // Not logged in - redirect to welcome page
   if (!user) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/welcome';
+    }
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-              <Heart className="h-6 w-6 text-purple-600" />
-              SecureHealth Portal
-            </CardTitle>
-            <CardDescription>
-              Please log in to access your dashboard and manage your healthcare.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-gray-600">
-              You need to be logged in to view your dashboard, manage healthcare claims, and track coverage.
-            </p>
-            <Button asChild size="lg" className="w-full">
-              <a href="/api/auth/login" className="flex items-center justify-center gap-2">
-                <LogIn className="h-4 w-4" />
-                Log In to Continue
-              </a>
-            </Button>
+          <CardContent className="p-8">
+            <div className="flex items-center justify-center gap-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span>Redirecting...</span>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -219,9 +208,9 @@ function Dashboard({ user }: { user: any }) {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="text-3xl font-bold">Healthcare Dashboard</h1>
+        <h1 className="text-3xl font-bold">Team Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! View your coverage, claims, and healthcare activity.
+          Welcome back, {user.name || user.email}! Monitor your team's projects, collaboration, and system health.
         </p>
       </header>
 
@@ -243,33 +232,33 @@ function Dashboard({ user }: { user: any }) {
 
       {/* Main Content Area */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Recent Claims */}
+        {/* Recent Projects */}
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Recent Claims</CardTitle>
-            <CardDescription>Your most recent healthcare claims and reimbursement status.</CardDescription>
+            <CardTitle>Recent Projects</CardTitle>
+            <CardDescription>Current project status and team activity.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Claim ID</TableHead>
-                  <TableHead>Provider / Service</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead>Project ID</TableHead>
+                  <TableHead>Name & Phase</TableHead>
+                  <TableHead className="text-right">Progress</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentTransactions.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell className="font-medium">{transaction.id}</TableCell>
-                    <TableCell>{transaction.payee}</TableCell>
-                    <TableCell className="text-right">${transaction.amount.toFixed(2)}</TableCell>
+                {recentOperations.map((operation) => (
+                  <TableRow key={operation.id}>
+                    <TableCell className="font-medium">{operation.id}</TableCell>
+                    <TableCell>{operation.facility}</TableCell>
+                    <TableCell className="text-right">{operation.output}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant={
-                        transaction.status === 'Approved' ? 'default' : transaction.status === 'Pending' ? 'secondary' : 'destructive'
+                        operation.status === 'Online' ? 'default' : operation.status === 'Ramping' ? 'secondary' : 'destructive'
                       }>
-                        {transaction.status}
+                        {operation.status}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -282,27 +271,27 @@ function Dashboard({ user }: { user: any }) {
         {/* Account Settings */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Healthcare Preferences</CardTitle>
-            <CardDescription>Manage your healthcare notification preferences.</CardDescription>
+            <CardTitle>Notification Preferences</CardTitle>
+            <CardDescription>Manage your team notification preferences.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {isLoading ? (
               <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
               </div>
             ) : (
               <>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="autoApproveReports" className="text-sm font-medium">
-                  Auto-Submit Claims
+                  Auto-Approve Reports
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Automatically submit eligible claims
+                  Automatically approve team report submissions
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium ${preferences.autoApproveReports ? 'text-green-600' : 'text-gray-400'}`}>
+                <span className={`text-xs font-medium ${preferences.autoApproveReports ? 'text-teal-600' : 'text-gray-400'}`}>
                   {preferences.autoApproveReports ? 'ON' : 'OFF'}
                 </span>
                 <Switch
@@ -320,11 +309,11 @@ function Dashboard({ user }: { user: any }) {
                   Email Notifications
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive claim status updates via email
+                  Receive project updates and team activity via email
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium ${preferences.emailNotifications ? 'text-green-600' : 'text-gray-400'}`}>
+                <span className={`text-xs font-medium ${preferences.emailNotifications ? 'text-teal-600' : 'text-gray-400'}`}>
                   {preferences.emailNotifications ? 'ON' : 'OFF'}
                 </span>
                 <Switch
@@ -339,14 +328,14 @@ function Dashboard({ user }: { user: any }) {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="smsAlerts" className="text-sm font-medium">
-                  SMS Notifications
+                  SMS Alerts
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive appointment and claim reminders
+                  Receive urgent project alerts via SMS
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium ${preferences.smsAlerts ? 'text-green-600' : 'text-gray-400'}`}>
+                <span className={`text-xs font-medium ${preferences.smsAlerts ? 'text-teal-600' : 'text-gray-400'}`}>
                   {preferences.smsAlerts ? 'ON' : 'OFF'}
                 </span>
                 <Switch
@@ -361,14 +350,14 @@ function Dashboard({ user }: { user: any }) {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="systemAlerts" className="text-sm font-medium">
-                  Coverage Alerts
+                  System Alerts
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive deductible and coverage updates
+                  Receive platform updates and maintenance notifications
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`text-xs font-medium ${preferences.systemAlerts ? 'text-green-600' : 'text-gray-400'}`}>
+                <span className={`text-xs font-medium ${preferences.systemAlerts ? 'text-teal-600' : 'text-gray-400'}`}>
                   {preferences.systemAlerts ? 'ON' : 'OFF'}
                 </span>
                 <Switch

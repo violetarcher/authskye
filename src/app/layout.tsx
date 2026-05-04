@@ -7,12 +7,12 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import './globals.css';
 
 export const metadata = {
-  title: 'SecureHealth Portal',
-  description: 'Secure Healthcare Management Platform',
+  title: 'CloudSync',
+  description: 'Modern SaaS Platform for Teams',
 };
 
 export const viewport = {
-  themeColor: '#0a1d73',
+  themeColor: '#6366f1',
 };
 
 export default function RootLayout({

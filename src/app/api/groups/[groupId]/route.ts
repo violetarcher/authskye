@@ -118,9 +118,6 @@ export const PUT = withApiAuthRequired(async function PUT(
 
     const groupData = group.data();
 
-    // Check if group belongs to user's organization
-    }
-
     await groupRef.update(updates);
 
     // Fetch updated group
