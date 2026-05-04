@@ -63,9 +63,6 @@ export const GET = withApiAuthRequired(async function GET(
 
     const folderData = folder.data();
 
-    // Check if folder belongs to user's organization
-    }
-
     // Check user's permissions
     const canCreateFile = await checkPermission(fgaUserId, 'can_create_file', fgaFolderId);
 

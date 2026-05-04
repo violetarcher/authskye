@@ -62,7 +62,6 @@ export const POST = withApiAuthRequired(async function POST(
     }
 
     const folderData = folder.data();
-    }
 
     const body = await request.json();
     const validation = shareFolderWithGroupSchema.safeParse(body);
@@ -154,7 +153,6 @@ export const DELETE = withApiAuthRequired(async function DELETE(
     }
 
     const folderData = folder.data();
-    }
 
     const body = await request.json();
     const validation = shareFolderWithGroupSchema.safeParse(body);

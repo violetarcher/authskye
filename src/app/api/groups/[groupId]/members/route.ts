@@ -6,19 +6,13 @@ import { db } from '@/lib/firebase-admin';
 import { addUserToGroup, removeUserFromGroup, getGroupMembers } from '@/lib/fga-service';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 
-interface RouteParams {
-  params: {
-    groupId: string;
-  };
-}
-
 /**
  * GET /api/groups/[groupId]/members
  * Get all members of a group
  */
 export const GET = withApiAuthRequired(async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -31,7 +25,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     // Verify group exists and belongs to user's organization
     const groupRef = db.collection('groups').doc(groupId);
@@ -45,7 +39,6 @@ export const GET = withApiAuthRequired(async function GET(
     }
 
     const groupData = group.data();
-    }
 
     // Get member user IDs from FGA
     const memberUserIds = await getGroupMembers(groupId);
@@ -85,7 +78,7 @@ export const GET = withApiAuthRequired(async function GET(
  */
 export const POST = withApiAuthRequired(async function POST(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -107,7 +100,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     // Verify group exists and belongs to user's organization
     const groupRef = db.collection('groups').doc(groupId);
@@ -121,14 +114,13 @@ export const POST = withApiAuthRequired(async function POST(
     }
 
     const groupData = group.data();
-    }
 
     const body = await request.json();
     const validation = addGroupMemberSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.format() },
         { status: 400 }
       );
     }
@@ -175,7 +167,7 @@ export const POST = withApiAuthRequired(async function POST(
  */
 export const DELETE = withApiAuthRequired(async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  context: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -197,7 +189,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { groupId } = params;
+    const { groupId } = context.params;
 
     // Verify group exists and belongs to user's organization
     const groupRef = db.collection('groups').doc(groupId);
@@ -211,14 +203,13 @@ export const DELETE = withApiAuthRequired(async function DELETE(
     }
 
     const groupData = group.data();
-    }
 
     const body = await request.json();
     const validation = addGroupMemberSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.format() },
         { status: 400 }
       );
     }

@@ -45,9 +45,6 @@ export const GET = withApiAuthRequired(async function GET(
 
     const groupData = group.data();
 
-    // Check if group belongs to user's organization
-    }
-
     return NextResponse.json({
       group: {
         id: group.id,

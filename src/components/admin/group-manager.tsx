@@ -278,123 +278,139 @@ export function GroupManager() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Groups List */}
-            <div>
-              <h3 className="text-sm font-medium mb-3">All Groups ({groups.length})</h3>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {groups.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No groups yet. Create one to get started.
-                  </div>
-                ) : (
-                  groups.map((group) => (
-                    <Card
+          {groups.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <p className="text-lg mb-2">No groups yet</p>
+              <p className="text-sm">Create a group to organize users and assign permissions</p>
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Group Name
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Description
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Members
+                    </th>
+                    <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                      Created
+                    </th>
+                    <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {groups.map((group) => (
+                    <tr
                       key={group.id}
-                      className={`cursor-pointer transition-colors hover:bg-accent ${
-                        selectedGroup?.id === group.id ? 'bg-accent' : ''
+                      className={`border-b transition-colors hover:bg-muted/50 cursor-pointer ${
+                        selectedGroup?.id === group.id ? 'bg-muted/50' : ''
                       }`}
                       onClick={() => setSelectedGroup(group)}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium">{group.name}</h4>
-                            {group.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {group.description}
-                              </p>
-                            )}
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Created {new Date(group.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteGroup(group.id);
-                            }}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
+                      <td className="p-4 align-middle font-medium">
+                        {group.name}
+                      </td>
+                      <td className="p-4 align-middle text-sm text-muted-foreground">
+                        {group.description || '—'}
+                      </td>
+                      <td className="p-4 align-middle">
+                        <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+                          {groupMembers.length > 0 && selectedGroup?.id === group.id
+                            ? groupMembers.length
+                            : '—'}
+                        </span>
+                      </td>
+                      <td className="p-4 align-middle text-sm text-muted-foreground">
+                        {new Date(group.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="p-4 align-middle text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteGroup(group.id);
+                          }}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
 
-            {/* Group Members */}
-            <div>
-              {selectedGroup ? (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium">
-                      Members of {selectedGroup.name} ({groupMembers.length})
-                    </h3>
-                    <Button
-                      size="sm"
-                      onClick={() => setAddMemberDialogOpen(true)}
-                    >
-                      Add Member
-                    </Button>
-                  </div>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {groupMembers.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No members in this group yet.
-                      </div>
-                    ) : (
-                      groupMembers.map((member) => (
-                        <Card key={member.userId}>
-                          <CardContent className="p-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className="font-medium">{member.name || member.email}</p>
-                                <p className="text-sm text-muted-foreground">{member.email}</p>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleRemoveMember(member.userId)}
-                                className="text-destructive hover:text-destructive"
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                </>
+          {/* Group Members Section */}
+          {selectedGroup && (
+            <div className="mt-6 pt-6 border-t">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">
+                  Members of {selectedGroup.name}
+                </h3>
+                <Button
+                  onClick={() => setAddMemberDialogOpen(true)}
+                >
+                  Add Member
+                </Button>
+              </div>
+
+              {groupMembers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-md">
+                  <p>No members in this group yet</p>
+                </div>
               ) : (
-                <div className="flex items-center justify-center h-full text-center py-12 text-muted-foreground">
-                  <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-12 w-12 mx-auto mb-4 opacity-50"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <p>Select a group to view members</p>
-                  </div>
+                <div className="rounded-md border">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                          Name
+                        </th>
+                        <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                          Email
+                        </th>
+                        <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupMembers.map((member) => (
+                        <tr key={member.userId} className="border-b transition-colors hover:bg-muted/50">
+                          <td className="p-4 align-middle font-medium">
+                            {member.name || '—'}
+                          </td>
+                          <td className="p-4 align-middle text-sm text-muted-foreground">
+                            {member.email}
+                          </td>
+                          <td className="p-4 align-middle text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveMember(member.userId)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              Remove
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
