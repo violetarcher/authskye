@@ -51,8 +51,8 @@ export function SignupForm() {
     if (!validation.success) {
       console.error('❌ Validation failed:', validation.error);
       const fieldErrors: Record<string, string> = {};
-      if (validation.error?.errors) {
-        validation.error.errors.forEach((error) => {
+      if (validation.error?.issues) {
+        validation.error.issues.forEach((error) => {
           if (error.path[0]) {
             fieldErrors[error.path[0] as string] = error.message;
           }

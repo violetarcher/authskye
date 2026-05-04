@@ -44,7 +44,7 @@ export default function ClaimsPage() {
 
         {/* Right column - Claims List */}
         <div key={refreshTrigger}>
-          <ClaimsList userId={user?.sub} />
+          <ClaimsList userId={user?.sub || undefined} />
         </div>
       </div>
     </div>

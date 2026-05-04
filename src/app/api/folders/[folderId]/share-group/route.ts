@@ -1,5 +1,5 @@
 // src/app/api/folders/[folderId]/share-group/route.ts
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { shareFolderWithGroupSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
@@ -16,9 +16,9 @@ import {
  * POST /api/folders/[folderId]/share-group
  * Share a folder with a group
  */
-export const POST = withApiAuthRequired(async function POST(
+export async function POST(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -31,7 +31,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can share)
     const fgaUserId = formatUserId(user.sub);
@@ -63,7 +63,7 @@ export const POST = withApiAuthRequired(async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -83,12 +83,14 @@ export const POST = withApiAuthRequired(async function POST(
 
     // FGA already verified permission - no additional checks needed
 
+    const groupData = group.data();
+
     // Assign group to folder in FGA
     const tuple = await assignGroupToFolder(groupId, folderId, permission);
 
     return NextResponse.json({
       success: true,
-      message: `Folder shared with group ${groupData.name} as ${permission}`,
+      message: `Folder shared with group ${groupData?.name || groupId} as ${permission}`,
       tupleInfo: {
         operation: 'created',
         tuple,
@@ -101,15 +103,15 @@ export const POST = withApiAuthRequired(async function POST(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/folders/[folderId]/share-group
  * Revoke a group's access to a folder
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -122,7 +124,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can manage sharing)
     const fgaUserId = formatUserId(user.sub);
@@ -154,7 +156,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -179,4 +181,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

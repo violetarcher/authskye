@@ -74,8 +74,8 @@ export function SidebarNav({ roles }: SidebarNavProps) {
         </Link>
       </Button>
       
-      {/* Analytics - Show for everyone, access control handled on page */}
-      <Button
+      {/* Analytics - Hidden (keeping code for future use) */}
+      {/* <Button
         asChild
         variant={pathname === '/analytics' ? 'secondary' : 'ghost'}
         className="w-full justify-start"
@@ -84,7 +84,7 @@ export function SidebarNav({ roles }: SidebarNavProps) {
           <BarChart3 className="mr-2 h-4 w-4" />
           Analytics
         </Link>
-      </Button>
+      </Button> */}
 
       {/* Documents - Show for everyone, access control via FGA */}
       <Button

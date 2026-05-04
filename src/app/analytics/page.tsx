@@ -14,8 +14,9 @@ export default function AnalyticsPage() {
   const hasAnalyticsAccess = roles.includes('Data Analyst');
   
   // Check for pending access request in user metadata - try different possible locations
-  const pendingAccessRequest = user?.['https://agency-inc-demo.com/app_metadata']?.pending_access_request || 
-                               user?.app_metadata?.pending_access_request ||
+  const appMetadata = user?.['https://agency-inc-demo.com/app_metadata'] as { pending_access_request?: string } | undefined;
+  const pendingAccessRequest = appMetadata?.pending_access_request ||
+                               (user as any)?.app_metadata?.pending_access_request ||
                                user?.['https://agency-inc-demo.com/pending_access_request'];
   
   // Debug: Log user object to see what metadata is available

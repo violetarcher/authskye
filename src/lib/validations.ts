@@ -123,9 +123,7 @@ export const enrollMfaFactorSchema = z.object({
     'passkey',
     // 'webauthn-roaming',    // Not yet supported - hiding for now
     // 'webauthn-platform'    // Not yet supported - hiding for now
-  ], {
-    errorMap: () => ({ message: 'Invalid MFA factor type' })
-  }),
+  ]),
   phoneNumber: z.string().optional(),
   email: z.string().email('Valid email is required').optional(),
   name: z.string().max(100, 'Name must be less than 100 characters').optional(),

@@ -1,5 +1,5 @@
 // src/app/api/documents/[documentId]/route.ts
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { updateDocumentSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
@@ -16,9 +16,9 @@ import {
  * GET /api/documents/[documentId]
  * Get a specific document
  */
-export const GET = withApiAuthRequired(async function GET(
+export async function GET(
   request: NextRequest,
-  context: { params: { documentId: string } }
+  { params }: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -31,7 +31,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { documentId } = context.params;
+    const { documentId } = params;
 
     // Check if user can read this document
     const fgaUserId = formatUserId(user.sub);
@@ -83,15 +83,15 @@ export const GET = withApiAuthRequired(async function GET(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * PUT /api/documents/[documentId]
  * Update a document
  */
-export const PUT = withApiAuthRequired(async function PUT(
+export async function PUT(
   request: NextRequest,
-  context: { params: { documentId: string } }
+  { params }: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -104,7 +104,7 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { documentId } = context.params;
+    const { documentId } = params;
 
     // Check if user can write to this document
     const fgaUserId = formatUserId(user.sub);
@@ -123,7 +123,7 @@ export const PUT = withApiAuthRequired(async function PUT(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -165,15 +165,15 @@ export const PUT = withApiAuthRequired(async function PUT(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/documents/[documentId]
  * Delete a document
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { documentId: string } }
+  { params }: { params: { documentId: string } }
 ) {
   try {
     const session = await getSession();
@@ -186,7 +186,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { documentId } = context.params;
+    const { documentId } = params;
 
     // Check if user owns this document (only owner can delete)
     const fgaUserId = formatUserId(user.sub);
@@ -240,4 +240,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

@@ -1,18 +1,18 @@
 // src/app/api/groups/[groupId]/route.ts
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { updateGroupSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
-import { readTuples, deleteTuples, formatGroupId } from '@/lib/fga-service';
+import { readTuples, deleteTuples, formatGroupId, type FGATuple } from '@/lib/fga-service';
 
 
 /**
  * GET /api/groups/[groupId]
  * Get a specific group
  */
-export const GET = withApiAuthRequired(async function GET(
+export async function GET(
   request: NextRequest,
-  context: { params: { groupId: string } }
+  { params }: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -25,7 +25,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { groupId } = context.params;
+    const { groupId } = params;
 
     // Fetch group from Firestore
     const groupRef = db.collection('groups').doc(groupId);
@@ -53,15 +53,15 @@ export const GET = withApiAuthRequired(async function GET(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * PUT /api/groups/[groupId]
  * Update a group
  */
-export const PUT = withApiAuthRequired(async function PUT(
+export async function PUT(
   request: NextRequest,
-  context: { params: { groupId: string } }
+  { params }: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -83,14 +83,14 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { groupId } = context.params;
+    const { groupId } = params;
 
     const body = await request.json();
     const validation = updateGroupSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -131,15 +131,15 @@ export const PUT = withApiAuthRequired(async function PUT(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/groups/[groupId]
  * Delete a group
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { groupId: string } }
+  { params }: { params: { groupId: string } }
 ) {
   try {
     const session = await getSession();
@@ -161,7 +161,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { groupId } = context.params;
+    const { groupId } = params;
 
     // Delete group from Firestore
     const groupRef = db.collection('groups').doc(groupId);
@@ -181,7 +181,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
     // Delete all tuples related to this group from FGA
     const fgaGroupId = formatGroupId(groupId);
     const tuples = await readTuples(fgaGroupId);
-    let deletedTuples = [];
+    let deletedTuples: FGATuple[] = [];
     if (tuples.length > 0) {
       deletedTuples = await deleteTuples(tuples);
     }
@@ -200,4 +200,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

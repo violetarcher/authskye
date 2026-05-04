@@ -1,5 +1,5 @@
 // src/app/api/folders/[folderId]/share/route.ts
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { shareDocumentSchema } from '@/lib/validations';
 import {
@@ -15,9 +15,9 @@ import {
  * POST /api/folders/[folderId]/share
  * Share a folder with a user
  */
-export const POST = withApiAuthRequired(async function POST(
+export async function POST(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -30,7 +30,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can share)
     const fgaUserId = formatUserId(user.sub);
@@ -49,7 +49,7 @@ export const POST = withApiAuthRequired(async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -83,15 +83,15 @@ export const POST = withApiAuthRequired(async function POST(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/folders/[folderId]/share
  * Revoke access to a folder
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -104,7 +104,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can manage sharing)
     const fgaUserId = formatUserId(user.sub);
@@ -123,7 +123,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -156,4 +156,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

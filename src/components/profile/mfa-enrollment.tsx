@@ -57,6 +57,7 @@ interface AuthenticationMethod {
   last_auth_at?: string;
   phone_number?: string;
   email?: string;
+  authenticator_type?: string;
 }
 
 interface MFAFactor {

@@ -8,7 +8,8 @@ import {
   writeTuple,
   formatUserId,
   formatFolderId,
-  listObjects
+  listObjects,
+  type FGATuple
 } from '@/lib/fga-service';
 
 /**
@@ -93,7 +94,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -130,10 +131,10 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     const fgaUserId = formatUserId(user.sub);
     const fgaFolderId = formatFolderId(folderId);
 
-    const tuples = [
+    const tuples: FGATuple[] = [
       {
         user: fgaUserId,
-        relation: 'owner' as const,
+        relation: 'owner',
         object: fgaFolderId,
       },
     ];
@@ -142,7 +143,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     if (parentId) {
       tuples.push({
         user: formatFolderId(parentId),
-        relation: 'parent' as const,
+        relation: 'parent',
         object: fgaFolderId,
       });
     }

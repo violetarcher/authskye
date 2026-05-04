@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 
 
 /**
@@ -25,9 +25,9 @@ import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
  * - 401: Unauthorized
  * - 500: Server error
  */
-export const POST = withApiAuthRequired(async function POST(
+export async function POST(
   request: NextRequest,
-  context: { params: { methodId: string } }
+  { params }: { params: { methodId: string } }
 ) {
   try {
     const session = await getSession();
@@ -51,7 +51,7 @@ export const POST = withApiAuthRequired(async function POST(
       );
     }
 
-    const { methodId } = context.params;
+    const { methodId } = params;
     const body = await request.json();
     const { code, credential, authn_response, auth_session } = body;
 
@@ -142,4 +142,4 @@ export const POST = withApiAuthRequired(async function POST(
       { status: 500 }
     );
   }
-});
+}

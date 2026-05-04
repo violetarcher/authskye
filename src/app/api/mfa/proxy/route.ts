@@ -40,7 +40,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     }
 
     // Get access token from session
-    const accessToken = session.accessToken;
+    const accessToken = session?.accessToken;
 
     if (!accessToken) {
       return NextResponse.json(

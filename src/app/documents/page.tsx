@@ -35,6 +35,10 @@ interface Document {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
+  canRead?: boolean;
+  canWrite?: boolean;
+  canShare?: boolean;
+  canChangeOwner?: boolean;
 }
 
 interface Folder {
@@ -79,7 +83,7 @@ export default function DocumentsPage() {
   const [currentTupleInfo, setCurrentTupleInfo] = useState<TupleInfo | null>(null);
 
   // Get current folder ID from URL
-  const currentFolderId = searchParams.get('folder');
+  const currentFolderId = searchParams?.get('folder');
 
   // Navigate to a folder by updating the URL
   const navigateToFolder = (folderId: string | null) => {

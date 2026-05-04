@@ -153,12 +153,12 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     const validation = enrollMfaFactorSchema.safeParse(body);
 
     if (!validation.success) {
-      console.error('❌ Validation failed:', validation.error.errors);
+      console.error('❌ Validation failed:', validation.error.issues);
       return NextResponse.json(
         {
           error: 'Validation error',
           message: 'Invalid enrollment request',
-          details: validation.error.errors,
+          details: validation.error.issues,
         },
         { status: 400 }
       );

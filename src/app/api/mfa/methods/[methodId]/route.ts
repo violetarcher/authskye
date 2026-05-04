@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 
 
 /**
@@ -13,9 +13,9 @@ import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
  * - 404: Method not found
  * - 500: Server error
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { methodId: string } }
+  { params }: { params: { methodId: string } }
 ) {
   try {
     const session = await getSession();
@@ -39,7 +39,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { methodId } = context.params;
+    const { methodId } = params;
 
     console.log('🗑️ Deleting MFA method via My Account API:', methodId, 'for user:', user.sub);
 
@@ -86,4 +86,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

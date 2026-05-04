@@ -97,12 +97,12 @@ export async function PATCH(
     const validation = updateOrganizationSettingsSchema.safeParse(body);
 
     if (!validation.success) {
-      console.error('❌ Validation failed:', validation.error.errors);
+      console.error('❌ Validation failed:', validation.error.issues);
       return NextResponse.json(
         {
           error: 'Validation error',
-          details: validation.error.errors,
-          message: validation.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+          details: validation.error.issues,
+          message: validation.error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
         },
         { status: 400 }
       );

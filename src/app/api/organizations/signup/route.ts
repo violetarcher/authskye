@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation error',
-          details: validation.error.errors,
+          details: validation.error.issues,
         },
         { status: 400 }
       );
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     // Get the Username-Password-Authentication connection
     const connections = await customDomainClient.connections.getAll({
-      strategy: 'auth0',
+      strategy: ['auth0'] as any,
     });
 
     const databaseConnection = connections.data.find(

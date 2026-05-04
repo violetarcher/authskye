@@ -52,7 +52,7 @@ export async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -254,7 +254,7 @@ export async function DELETE(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -289,7 +289,7 @@ export async function DELETE(
     const existingDomains = connectionDetails.data.options?.domain_aliases || [];
 
     // Remove the domain
-    const updatedDomains = existingDomains.filter(d => d !== domain);
+    const updatedDomains = existingDomains.filter((d: string) => d !== domain);
 
     if (updatedDomains.length === existingDomains.length) {
       return NextResponse.json(

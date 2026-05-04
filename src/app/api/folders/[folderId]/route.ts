@@ -1,5 +1,5 @@
 // src/app/api/folders/[folderId]/route.ts
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
+import { getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { updateFolderSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
@@ -16,9 +16,9 @@ import {
  * GET /api/folders/[folderId]
  * Get a specific folder
  */
-export const GET = withApiAuthRequired(async function GET(
+export async function GET(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -31,7 +31,7 @@ export const GET = withApiAuthRequired(async function GET(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user can view this folder
     const fgaUserId = formatUserId(user.sub);
@@ -76,15 +76,15 @@ export const GET = withApiAuthRequired(async function GET(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * PUT /api/folders/[folderId]
  * Update a folder
  */
-export const PUT = withApiAuthRequired(async function PUT(
+export async function PUT(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -97,7 +97,7 @@ export const PUT = withApiAuthRequired(async function PUT(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can update)
     const fgaUserId = formatUserId(user.sub);
@@ -116,7 +116,7 @@ export const PUT = withApiAuthRequired(async function PUT(
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation error', details: validation.error.errors },
+        { error: 'Validation error', details: validation.error.issues },
         { status: 400 }
       );
     }
@@ -157,15 +157,15 @@ export const PUT = withApiAuthRequired(async function PUT(
       { status: 500 }
     );
   }
-});
+}
 
 /**
  * DELETE /api/folders/[folderId]
  * Delete a folder
  */
-export const DELETE = withApiAuthRequired(async function DELETE(
+export async function DELETE(
   request: NextRequest,
-  context: { params: { folderId: string } }
+  { params }: { params: { folderId: string } }
 ) {
   try {
     const session = await getSession();
@@ -178,7 +178,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       );
     }
 
-    const { folderId } = context.params;
+    const { folderId } = params;
 
     // Check if user owns this folder (only owner can delete)
     const fgaUserId = formatUserId(user.sub);
@@ -231,4 +231,4 @@ export const DELETE = withApiAuthRequired(async function DELETE(
       { status: 500 }
     );
   }
-});
+}

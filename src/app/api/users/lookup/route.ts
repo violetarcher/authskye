@@ -61,7 +61,10 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
       }
     } else {
       // Non-org user: search all users by email
-      const users = await auth0.users.getByEmail(email);
+      const users = await auth0.users.getAll({
+        q: `email:"${email}"`,
+        search_engine: 'v3'
+      });
 
       if (!users.data || users.data.length === 0) {
         return NextResponse.json(
