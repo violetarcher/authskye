@@ -14,7 +14,7 @@ export async function Sidebar() {
 
   const orgName = user?.['https://agency-inc-demo.com/org_name'] || '';
   const orgLogo = user?.['https://agency-inc-demo.com/org_logo'];
-  const companyName = orgName ? `SaaS Consumer | ${orgName}` : 'Acme Inc';
+  const companyName = orgName ? `EnergyCo | ${orgName}` : 'EnergyCo';
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">

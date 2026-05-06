@@ -13,8 +13,8 @@ export const POST = withApiAuthRequired(async function POST(request) {
 
     // Get all bills for this user
     const querySnapshot = await db
-      .collection('documents')
-      .where('ownerId', '==', user.sub)
+      .collection('claims')
+      .where('userId', '==', user.sub)
       .get();
 
     // Delete all bills for this user

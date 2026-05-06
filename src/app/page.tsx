@@ -22,22 +22,22 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { Activity, LogIn, AlertTriangle, Building2, Zap, Radio } from "lucide-react"
+import { Activity, LogIn, AlertTriangle, Building2, Zap, Radio, Droplets, Wind, Sun } from "lucide-react"
 
 // Fictitious data for the dashboard
 const kpiData = [
-  { title: "Active Users", value: "12,847", change: "+18% from last month", icon: Activity, color: "text-indigo-600" },
-  { title: "Team Collaboration", value: "94.2%", change: "Engagement rate", icon: Building2, color: "text-teal-600" },
-  { title: "Projects", value: "156", change: "23 completed this month", icon: Zap, color: "text-purple-600" },
-  { title: "System Health", value: "Excellent", change: "99.9% uptime", icon: Radio, color: "text-indigo-500" },
+  { title: "Current Usage", value: "847 kWh", change: "-12% vs last month", icon: Zap, color: "text-amber-600" },
+  { title: "Monthly Bill", value: "$124.50", change: "Estimated for this period", icon: Activity, color: "text-green-600" },
+  { title: "Solar Credit", value: "$18.20", change: "Generated this month", icon: Sun, color: "text-yellow-500" },
+  { title: "Usage Efficiency", value: "Good", change: "Better than 68% of neighbors", icon: Radio, color: "text-blue-500" },
 ];
 
 const recentOperations = [
-  { id: "PROJ-1047", facility: "Q4 Marketing Campaign - In Progress", output: "85%", status: "Online" },
-  { id: "PROJ-1046", facility: "Mobile App Redesign - Review Phase", output: "92%", status: "Ramping" },
-  { id: "PROJ-1045", facility: "Customer Portal v2.0 - Launched", output: "100%", status: "Online" },
-  { id: "PROJ-1044", facility: "Analytics Dashboard - Maintenance", output: "0%", status: "Offline" },
-  { id: "PROJ-1043", facility: "API Integration - Development", output: "67%", status: "Online" },
+  { id: "BILL-2024-03", facility: "Electric - Residential Service", output: "$124.50", status: "Current" },
+  { id: "BILL-2024-02", facility: "Electric - Residential Service", output: "$138.75", status: "Paid" },
+  { id: "BILL-2024-01", facility: "Electric - Residential Service", output: "$156.20", status: "Paid" },
+  { id: "BILL-2023-12", facility: "Electric - Residential Service", output: "$145.90", status: "Paid" },
+  { id: "BILL-2023-11", facility: "Electric - Residential Service", output: "$132.40", status: "Paid" },
 ];
 
 export default function HomePage() {
@@ -208,9 +208,9 @@ function Dashboard({ user }: { user: any }) {
   return (
     <div className="flex flex-col gap-8">
       <header>
-        <h1 className="text-3xl font-bold">Team Dashboard</h1>
+        <h1 className="text-3xl font-bold">Energy Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! Monitor your team's projects, collaboration, and system health.
+          Welcome back, {user.name || user.email}! Monitor your energy usage, bills, and savings.
         </p>
       </header>
 
@@ -224,7 +224,7 @@ function Dashboard({ user }: { user: any }) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{kpi.value}</div>
-              <p className="text-xs text-muted-foreground">{kpi.change} from last month</p>
+              <p className="text-xs text-muted-foreground">{kpi.change}</p>
             </CardContent>
           </Card>
         ))}
@@ -232,19 +232,19 @@ function Dashboard({ user }: { user: any }) {
 
       {/* Main Content Area */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Recent Projects */}
+        {/* Recent Bills */}
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>Recent Projects</CardTitle>
-            <CardDescription>Current project status and team activity.</CardDescription>
+            <CardTitle>Recent Bills</CardTitle>
+            <CardDescription>Your billing history and payment status.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Project ID</TableHead>
-                  <TableHead>Name & Phase</TableHead>
-                  <TableHead className="text-right">Progress</TableHead>
+                  <TableHead>Bill ID</TableHead>
+                  <TableHead>Service Type</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                 </TableRow>
               </TableHeader>
@@ -256,7 +256,7 @@ function Dashboard({ user }: { user: any }) {
                     <TableCell className="text-right">{operation.output}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant={
-                        operation.status === 'Online' ? 'default' : operation.status === 'Ramping' ? 'secondary' : 'destructive'
+                        operation.status === 'Current' ? 'secondary' : operation.status === 'Paid' ? 'default' : 'destructive'
                       }>
                         {operation.status}
                       </Badge>
@@ -272,7 +272,7 @@ function Dashboard({ user }: { user: any }) {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Manage your team notification preferences.</CardDescription>
+            <CardDescription>Manage your energy account notification preferences.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {isLoading ? (
@@ -284,10 +284,10 @@ function Dashboard({ user }: { user: any }) {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="autoApproveReports" className="text-sm font-medium">
-                  Auto-Approve Reports
+                  Auto-Pay Bills
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Automatically approve team report submissions
+                  Automatically pay your monthly utility bills
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -309,7 +309,7 @@ function Dashboard({ user }: { user: any }) {
                   Email Notifications
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive project updates and team activity via email
+                  Receive bill reminders and usage alerts via email
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -331,7 +331,7 @@ function Dashboard({ user }: { user: any }) {
                   SMS Alerts
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive urgent project alerts via SMS
+                  Receive urgent billing and outage alerts via SMS
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -350,10 +350,10 @@ function Dashboard({ user }: { user: any }) {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <Label htmlFor="systemAlerts" className="text-sm font-medium">
-                  System Alerts
+                  Service Alerts
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Receive platform updates and maintenance notifications
+                  Receive planned outage and maintenance notifications
                 </p>
               </div>
               <div className="flex items-center gap-3">
