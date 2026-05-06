@@ -59,7 +59,7 @@ export function SidebarNav({ roles }: SidebarNavProps) {
       >
         <Link href="/claims">
           <Activity className="mr-2 h-4 w-4" />
-          Operations
+          Billing
         </Link>
       </Button>
 

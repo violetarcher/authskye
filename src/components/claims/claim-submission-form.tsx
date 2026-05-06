@@ -25,9 +25,9 @@ import {
   Wand2
 } from 'lucide-react';
 
-interface ClaimSubmissionFormProps {
+interface BillSubmissionFormProps {
   user: any;
-  onClaimSubmitted?: () => void; // Callback to refresh claims list
+  onClaimSubmitted?: () => void; // Callback to refresh bills list
 }
 
 interface CIBAStatus {
@@ -36,55 +36,55 @@ interface CIBAStatus {
   message?: string;
 }
 
-// Demo data sets for autofill - cycles through different scenarios
+// Demo data sets for autofill - cycles through different utility billing scenarios
 const DEMO_DATA_SETS = [
   {
     serviceDate: new Date().toISOString().split('T')[0],
-    providerName: 'Dr. Sarah Chen, MD',
-    providerNPI: '1234567890',
-    diagnosisCode: 'F41.1', // Generalized anxiety disorder
-    claimAmount: '285.00',
-    description: 'Psychiatric consultation and therapy session - Out-of-network provider',
+    providerName: 'PowerGrid Electric',
+    providerNPI: '9876543210',
+    diagnosisCode: 'ELEC-001',
+    claimAmount: '125.50',
+    description: 'Monthly electric bill - Residential account, summer peak rates',
     routingNumber: '121000248', // Wells Fargo routing (demo)
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     serviceDate: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-    providerName: 'Dr. Michael Torres, PsyD',
-    providerNPI: '9876543210',
-    diagnosisCode: 'F33.1', // Major depressive disorder, recurrent
-    claimAmount: '325.00',
-    description: 'Psychotherapy session - Individual therapy for depression management',
+    providerName: 'NaturalGas Co',
+    providerNPI: '5554443333',
+    diagnosisCode: 'GAS-002',
+    claimAmount: '89.75',
+    description: 'Monthly natural gas bill - Heating and cooking services',
     routingNumber: '026009593', // Bank of America routing (demo)
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     serviceDate: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
-    providerName: 'Dr. Emily Rodriguez, LMFT',
-    providerNPI: '5554443333',
-    diagnosisCode: 'F43.10', // Post-traumatic stress disorder
-    claimAmount: '195.00',
-    description: 'Family therapy session - PTSD treatment and trauma counseling',
+    providerName: 'CityWater Services',
+    providerNPI: '1112223334',
+    diagnosisCode: 'WATER-003',
+    claimAmount: '45.00',
+    description: 'Monthly water and sewage bill - Residential usage',
     routingNumber: '071000013', // Chase routing (demo)
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
     serviceDate: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
-    providerName: 'Dr. James Park, MD',
-    providerNPI: '1112223334',
-    diagnosisCode: 'F90.2', // ADHD, combined type
-    claimAmount: '420.00',
-    description: 'Comprehensive psychiatric evaluation and medication management consultation',
+    providerName: 'Green Solar Rebate',
+    providerNPI: '1234567890',
+    diagnosisCode: 'SOLAR-004',
+    claimAmount: '320.00',
+    description: 'Solar panel credit - Renewable energy generation credit for excess power',
     routingNumber: '111000025', // Citibank routing (demo)
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
   },
 ];
 
-export function ClaimSubmissionForm({ user, onClaimSubmitted }: ClaimSubmissionFormProps) {
+export function ClaimSubmissionForm({ user, onClaimSubmitted }: BillSubmissionFormProps) {
   const [loading, setLoading] = useState(false);
   const [cibaStatus, setCibaStatus] = useState<CIBAStatus>({ status: 'idle' });
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
@@ -101,7 +101,7 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: ClaimSubmissionF
   });
   const [superbillFile, setSuperbillFile] = useState<File | null>(null);
 
-  // Autofill demo data - cycles through different scenarios
+  // Autofill demo data - cycles through different utility billing scenarios
   const fillDemoData = () => {
     const demoData = DEMO_DATA_SETS[currentDemoIndex];
     setFormData(demoData);
@@ -109,7 +109,7 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: ClaimSubmissionF
     // Cycle to next demo data set
     setCurrentDemoIndex((currentDemoIndex + 1) % DEMO_DATA_SETS.length);
 
-    // Create a mock PDF file for the superbill
+    // Create a mock PDF file for the invoice
     const mockPdfContent = `%PDF-1.4
 1 0 obj
 <<
@@ -152,18 +152,18 @@ stream
 BT
 /F1 24 Tf
 100 700 Td
-(SUPERBILL - DEMO) Tj
+(UTILITY BILL - DEMO) Tj
 /F1 12 Tf
 100 650 Td
 (Provider: ${demoData.providerName}) Tj
 100 630 Td
-(Patient: ${user?.name || 'Demo Patient'}) Tj
+(Account Holder: ${user?.name || 'Demo Customer'}) Tj
 100 610 Td
-(Date: ${new Date(demoData.serviceDate).toLocaleDateString()}) Tj
+(Service Date: ${new Date(demoData.serviceDate).toLocaleDateString()}) Tj
 100 590 Td
-(Diagnosis: ${demoData.diagnosisCode}) Tj
+(Service Type: ${demoData.diagnosisCode}) Tj
 100 570 Td
-(Amount: $${demoData.claimAmount}) Tj
+(Amount Due: $${demoData.claimAmount}) Tj
 ET
 endstream
 endobj
@@ -185,7 +185,7 @@ startxref
 %%EOF`;
 
     const blob = new Blob([mockPdfContent], { type: 'application/pdf' });
-    const file = new File([blob], `superbill_${demoData.providerName.split(' ')[1]}.pdf`, { type: 'application/pdf' });
+    const file = new File([blob], `invoice_${demoData.providerName.split(' ')[0].toLowerCase()}.pdf`, { type: 'application/pdf' });
     setSuperbillFile(file);
 
     toast.success('Demo data filled!', {
@@ -227,8 +227,8 @@ startxref
     }
 
     if (!superbillFile) {
-      toast.error('Superbill required', {
-        description: 'Please upload your superbill PDF',
+      toast.error('Invoice required', {
+        description: 'Please upload your utility bill invoice (PDF)',
       });
       return false;
     }
@@ -261,7 +261,7 @@ startxref
     try {
       setCibaStatus({ status: 'pending', message: 'Initiating authentication request...' });
 
-      console.log('🔐 Initiating CIBA flow for claim submission');
+      console.log('🔐 Initiating CIBA flow for bill payment');
 
       // Step 1: Initiate CIBA authentication request
       const cibaResponse = await fetch('/api/ciba/initiate', {
@@ -269,7 +269,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email',
-          binding_message: `Approve claim: ${formData.claimAmount} USD`,
+          binding_message: `Approve payment: ${formData.claimAmount} USD`,
         }),
       });
 
@@ -398,7 +398,7 @@ startxref
     try {
       // Step 1: Initiate CIBA authentication
       toast.info('Authentication required', {
-        description: 'Please approve the push notification on your mobile device',
+        description: 'Please approve the payment via Guardian app on your mobile device',
       });
 
       const cibaApproved = await initiateCIBA();
@@ -429,16 +429,16 @@ startxref
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to submit claim');
+        throw new Error(error.message || 'Failed to submit payment');
       }
 
       const result = await response.json();
 
-      toast.success('Claim submitted successfully!', {
-        description: `Claim ID: ${result.claimId}`,
+      toast.success('Bill payment submitted successfully!', {
+        description: `Payment ID: ${result.claimId}`,
       });
 
-      // Trigger claims list refresh
+      // Trigger bills list refresh
       if (onClaimSubmitted) {
         onClaimSubmitted();
       }
@@ -460,7 +460,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit claim',
+        description: error.message || 'Failed to submit payment',
       });
     } finally {
       setLoading(false);
@@ -503,9 +503,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting claim...'}
-            {cibaStatus.status === 'denied' && 'Authentication denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
+            {cibaStatus.status === 'denied' && 'Payment denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -515,7 +515,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="serviceDate" className="text-xs">Service Date *</Label>
+            <Label htmlFor="serviceDate" className="text-xs">Billing Period *</Label>
             <Input
               id="serviceDate"
               name="serviceDate"
@@ -546,12 +546,12 @@ startxref
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="providerName" className="text-xs">Provider *</Label>
+          <Label htmlFor="providerName" className="text-xs">Utility Provider *</Label>
           <Input
             id="providerName"
             name="providerName"
             className="h-8 text-sm"
-            placeholder="Dr. Jane Smith"
+            placeholder="PowerGrid Electric"
             value={formData.providerName}
             onChange={handleInputChange}
             required
@@ -560,7 +560,7 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="providerNPI" className="text-xs">NPI</Label>
+            <Label htmlFor="providerNPI" className="text-xs">Account Number</Label>
             <Input
               id="providerNPI"
               name="providerNPI"
@@ -572,12 +572,12 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="diagnosisCode" className="text-xs">Diagnosis Code</Label>
+            <Label htmlFor="diagnosisCode" className="text-xs">Service Type</Label>
             <Input
               id="diagnosisCode"
               name="diagnosisCode"
               className="h-8 text-sm"
-              placeholder="F41.1"
+              placeholder="ELEC-001"
               value={formData.diagnosisCode}
               onChange={handleInputChange}
             />
@@ -597,11 +597,11 @@ startxref
           />
         </div>
 
-        {/* Superbill Upload - Compact */}
+        {/* Invoice Upload - Compact */}
         <div className="space-y-1">
           <Label htmlFor="superbill" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Superbill (PDF) *
+            Utility Invoice (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
             <Label htmlFor="superbill" className="cursor-pointer text-xs text-primary">
@@ -627,7 +627,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Direct Deposit (Push approval required)
+            Payment Account (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -685,7 +685,7 @@ startxref
           ) : (
             <>
               <Shield className="mr-2 h-4 w-4" />
-              Submit Claim
+              Submit Payment
             </>
           )}
         </Button>

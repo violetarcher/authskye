@@ -7,8 +7,8 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import './globals.css';
 
 export const metadata = {
-  title: 'CloudSync',
-  description: 'Modern SaaS Platform for Teams',
+  title: 'EnergyCo',
+  description: 'Utility Billing and Payment Management Platform',
 };
 
 export const viewport = {
