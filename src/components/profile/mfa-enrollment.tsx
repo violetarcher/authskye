@@ -71,12 +71,16 @@ interface MFAEnrollmentProps {
   user?: User;
 }
 
-export function MFAEnrollment({ user }: MFAEnrollmentProps) {
+export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
+  // Local user state that can be refreshed from Auth0
+  const [currentUser, setCurrentUser] = useState<User | undefined>(initialUser);
   const [enrolledMethods, setEnrolledMethods] = useState<AuthenticationMethod[]>([]);
   const [enrolledPasskeys, setEnrolledPasskeys] = useState<AuthenticationMethod[]>([]);
   const [availableFactors, setAvailableFactors] = useState<MFAFactor[]>([]);
   const [loading, setLoading] = useState(false);
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
+  const [addEmailDialogOpen, setAddEmailDialogOpen] = useState(false);
+  const [newEmailAddress, setNewEmailAddress] = useState('');
   const [selectedFactor, setSelectedFactor] = useState<MFAFactor | null>(null);
   const [enrollmentData, setEnrollmentData] = useState({ phoneNumber: '', email: '' });
   const [enrollDialogOpen, setEnrollDialogOpen] = useState(false);
@@ -127,9 +131,33 @@ export function MFAEnrollment({ user }: MFAEnrollmentProps) {
   const [testLoading, setTestLoading] = useState(false);
   const [enrolledMethodsError, setEnrolledMethodsError] = useState<string | null>(null);
 
+  // Fetch fresh user data from Auth0 (to get updated email/verification status)
+  const refreshUserData = async () => {
+    try {
+      const response = await fetch('/api/user');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user) {
+          setCurrentUser({
+            sub: data.user.user_id,
+            email: data.user.email,
+            email_verified: data.user.email_verified,
+            phone_number: data.user.phone_number,
+            phone_verified: data.user.phone_verified,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
+
   useEffect(() => {
     // Fetch available factors on mount
     fetchAvailableFactors();
+
+    // Fetch fresh user data from Auth0 on mount (session data may be stale)
+    refreshUserData();
 
     // Check if we have a cached My Account API token
     const cachedToken = localStorage.getItem('myAccountToken');
@@ -1094,7 +1122,7 @@ export function MFAEnrollment({ user }: MFAEnrollmentProps) {
   const handleSendEmailVerification = async () => {
     setEmailVerificationLoading(true);
     try {
-      const response = await fetch('/api/email-verification', {
+      const response = await fetch('/api/user/email/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -1106,7 +1134,45 @@ export function MFAEnrollment({ user }: MFAEnrollmentProps) {
       } else {
         const error = await response.json();
         toast.error('Failed to send email', {
-          description: error.details || 'Failed to send email verification link',
+          description: error.details || error.error || 'Failed to send email verification link',
+        });
+      }
+    } catch (error) {
+      toast.error('Network error', {
+        description: 'Failed to connect to server. Please try again.',
+      });
+    } finally {
+      setEmailVerificationLoading(false);
+    }
+  };
+
+  const handleAddEmail = async () => {
+    if (!newEmailAddress) {
+      toast.error('Please enter an email address');
+      return;
+    }
+
+    setEmailVerificationLoading(true);
+    try {
+      const response = await fetch('/api/user/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmailAddress }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Email added', {
+          description: 'Please check your inbox for a verification link.',
+        });
+        setAddEmailDialogOpen(false);
+        setNewEmailAddress('');
+        // Refresh user data to show the new email
+        await refreshUserData();
+      } else {
+        toast.error('Failed to add email', {
+          description: data.error || data.details || 'Failed to add email address',
         });
       }
     } catch (error) {
@@ -1321,29 +1387,88 @@ export function MFAEnrollment({ user }: MFAEnrollmentProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Mail className="w-4 h-4" />
-            Email Verification
+            Add or Verify Email
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center justify-between p-2 border rounded">
             <div className="flex items-center gap-2">
-              <Mail className={`w-4 h-4 ${user?.email_verified ? 'text-green-600' : 'text-orange-600'}`} />
-              <span className="text-sm font-medium">{user?.email || 'No email'}</span>
+              <Mail className={`w-4 h-4 ${currentUser?.email ? (currentUser?.email_verified ? 'text-green-600' : 'text-orange-600') : 'text-gray-400'}`} />
+              <span className="text-sm font-medium">{currentUser?.email || 'No email address'}</span>
             </div>
-            {user?.email_verified ? (
-              <Badge variant="default" className="bg-green-600 h-6">
-                <Check className="w-3 h-3 mr-1" />
-                Verified
-              </Badge>
+            {currentUser?.email ? (
+              currentUser?.email_verified ? (
+                <Badge variant="default" className="bg-green-600 h-6">
+                  <Check className="w-3 h-3 mr-1" />
+                  Verified
+                </Badge>
+              ) : (
+                <Button
+                  onClick={handleSendEmailVerification}
+                  disabled={emailVerificationLoading}
+                  size="sm"
+                  variant="outline"
+                >
+                  {emailVerificationLoading ? 'Sending...' : 'Send Verification'}
+                </Button>
+              )
             ) : (
-              <Button
-                onClick={handleSendEmailVerification}
-                disabled={emailVerificationLoading}
-                size="sm"
-                variant="outline"
-              >
-                {emailVerificationLoading ? 'Sending...' : 'Verify'}
-              </Button>
+              <Dialog open={addEmailDialogOpen} onOpenChange={setAddEmailDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="default">
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add Email
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Add Email Address</DialogTitle>
+                    <DialogDescription>
+                      Add an email address to your account. You'll receive a verification link.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="new-email">Email Address</Label>
+                      <Input
+                        id="new-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={newEmailAddress}
+                        onChange={(e) => setNewEmailAddress(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setAddEmailDialogOpen(false);
+                        setNewEmailAddress('');
+                      }}
+                      disabled={emailVerificationLoading}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleAddEmail}
+                      disabled={emailVerificationLoading || !newEmailAddress}
+                    >
+                      {emailVerificationLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Adding...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Add & Verify
+                        </>
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
         </CardContent>
