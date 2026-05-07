@@ -37,8 +37,8 @@ export default function WelcomePage() {
               Get a fair and fixed<br />energy plan with ease
             </h1>
             <p className="text-xl lg:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              The price you see is the price you pay.<br />
-              <span className="font-semibold">No Fine Print.</span>
+              {/* The price you see is the price you pay.<br />
+              <span className="font-semibold">No Fine Print.</span> */}
             </p>
 
             {/* CTA Box */}
@@ -99,7 +99,7 @@ export default function WelcomePage() {
       </section>
 
       {/* Value Propositions */}
-      <section className="bg-gray-50 py-20">
+      {/* <section className="bg-gray-50 py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -171,7 +171,7 @@ export default function WelcomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-400 py-12">

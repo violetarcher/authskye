@@ -1,8 +1,8 @@
 import { SignupForm } from '@/components/organization/signup-form';
 
 export const metadata = {
-  title: 'Create Your Organization | Meridian Energy Portal',
-  description: 'Join Meridian Energy Portal to manage power generation and optimize grid operations.',
+  title: 'Create Your Organization | EnergyCo',
+  description: 'Join EnergyCo to manage power generation and optimize grid operations.',
 };
 
 export default function OrganizationSignupPage() {
@@ -11,7 +11,7 @@ export default function OrganizationSignupPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Meridian Energy Portal</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to EnergyCo</h1>
           <p className="text-lg text-muted-foreground">
             Start managing your energy operations in minutes
           </p>

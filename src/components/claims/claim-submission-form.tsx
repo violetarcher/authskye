@@ -649,9 +649,9 @@ startxref
               <Input
                 id="accountNumber"
                 name="accountNumber"
-                type="password"
+                type="text"
                 className="h-8 text-sm"
-                placeholder="••••••••"
+                placeholder="Account number"
                 value={formData.accountNumber}
                 onChange={handleInputChange}
                 required

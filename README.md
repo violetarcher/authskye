@@ -1,4 +1,4 @@
-# SaaS+, A B2B SaaS app to demonstrate Auth0 + FGA functionality
+# Authskye, A B2B & B2B app to demonstrate Auth0 + FGA functionality
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Auth0](https://img.shields.io/badge/Auth0-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
