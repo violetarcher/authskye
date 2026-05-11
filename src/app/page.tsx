@@ -73,10 +73,19 @@ export default function HomePage() {
     );
   }
 
-  // Not logged in - redirect to welcome page
+  // Not logged in - check for invitation or redirect to welcome
   if (!user) {
     if (typeof window !== 'undefined') {
-      window.location.href = '/welcome';
+      const params = new URLSearchParams(window.location.search);
+      const invitation = params.get('invitation');
+      const organization = params.get('organization');
+
+      // If this is an organization invitation, redirect to login with invitation params
+      if (invitation && organization) {
+        window.location.href = `/api/auth/login?invitation=${invitation}&organization=${organization}`;
+      } else {
+        window.location.href = '/welcome';
+      }
     }
     return (
       <div className="flex items-center justify-center min-h-[400px]">
