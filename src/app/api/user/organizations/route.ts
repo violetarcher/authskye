@@ -37,13 +37,17 @@ export async function GET(request: NextRequest) {
       isCurrent: org.id === currentOrgId
     }));
 
+    // Get current org's fresh logo from API data (session token logo may be stale)
+    const currentOrgFromApi = enrichedOrgs.find(org => org.id === currentOrgId);
+    const freshLogo = currentOrgFromApi?.logo_url || currentOrgLogo;
+
     return Response.json({
       success: true,
       organizations: enrichedOrgs,
       currentOrganization: {
         id: currentOrgId,
         name: currentOrgName,
-        logo: currentOrgLogo
+        logo: freshLogo
       }
     });
   } catch (error: any) {
