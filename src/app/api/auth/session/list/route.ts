@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
+
+export const dynamic = 'force-dynamic';
 import { Auth0SessionManager } from '@/lib/auth0-session-manager';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 
