@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
@@ -13,7 +12,7 @@ export default function SignupSuccessPage() {
             <CardContent>
             <p className="mb-4">Please log in to continue to the dashboard.</p>
             <Button asChild className="w-full">
-                <Link href="/api/auth/login?returnTo=/reports">Log In</Link>
+                <a href="/api/auth/login?returnTo=/reports">Log In</a>
             </Button>
             </CardContent>
         </Card>

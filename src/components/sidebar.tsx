@@ -2,7 +2,6 @@
 import { getSession } from '@auth0/nextjs-auth0';
 import { SidebarNav } from './sidebar-nav';
 import { OrgSwitcher } from './org-switcher';
-import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { LogIn, LogOut, Building2 } from 'lucide-react';
@@ -59,19 +58,19 @@ export async function Sidebar() {
                 {user.name}
                </span>
                <Button asChild variant="ghost" className="h-auto p-0 justify-start text-xs text-muted-foreground">
-                <Link href="/api/auth/logout">
+                <a href="/api/auth/logout">
                   <LogOut className="mr-2 h-4 w-4" />
                   Logout
-                </Link>
+                </a>
               </Button>
             </div>
           </div>
         ) : (
           <Button asChild variant="ghost" className="w-full justify-start">
-            <Link href="/api/auth/login?returnTo=/reports">
+            <a href="/api/auth/login?returnTo=/reports">
               <LogIn className="mr-2 h-4 w-4" />
               Login
-            </Link>
+            </a>
           </Button>
         )}
       </div>

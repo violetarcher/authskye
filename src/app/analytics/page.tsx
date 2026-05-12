@@ -210,7 +210,7 @@ export default function AnalyticsPage() {
         <div className="text-center">
           <p>Please log in to access analytics.</p>
           <Button asChild>
-            <Link href="/api/auth/login?returnTo=/analytics">Login</Link>
+            <a href="/api/auth/login?returnTo=/analytics">Login</a>
           </Button>
         </div>
       ) : hasAnalyticsAccess ? (

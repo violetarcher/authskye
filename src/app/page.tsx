@@ -104,7 +104,7 @@ function WelcomePage() {
             <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Business</a>
             <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Support</a>
             <Button asChild variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
-              <Link href="/api/auth/login">Sign In</Link>
+              <a href="/api/auth/login">Sign In</a>
             </Button>
           </div>
         </div>
@@ -126,9 +126,9 @@ function WelcomePage() {
                 </h3>
                 <div className="space-y-3">
                   <Button asChild size="lg" className="w-full h-14 text-lg bg-blue-600 hover:bg-blue-700">
-                    <Link href="/api/auth/login">
+                    <a href="/api/auth/login">
                       Sign In to Your Account
-                    </Link>
+                    </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full h-14 text-lg border-2">
                     <Link href="/organizations/signup">
