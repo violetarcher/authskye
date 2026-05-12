@@ -1,9 +1,10 @@
-// src/app/layout.tsx - Using AuthWrapper
+// src/app/layout.tsx
 import { ThemeProvider } from "@/components/theme-provider";
 import { Sidebar } from "@/components/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthWrapper } from "@/components/auth-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
@@ -31,12 +32,9 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <div className="flex min-h-screen w-full">
-                <Sidebar />
-                <main className="flex-1 p-8">
-                  {children}
-                </main>
-              </div>
+              <ConditionalLayout sidebar={<Sidebar />}>
+                {children}
+              </ConditionalLayout>
               <Toaster position="top-right" />
             </ThemeProvider>
           </AuthWrapper>
