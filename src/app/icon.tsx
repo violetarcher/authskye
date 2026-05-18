@@ -8,18 +8,18 @@ export default function Icon() {
     (
       <div
         style={{
-          fontSize: 24,
-          background: '#f59e0b',
+          fontSize: 20,
+          background: '#003594',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           color: 'white',
-          borderRadius: '50%',
+          borderRadius: '20%',
         }}
       >
-        ⚡
+        🐾
       </div>
     ),
     {

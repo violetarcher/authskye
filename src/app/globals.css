@@ -4,49 +4,49 @@
 
 @layer base {
   :root {
-    /* SaaS Consumer Branding - Modern Purple/Blue (#6366f1) */
+    /* Paw0 Branding - AKC Blue (#003594) with Gold accent */
     --background: 0 0% 100%;
-    --foreground: 240 10% 15%;
+    --foreground: 220 20% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 220 20% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
-    --primary: 239 84% 67%;
+    --popover-foreground: 220 20% 15%;
+    --primary: 220 100% 29%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 10% 96%;
-    --secondary-foreground: 240 10% 15%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 280 65% 60%;
+    --secondary: 220 10% 96%;
+    --secondary-foreground: 220 20% 15%;
+    --muted: 220 5% 96%;
+    --muted-foreground: 220 4% 46%;
+    --accent: 43 85% 46%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 239 84% 67%;
+    --border: 220 6% 90%;
+    --input: 220 6% 90%;
+    --ring: 220 100% 29%;
     --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 240 5% 12%;
+    --background: 220 10% 10%;
     --foreground: 0 0% 98%;
-    --card: 240 6% 10%;
+    --card: 220 10% 12%;
     --card-foreground: 0 0% 98%;
-    --popover: 240 6% 10%;
+    --popover: 220 10% 12%;
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 5% 15%;
+    --primary-foreground: 220 100% 29%;
+    --secondary: 220 10% 15%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 240 5% 15%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 5% 15%;
-    --accent-foreground: 0 0% 98%;
+    --muted: 220 10% 15%;
+    --muted-foreground: 220 5% 64.9%;
+    --accent: 43 85% 46%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5% 20%;
-    --input: 240 5% 20%;
-    --ring: 240 4.9% 83.9%;
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
+    --ring: 220 10% 83.9%;
   }
 }
 

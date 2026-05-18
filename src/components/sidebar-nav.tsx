@@ -1,4 +1,4 @@
-// src/components/sidebar-nav.tsx - Updated with Analytics
+// src/components/sidebar-nav.tsx - Paw0 AKC Navigation
 'use client';
 
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import {
   FolderOpen,
   Shield,
   User,
-  Activity,
+  Dog,
   Building2
 } from 'lucide-react';
 
@@ -58,8 +58,8 @@ export function SidebarNav({ roles }: SidebarNavProps) {
         className="w-full justify-start"
       >
         <Link href="/claims">
-          <Activity className="mr-2 h-4 w-4" />
-          Billing
+          <Dog className="mr-2 h-4 w-4" />
+          Registrations
         </Link>
       </Button>
 

@@ -7,21 +7,21 @@ import { ClaimsList } from '@/components/claims/claims-list';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Zap, Trash2 } from 'lucide-react';
+import { Dog, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function BillingPage() {
+export default function RegistrationsPage() {
   const { user } = useUser();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isClearing, setIsClearing] = useState(false);
   const [openClearDialog, setOpenClearDialog] = useState(false);
 
-  const handleBillSubmitted = () => {
-    // Trigger re-render of bills list by changing the key
+  const handleRegistrationSubmitted = () => {
+    // Trigger re-render of registrations list by changing the key
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleClearAllBills = async () => {
+  const handleClearAllRegistrations = async () => {
     setIsClearing(true);
     try {
       const response = await fetch('/api/claims/clear', {
@@ -30,17 +30,17 @@ export default function BillingPage() {
 
       if (!response.ok) {
         const error = await response.json();
-        toast.error('Failed to clear bills', {
+        toast.error('Failed to clear registrations', {
           description: error.message || 'An error occurred',
         });
         return;
       }
 
-      toast.success('All bills cleared successfully');
+      toast.success('All registrations cleared successfully');
       setRefreshTrigger(prev => prev + 1);
       setOpenClearDialog(false);
     } catch (error: any) {
-      toast.error('Error clearing bills', {
+      toast.error('Error clearing registrations', {
         description: error.message || 'An error occurred',
       });
     } finally {
@@ -52,29 +52,29 @@ export default function BillingPage() {
     <div className="space-y-4">
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Zap className="w-8 h-8" />
-          Billing Management
+          <Dog className="w-8 h-8 text-[#003594]" />
+          Dog Registration
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Submit and track your utility bills and payments
+          Register your dogs and track registration status
         </p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Left column - Bill Payment */}
+        {/* Left column - Registration Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Submit Payment Information</CardTitle>
+            <CardTitle className="text-lg">Submit Registration</CardTitle>
             <CardDescription className="text-xs">
               Complete the form below and approve via mobile push notification
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ClaimSubmissionForm user={user} onClaimSubmitted={handleBillSubmitted} />
+            <ClaimSubmissionForm user={user} onClaimSubmitted={handleRegistrationSubmitted} />
           </CardContent>
         </Card>
 
-        {/* Right column - Bills List */}
+        {/* Right column - Registrations List */}
         <div key={refreshTrigger}>
           <div className="flex flex-col gap-3">
             <ClaimsList userId={user?.sub || undefined} />
@@ -87,14 +87,14 @@ export default function BillingPage() {
                   disabled={isClearing}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear All Bills
+                  Clear All Registrations
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Clear All Bills?</DialogTitle>
+                  <DialogTitle>Clear All Registrations?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All bills in your account will be permanently deleted.
+                    This action cannot be undone. All registrations in your account will be permanently deleted.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-2">
@@ -107,10 +107,10 @@ export default function BillingPage() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={handleClearAllBills}
+                    onClick={handleClearAllRegistrations}
                     disabled={isClearing}
                   >
-                    {isClearing ? 'Clearing...' : 'Clear All Bills'}
+                    {isClearing ? 'Clearing...' : 'Clear All Registrations'}
                   </Button>
                 </div>
               </DialogContent>

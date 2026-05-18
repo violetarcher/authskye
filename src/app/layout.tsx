@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'EnergyCo',
-  description: 'Utility Billing and Payment Management Platform',
+  title: 'Paw0',
+  description: 'Canine Registry and Management Platform',
 };
 
 export const viewport = {
-  themeColor: '#6366f1',
+  themeColor: '#003594',
 };
 
 export default function RootLayout({

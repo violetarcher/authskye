@@ -118,9 +118,9 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Create Your Organization</CardTitle>
+        <CardTitle className="text-2xl">Create Your Kennel Club</CardTitle>
         <CardDescription>
-          Join Meridian Energy Portal to manage power generation, optimize grid operations, and track facility performance.
+          Join Paw0 to manage dog registrations, track pedigrees, and participate in AKC events.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -139,7 +139,7 @@ export function SignupForm() {
             </Label>
             <Input
               id="organizationName"
-              placeholder="Acme Energy"
+              placeholder="Golden Valley Kennel Club"
               value={formData.organizationName}
               onChange={handleChange('organizationName')}
               disabled={isSubmitting}
@@ -158,7 +158,7 @@ export function SignupForm() {
             <Input
               id="adminEmail"
               type="email"
-              placeholder="admin@acme-energy.com"
+              placeholder="admin@goldenvalleykennel.com"
               value={formData.adminEmail}
               onChange={handleChange('adminEmail')}
               disabled={isSubmitting}

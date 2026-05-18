@@ -22,12 +22,14 @@ import {
   Smartphone,
   AlertTriangle,
   Lock,
-  Wand2
+  Wand2,
+  Dog,
+  PawPrint
 } from 'lucide-react';
 
-interface BillSubmissionFormProps {
+interface RegistrationFormProps {
   user: any;
-  onClaimSubmitted?: () => void; // Callback to refresh bills list
+  onClaimSubmitted?: () => void; // Callback to refresh registrations list
 }
 
 interface CIBAStatus {
@@ -36,55 +38,55 @@ interface CIBAStatus {
   message?: string;
 }
 
-// Demo data sets for autofill - cycles through different utility billing scenarios
+// Demo data sets for autofill - cycles through different dog registration scenarios
 const DEMO_DATA_SETS = [
   {
     serviceDate: new Date().toISOString().split('T')[0],
-    providerName: 'PowerGrid Electric',
-    providerNPI: '9876543210',
-    diagnosisCode: 'ELEC-001',
-    claimAmount: '125.50',
-    description: 'Monthly electric bill - Residential account, summer peak rates',
-    routingNumber: '121000248', // Wells Fargo routing (demo)
+    providerName: "Champion's Golden Legacy",
+    providerNPI: 'DN85742310',
+    diagnosisCode: 'Golden Retriever',
+    claimAmount: '35.00',
+    description: 'AKC Full Registration - Male, DOB: Jan 15, 2024. Sire: GCH Sunfire Gold Standard. Dam: CH Meadowbrook Sunshine',
+    routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
-    serviceDate: new Date(Date.now() - 86400000).toISOString().split('T')[0], // Yesterday
-    providerName: 'NaturalGas Co',
-    providerNPI: '5554443333',
-    diagnosisCode: 'GAS-002',
-    claimAmount: '89.75',
-    description: 'Monthly natural gas bill - Heating and cooking services',
-    routingNumber: '026009593', // Bank of America routing (demo)
+    serviceDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+    providerName: 'Midnight Storm Runner',
+    providerNPI: 'DN86123456',
+    diagnosisCode: 'German Shepherd',
+    claimAmount: '35.00',
+    description: 'AKC Full Registration - Female, DOB: Feb 20, 2024. Sire: GCH Vom Haus Sentinel. Dam: CH Blackwood Night Sky',
+    routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
-    serviceDate: new Date(Date.now() - 172800000).toISOString().split('T')[0], // 2 days ago
-    providerName: 'CityWater Services',
-    providerNPI: '1112223334',
-    diagnosisCode: 'WATER-003',
-    claimAmount: '45.00',
-    description: 'Monthly water and sewage bill - Residential usage',
-    routingNumber: '071000013', // Chase routing (demo)
+    serviceDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
+    providerName: 'Royal Blue Diamond',
+    providerNPI: 'DN87654321',
+    diagnosisCode: 'Labrador Retriever',
+    claimAmount: '25.00',
+    description: 'AKC Limited Registration - Male, DOB: Mar 10, 2024. Sire: CH Lakeside Thunder. Dam: Bayshore Morning Star',
+    routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
-    serviceDate: new Date(Date.now() - 259200000).toISOString().split('T')[0], // 3 days ago
-    providerName: 'Green Solar Rebate',
-    providerNPI: '1234567890',
-    diagnosisCode: 'SOLAR-004',
-    claimAmount: '320.00',
-    description: 'Solar panel credit - Renewable energy generation credit for excess power',
-    routingNumber: '111000025', // Citibank routing (demo)
+    serviceDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
+    providerName: 'Starlight Serenade',
+    providerNPI: 'PR45678901',
+    diagnosisCode: 'Standard Poodle',
+    claimAmount: '35.00',
+    description: 'AKC Full Registration - Female, DOB: Dec 5, 2023. Champion bloodline with show potential.',
+    routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
   },
 ];
 
-export function ClaimSubmissionForm({ user, onClaimSubmitted }: BillSubmissionFormProps) {
+export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationFormProps) {
   const [loading, setLoading] = useState(false);
   const [cibaStatus, setCibaStatus] = useState<CIBAStatus>({ status: 'idle' });
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
@@ -101,7 +103,7 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: BillSubmissionFo
   });
   const [superbillFile, setSuperbillFile] = useState<File | null>(null);
 
-  // Autofill demo data - cycles through different utility billing scenarios
+  // Autofill demo data - cycles through different dog registration scenarios
   const fillDemoData = () => {
     const demoData = DEMO_DATA_SETS[currentDemoIndex];
     setFormData(demoData);
@@ -109,7 +111,7 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: BillSubmissionFo
     // Cycle to next demo data set
     setCurrentDemoIndex((currentDemoIndex + 1) % DEMO_DATA_SETS.length);
 
-    // Create a mock PDF file for the invoice
+    // Create a mock PDF file for the pedigree document
     const mockPdfContent = `%PDF-1.4
 1 0 obj
 <<
@@ -152,18 +154,18 @@ stream
 BT
 /F1 24 Tf
 100 700 Td
-(UTILITY BILL - DEMO) Tj
+(AKC PEDIGREE - DEMO) Tj
 /F1 12 Tf
 100 650 Td
-(Provider: ${demoData.providerName}) Tj
+(Dog Name: ${demoData.providerName}) Tj
 100 630 Td
-(Account Holder: ${user?.name || 'Demo Customer'}) Tj
+(Owner: ${user?.name || 'Demo Breeder'}) Tj
 100 610 Td
-(Service Date: ${new Date(demoData.serviceDate).toLocaleDateString()}) Tj
+(Registration Date: ${new Date(demoData.serviceDate).toLocaleDateString()}) Tj
 100 590 Td
-(Service Type: ${demoData.diagnosisCode}) Tj
+(Breed: ${demoData.diagnosisCode}) Tj
 100 570 Td
-(Amount Due: $${demoData.claimAmount}) Tj
+(Registration Fee: $${demoData.claimAmount}) Tj
 ET
 endstream
 endobj
@@ -185,11 +187,11 @@ startxref
 %%EOF`;
 
     const blob = new Blob([mockPdfContent], { type: 'application/pdf' });
-    const file = new File([blob], `invoice_${demoData.providerName.split(' ')[0].toLowerCase()}.pdf`, { type: 'application/pdf' });
+    const file = new File([blob], `pedigree_${demoData.providerName.split(' ')[0].toLowerCase()}.pdf`, { type: 'application/pdf' });
     setSuperbillFile(file);
 
     toast.success('Demo data filled!', {
-      description: `Scenario ${currentDemoIndex + 1}: ${demoData.providerName}`,
+      description: `${demoData.diagnosisCode}: ${demoData.providerName}`,
     });
   };
 
@@ -198,7 +200,7 @@ startxref
       const file = e.target.files[0];
       if (file.type === 'application/pdf' && file.size <= 10 * 1024 * 1024) {
         setSuperbillFile(file);
-        toast.success('Superbill uploaded', {
+        toast.success('Pedigree document uploaded', {
           description: `File: ${file.name}`,
         });
       } else {
@@ -227,8 +229,8 @@ startxref
     }
 
     if (!superbillFile) {
-      toast.error('Invoice required', {
-        description: 'Please upload your utility bill invoice (PDF)',
+      toast.error('Pedigree document required', {
+        description: 'Please upload the pedigree or health certificate (PDF)',
       });
       return false;
     }
@@ -261,7 +263,7 @@ startxref
     try {
       setCibaStatus({ status: 'pending', message: 'Initiating authentication request...' });
 
-      console.log('🔐 Initiating CIBA flow for bill payment');
+      console.log('🔐 Initiating CIBA flow for dog registration');
 
       // Step 1: Initiate CIBA authentication request
       const cibaResponse = await fetch('/api/ciba/initiate', {
@@ -269,7 +271,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email',
-          binding_message: `Approve payment: ${formData.claimAmount} USD`,
+          binding_message: `Approve registration: ${formData.claimAmount} USD`,
         }),
       });
 
@@ -398,7 +400,7 @@ startxref
     try {
       // Step 1: Initiate CIBA authentication
       toast.info('Authentication required', {
-        description: 'Please approve the payment via Guardian app on your mobile device',
+        description: 'Please approve the registration via Guardian app on your mobile device',
       });
 
       const cibaApproved = await initiateCIBA();
@@ -408,7 +410,7 @@ startxref
         return;
       }
 
-      // Step 2: Submit claim after CIBA approval
+      // Step 2: Submit registration after CIBA approval
       const formDataToSend = new FormData();
       formDataToSend.append('serviceDate', formData.serviceDate);
       formDataToSend.append('providerName', formData.providerName);
@@ -429,16 +431,16 @@ startxref
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to submit payment');
+        throw new Error(error.message || 'Failed to submit registration');
       }
 
       const result = await response.json();
 
-      toast.success('Bill payment submitted successfully!', {
-        description: `Payment ID: ${result.claimId}`,
+      toast.success('Dog registration submitted successfully!', {
+        description: `Registration ID: ${result.claimId}`,
       });
 
-      // Trigger bills list refresh
+      // Trigger registrations list refresh
       if (onClaimSubmitted) {
         onClaimSubmitted();
       }
@@ -460,7 +462,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit payment',
+        description: error.message || 'Failed to submit registration',
       });
     } finally {
       setLoading(false);
@@ -503,9 +505,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
-            {cibaStatus.status === 'denied' && 'Payment denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for registration approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting registration...'}
+            {cibaStatus.status === 'denied' && 'Registration denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -515,7 +517,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="serviceDate" className="text-xs">Billing Period *</Label>
+            <Label htmlFor="serviceDate" className="text-xs">Registration Date *</Label>
             <Input
               id="serviceDate"
               name="serviceDate"
@@ -527,7 +529,7 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="claimAmount" className="text-xs">Amount *</Label>
+            <Label htmlFor="claimAmount" className="text-xs">Fee *</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
               <Input
@@ -536,7 +538,7 @@ startxref
                 type="number"
                 step="0.01"
                 className="pl-7 h-8 text-sm"
-                placeholder="0.00"
+                placeholder="35.00"
                 value={formData.claimAmount}
                 onChange={handleInputChange}
                 required
@@ -546,12 +548,15 @@ startxref
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="providerName" className="text-xs">Utility Provider *</Label>
+          <Label htmlFor="providerName" className="text-xs flex items-center gap-1">
+            <Dog className="w-3 h-3" />
+            Dog Name *
+          </Label>
           <Input
             id="providerName"
             name="providerName"
             className="h-8 text-sm"
-            placeholder="PowerGrid Electric"
+            placeholder="Champion's Golden Legacy"
             value={formData.providerName}
             onChange={handleInputChange}
             required
@@ -560,24 +565,24 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="providerNPI" className="text-xs">Account Number</Label>
+            <Label htmlFor="providerNPI" className="text-xs">Registration Number</Label>
             <Input
               id="providerNPI"
               name="providerNPI"
               className="h-8 text-sm"
-              placeholder="1234567890"
+              placeholder="DN85742310"
               maxLength={10}
               value={formData.providerNPI}
               onChange={handleInputChange}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="diagnosisCode" className="text-xs">Service Type</Label>
+            <Label htmlFor="diagnosisCode" className="text-xs">Breed</Label>
             <Input
               id="diagnosisCode"
               name="diagnosisCode"
               className="h-8 text-sm"
-              placeholder="ELEC-001"
+              placeholder="Golden Retriever"
               value={formData.diagnosisCode}
               onChange={handleInputChange}
             />
@@ -590,18 +595,18 @@ startxref
             id="description"
             name="description"
             className="text-sm"
-            placeholder="Service description"
+            placeholder="Registration details, lineage, etc."
             rows={2}
             value={formData.description}
             onChange={handleInputChange}
           />
         </div>
 
-        {/* Invoice Upload - Compact */}
+        {/* Pedigree Document Upload - Compact */}
         <div className="space-y-1">
           <Label htmlFor="superbill" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Utility Invoice (PDF) *
+            Pedigree / Health Certificate (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
             <Label htmlFor="superbill" className="cursor-pointer text-xs text-primary">
@@ -623,7 +628,7 @@ startxref
           </div>
         </div>
 
-        {/* Bank Info - Compact */}
+        {/* Payment Info - Compact */}
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
@@ -676,7 +681,7 @@ startxref
 
       {/* Submit Button */}
       <div className="flex items-center justify-end pt-2">
-        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending'} className="w-full">
+        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending'} className="w-full bg-[#003594] hover:bg-[#002670]">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -684,8 +689,8 @@ startxref
             </>
           ) : (
             <>
-              <Shield className="mr-2 h-4 w-4" />
-              Submit Payment
+              <PawPrint className="mr-2 h-4 w-4" />
+              Submit Registration
             </>
           )}
         </Button>

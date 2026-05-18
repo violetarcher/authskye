@@ -1,10 +1,10 @@
-// src/components/sidebar.tsx - Clean production version
+// src/components/sidebar.tsx - Paw0 AKC Branding
 import { getSession } from '@auth0/nextjs-auth0';
 import { SidebarNav } from './sidebar-nav';
 import { OrgSwitcher } from './org-switcher';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, Building2 } from 'lucide-react';
+import { LogIn, LogOut, PawPrint } from 'lucide-react';
 
 export async function Sidebar() {
   const session = await getSession();
@@ -13,7 +13,7 @@ export async function Sidebar() {
 
   const orgName = user?.['https://agency-inc-demo.com/org_name'] || '';
   const orgLogo = user?.['https://agency-inc-demo.com/org_logo'];
-  const companyName = orgName ? `EnergyCo | ${orgName}` : 'EnergyCo';
+  const companyName = orgName ? `Paw0 | ${orgName}` : 'Paw0';
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
@@ -27,8 +27,8 @@ export async function Sidebar() {
             className="rounded-md"
           />
         ) : (
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-            <Building2 className="h-5 w-5" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[#003594] text-white">
+            <PawPrint className="h-5 w-5" />
           </div>
         )}
         <h2 className="text-xl font-bold">{companyName}</h2>
