@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +26,7 @@ import {
   Dog,
   PawPrint
 } from 'lucide-react';
+import { GuardianEnrollmentModal } from './guardian-enrollment-modal';
 
 interface RegistrationFormProps {
   user: any;
@@ -90,6 +91,9 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationForm
   const [loading, setLoading] = useState(false);
   const [cibaStatus, setCibaStatus] = useState<CIBAStatus>({ status: 'idle' });
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
+  const [guardianEnrolled, setGuardianEnrolled] = useState<boolean | null>(null);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(false);
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [formData, setFormData] = useState({
     serviceDate: '',
     providerName: '',
@@ -102,6 +106,36 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationForm
     accountNumberConfirm: '',
   });
   const [superbillFile, setSuperbillFile] = useState<File | null>(null);
+
+  // Check Guardian enrollment status on mount
+  useEffect(() => {
+    checkGuardianEnrollment();
+  }, []);
+
+  const checkGuardianEnrollment = async () => {
+    setCheckingEnrollment(true);
+    try {
+      const response = await fetch('/api/guardian/check-enrollment');
+      if (response.ok) {
+        const data = await response.json();
+        setGuardianEnrolled(data.enrolled);
+        console.log('🔍 Guardian enrolled:', data.enrolled);
+      }
+    } catch (error) {
+      console.error('Failed to check Guardian enrollment:', error);
+      // Assume not enrolled if check fails
+      setGuardianEnrolled(false);
+    } finally {
+      setCheckingEnrollment(false);
+    }
+  };
+
+  const handleEnrollmentComplete = () => {
+    setGuardianEnrolled(true);
+    toast.success('Guardian enrolled successfully!', {
+      description: 'You can now approve registrations via push notification.',
+    });
+  };
 
   // Autofill demo data - cycles through different dog registration scenarios
   const fillDemoData = () => {
@@ -395,6 +429,21 @@ startxref
       return;
     }
 
+    // Check Guardian enrollment before proceeding
+    if (guardianEnrolled === null) {
+      // Still checking, wait
+      toast.info('Checking enrollment status...', {
+        description: 'Please wait while we verify your Guardian setup.',
+      });
+      await checkGuardianEnrollment();
+    }
+
+    if (!guardianEnrolled) {
+      // User not enrolled - show enrollment modal
+      setShowEnrollmentModal(true);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -484,6 +533,36 @@ startxref
           Fill Demo ({currentDemoIndex + 1}/4)
         </Button>
       </div>
+
+      {/* Guardian Enrollment Status */}
+      {guardianEnrolled === false && cibaStatus.status === 'idle' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span className="text-xs font-medium text-amber-800">
+              Guardian push not set up
+            </span>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-6 text-xs border-amber-400 text-amber-700 hover:bg-amber-100"
+            onClick={() => setShowEnrollmentModal(true)}
+          >
+            Set Up Now
+          </Button>
+        </div>
+      )}
+
+      {guardianEnrolled === true && cibaStatus.status === 'idle' && (
+        <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+          <span className="text-xs font-medium text-green-800">
+            Guardian push ready
+          </span>
+        </div>
+      )}
 
       {/* CIBA Status Alert - Compact */}
       {cibaStatus.status !== 'idle' && (
@@ -681,11 +760,16 @@ startxref
 
       {/* Submit Button */}
       <div className="flex items-center justify-end pt-2">
-        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending'} className="w-full bg-[#003594] hover:bg-[#002670]">
+        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending' || checkingEnrollment} className="w-full bg-[#003594] hover:bg-[#002670]">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Processing...
+            </>
+          ) : checkingEnrollment ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Checking...
             </>
           ) : (
             <>
@@ -695,6 +779,13 @@ startxref
           )}
         </Button>
       </div>
+
+      {/* Guardian Enrollment Modal */}
+      <GuardianEnrollmentModal
+        open={showEnrollmentModal}
+        onOpenChange={setShowEnrollmentModal}
+        onEnrollmentComplete={handleEnrollmentComplete}
+      />
     </form>
   );
 }

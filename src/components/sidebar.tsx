@@ -10,6 +10,7 @@ export async function Sidebar() {
   const session = await getSession();
   const user = session?.user;
   const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+  const orgId = user?.org_id;
 
   const orgName = user?.['https://agency-inc-demo.com/org_name'] || '';
   const orgLogo = user?.['https://agency-inc-demo.com/org_logo'];
@@ -41,7 +42,7 @@ export async function Sidebar() {
         </>
       )}
 
-      <SidebarNav roles={roles} />
+      <SidebarNav roles={roles} hasOrganization={!!orgId} />
 
       <div className="mt-auto">
         {user ? (

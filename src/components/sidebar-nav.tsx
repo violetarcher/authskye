@@ -20,11 +20,12 @@ import {
 
 interface SidebarNavProps {
   roles: string[];
+  hasOrganization?: boolean;
 }
 
-export function SidebarNav({ roles }: SidebarNavProps) {
+export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
   const pathname = usePathname();
-  
+
   const isAdmin = roles && Array.isArray(roles) && roles.includes('Admin');
 
   return (
@@ -41,16 +42,19 @@ export function SidebarNav({ roles }: SidebarNavProps) {
         </Link>
       </Button>
       
-      <Button
-        asChild
-        variant={pathname === '/reports' ? 'secondary' : 'ghost'}
-        className="w-full justify-start"
-      >
-        <Link href="/reports">
-          <FileText className="mr-2 h-4 w-4" />
-          Reports
-        </Link>
-      </Button>
+      {/* Reports - Only show for organization users */}
+      {hasOrganization && (
+        <Button
+          asChild
+          variant={pathname === '/reports' ? 'secondary' : 'ghost'}
+          className="w-full justify-start"
+        >
+          <Link href="/reports">
+            <FileText className="mr-2 h-4 w-4" />
+            Reports
+          </Link>
+        </Button>
+      )}
 
       <Button
         asChild
