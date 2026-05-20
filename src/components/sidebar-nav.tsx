@@ -15,7 +15,8 @@ import {
   Shield,
   User,
   Dog,
-  Building2
+  Building2,
+  Bot
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -99,6 +100,18 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
         <Link href="/documents">
           <FolderOpen className="mr-2 h-4 w-4" />
           Documents
+        </Link>
+      </Button>
+
+      {/* Agents - AI agent authorization demo */}
+      <Button
+        asChild
+        variant={pathname === '/agents' ? 'secondary' : 'ghost'}
+        className="w-full justify-start"
+      >
+        <Link href="/agents">
+          <Bot className="mr-2 h-4 w-4" />
+          Agents
         </Link>
       </Button>
 

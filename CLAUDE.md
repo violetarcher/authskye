@@ -12,6 +12,7 @@ This is a B2B SaaS application demonstrating enterprise-grade identity and autho
 - **Session Management** with real-time enforcement
 - **Step-Up MFA** for sensitive operations
 - **Kong API Gateway** integration with JWT validation
+- **AI Agents Demo** with "Agents as Principals" FGA pattern
 
 **Branding:**
 - Primary color: Dark navy blue (#0a1d73)
@@ -929,7 +930,98 @@ The application uses **on-demand token exchange** to obtain My Account API token
 
 **Critical:** Token audience MUST match API domain (both use custom domain `login.authskye.org`)
 
-### 10. Kong API Gateway Integration
+### 10. AI Agents Demo (Agents as Principals)
+
+The application includes an **AI Agents Demo** that showcases the "Agents as Principals" pattern from Auth0 FGA. This pattern treats AI/automated agents as first-class principals alongside human users in authorization systems.
+
+**Documentation:** https://docs.fga.dev/modeling/agents/agents-as-principals
+
+**Architecture:**
+```
+User selects Persona + Agent Type
+         ↓
+User sends message to Agent
+         ↓
+Backend parses intent (action + resources)
+         ↓
+FGA checks BOTH user AND agent permissions
+         ↓
+Agent responds based on combined authorization
+```
+
+**Key Components:**
+- `src/app/agents/page.tsx` - Main Agents demo page with chat interface
+- `src/app/api/agents/chat/route.ts` - Chat endpoint with FGA permission checks
+- `src/app/api/agents/check-permission/route.ts` - Direct FGA permission check endpoint
+- `src/app/api/agents/setup-demo/route.ts` - Setup/cleanup demo FGA tuples
+
+**Demo Personas (Users):**
+| Persona | Role | Access |
+|---------|------|--------|
+| Alice Chen | Project Manager | Full access to Project Alpha, read access to Beta |
+| Bob Martinez | Developer | Read access to both projects |
+| Carol Williams | Support Agent | Limited access to specific issues only |
+| Dan Thompson | Organization Admin | Full organization access |
+
+**Demo Agent Types:**
+| Agent | Purpose | Permissions |
+|-------|---------|-------------|
+| Triage Bot | Categorizes/assigns issues | `can_read`, `can_triage` on projects |
+| Reporting Bot | Generates reports | `can_read` across organization |
+| Support Agent | Handles support tickets | `can_read`, `can_comment` on issues |
+| Code Review Bot | Reviews code changes | `can_read`, `can_review` on projects |
+
+**FGA Object Model:**
+```
+agent:{id}        - AI agents (triage-bot, reporting-bot, etc.)
+user:{id}         - Human users (alice-pm, bob-dev, etc.)
+project:{id}      - Projects (alpha, beta)
+organization:{id} - Organizations (acme)
+issue:{id}        - Issues (issue-123, issue-456)
+
+Relations: can_read, can_write, can_triage, can_review, can_comment, can_manage, can_delete
+```
+
+**Demo Setup:**
+The page includes "Setup Demo" button that creates FGA tuples for all personas and agents. Tuples can be cleaned up with "Cleanup" button.
+
+**Chat Flow:**
+1. User selects a persona (simulated user identity)
+2. User selects an agent type
+3. User sends a message (e.g., "Can you read Project Alpha?")
+4. Backend parses intent to determine action and resources
+5. FGA checks both user AND agent have required permissions
+6. Agent responds explaining authorization result
+
+**Key Principle:**
+Both the human user AND the AI agent must have authorization for an action to proceed. This prevents:
+- Agents exceeding user permissions
+- Users using agents to bypass their own restrictions
+- Unauthorized autonomous agent actions
+
+**LLM Integration (Optional):**
+When LightLLM is configured, the chat provides intelligent responses. Without LLM, the system uses rule-based responses demonstrating the authorization patterns.
+
+```env
+LIGHTLLM_ENDPOINT='https://llm.atko.ai'
+LIGHTLLM_API_KEY='sk-...'  # Must start with 'sk-'
+LIGHTLLM_MODEL='gpt-4o'
+```
+
+**FGA Helper Functions:**
+```typescript
+import {
+  formatAgentId,        // agent:{id}
+  formatProjectId,      // project:{id}
+  formatOrganizationId, // organization:{id}
+  formatIssueId,        // issue:{id}
+  checkAgentPermission, // Check if agent has permission
+  grantAgentPermission, // Grant agent a permission
+  revokeAgentPermission // Revoke agent's permission
+} from '@/lib/fga-service';
+```
+
+### 11. Kong API Gateway Integration
 
 **Kong Konnect** (`kong-019c989905usehqbh.kongcloud.dev`) sits as an API gateway layer between the frontend and backend APIs, providing JWT validation, rate limiting, CORS handling, and request transformation.
 
@@ -1044,12 +1136,17 @@ src/
 │   │   │   └── session/       # Session validation/enforcement endpoints
 │   │   ├── kong-protected/    # Kong Gateway-protected endpoints
 │   │   │   └── analytics/     # Analytics API (requires X-Kong-Protected header)
+│   │   ├── agents/            # AI Agents demo endpoints
+│   │   │   ├── chat/          # Chat with FGA permission checks
+│   │   │   ├── check-permission/ # Direct FGA permission check
+│   │   │   └── setup-demo/    # Setup/cleanup demo FGA tuples
 │   │   ├── organization/      # Member and role management
 │   │   ├── documents/         # Document CRUD (FGA-protected)
 │   │   ├── folders/           # Folder CRUD (FGA-protected)
 │   │   ├── groups/            # Group management
 │   │   └── user/              # User preferences/metadata
 │   ├── admin/                 # Admin dashboard pages
+│   ├── agents/                # AI Agents demo page (chat + FGA)
 │   ├── api-gateway/           # Kong Gateway demo page with Mermaid diagram
 │   ├── documents/             # Document management UI
 │   ├── analytics/             # Analytics with access request workflow
@@ -1317,6 +1414,9 @@ When working on demo branches, remember that branding changes are cosmetic - the
 - `src/app/claims/page.tsx` - Claims management page
 - `src/app/api/organization/members/route.ts` - Organization invitations with custom domain header
 - `src/app/api/kong-protected/analytics/route.ts` - Kong-protected endpoint example
+- `src/app/agents/page.tsx` - AI Agents demo page with chat interface
+- `src/app/api/agents/chat/route.ts` - Chat endpoint with FGA permission checks
+- `src/app/api/agents/setup-demo/route.ts` - Setup/cleanup demo FGA tuples
 - `src/app/api-gateway/page.tsx` - Kong Gateway demo page
 - `src/components/admin/member-manager.tsx` - Member invitation UI
 - `src/components/mermaid-diagram.tsx` - Mermaid diagram component

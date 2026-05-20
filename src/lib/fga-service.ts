@@ -1,7 +1,7 @@
 // src/lib/fga-service.ts
 import fgaClient from './fga-client';
 
-export type FGAObjectType = 'user' | 'group' | 'folder' | 'doc';
+export type FGAObjectType = 'user' | 'group' | 'folder' | 'doc' | 'agent' | 'project' | 'organization' | 'issue';
 export type FGARelation =
   | 'owner'
   | 'viewer'
@@ -11,7 +11,13 @@ export type FGARelation =
   | 'can_write'
   | 'can_share'
   | 'can_change_owner'
-  | 'can_create_file';
+  | 'can_create_file'
+  // Agent-specific relations
+  | 'can_triage'
+  | 'can_review'
+  | 'can_comment'
+  | 'can_manage'
+  | 'can_delete';
 
 export interface FGATuple {
   user: string;
@@ -287,4 +293,112 @@ export async function getGroupMembers(groupId: string): Promise<string[]> {
     console.error('Error getting group members:', error);
     return [];
   }
+}
+
+// ==========================================
+// Agent-specific helpers (Agents as Principals)
+// ==========================================
+
+/**
+ * Helper function to format an agent ID for FGA
+ * @param agentId - Agent identifier (e.g., "triage-bot")
+ * @returns Formatted agent string (e.g., "agent:triage-bot")
+ */
+export function formatAgentId(agentId: string): string {
+  return `agent:${agentId}`;
+}
+
+/**
+ * Helper function to format a project ID for FGA
+ * @param projectId - Project identifier
+ * @returns Formatted project string (e.g., "project:alpha")
+ */
+export function formatProjectId(projectId: string): string {
+  return `project:${projectId}`;
+}
+
+/**
+ * Helper function to format an organization ID for FGA
+ * @param orgId - Organization identifier
+ * @returns Formatted organization string (e.g., "organization:acme")
+ */
+export function formatOrganizationId(orgId: string): string {
+  return `organization:${orgId}`;
+}
+
+/**
+ * Helper function to format an issue ID for FGA
+ * @param issueId - Issue identifier
+ * @returns Formatted issue string (e.g., "issue:issue-123")
+ */
+export function formatIssueId(issueId: string): string {
+  return `issue:${issueId}`;
+}
+
+/**
+ * Check if an agent has permission on a resource
+ * @param agentId - Agent identifier
+ * @param relation - The permission to check
+ * @param object - The resource to check against
+ * @returns Promise<boolean>
+ */
+export async function checkAgentPermission(
+  agentId: string,
+  relation: FGARelation,
+  object: string
+): Promise<boolean> {
+  return checkPermission(formatAgentId(agentId), relation, object);
+}
+
+/**
+ * Grant an agent permission on a resource
+ * @param agentId - Agent identifier
+ * @param relation - The permission to grant
+ * @param object - The resource
+ * @returns Promise<FGATuple>
+ */
+export async function grantAgentPermission(
+  agentId: string,
+  relation: FGARelation,
+  object: string
+): Promise<FGATuple> {
+  return writeTuple({
+    user: formatAgentId(agentId),
+    relation,
+    object,
+  });
+}
+
+/**
+ * Revoke an agent's permission on a resource
+ * @param agentId - Agent identifier
+ * @param relation - The permission to revoke
+ * @param object - The resource
+ * @returns Promise<FGATuple>
+ */
+export async function revokeAgentPermission(
+  agentId: string,
+  relation: FGARelation,
+  object: string
+): Promise<FGATuple> {
+  return deleteTuple({
+    user: formatAgentId(agentId),
+    relation,
+    object,
+  });
+}
+
+/**
+ * List all objects an agent can access with a specific relation
+ * @param agentId - Agent identifier
+ * @param relation - The relation to check
+ * @param objectType - Type of objects to list
+ * @returns Promise<string[]>
+ */
+export async function listAgentAccessibleObjects(
+  agentId: string,
+  relation: FGARelation,
+  objectType: FGAObjectType
+): Promise<string[]> {
+  return listObjects(formatAgentId(agentId), relation, objectType);
 }

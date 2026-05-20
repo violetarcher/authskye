@@ -1,0 +1,63 @@
+module agents
+
+# AI Agents as First-Class Principals
+# This module implements the "Agents as Principals" pattern where AI agents
+# are treated as first-class entities alongside human users in authorization.
+# See: https://docs.fga.dev/modeling/agents/agents-as-principals
+
+type agent
+  relations
+    # Agents can belong to an organization (scopes their access)
+    define organization: [organization]
+
+type organization
+  relations
+    # Direct membership
+    define member: [user, agent]
+    define admin: [user]
+
+    # Computed permissions
+    define can_read: member or admin
+    define can_write: admin
+    define can_manage: admin
+    define can_delete: admin
+
+type project
+  relations
+    # Hierarchy - projects belong to organizations
+    define organization: [organization]
+
+    # Direct relations - both users AND agents can have access
+    define owner: [user, agent]
+    define editor: [user, agent]
+    define viewer: [user, agent] or owner or editor or member from organization
+
+    # Agent-specific capabilities (scoped permissions for automated tasks)
+    define triager: [agent]
+    define reviewer: [agent]
+
+    # Computed permissions
+    define can_read: viewer
+    define can_write: editor or owner
+    define can_triage: triager or owner
+    define can_review: reviewer or owner
+    define can_manage: owner or admin from organization
+
+type issue
+  relations
+    # Hierarchy - issues belong to projects
+    define project: [project]
+
+    # Direct relations - both users AND agents can have access
+    define reporter: [user, agent]
+    define assignee: [user, agent]
+    define commenter: [user, agent]
+
+    # Inherited access from project
+    define viewer: [user, agent] or reporter or assignee or viewer from project
+
+    # Computed permissions
+    define can_read: viewer
+    define can_comment: commenter or assignee or reporter or editor from project
+    define can_assign: owner from project or triager from project
+    define can_close: assignee or owner from project

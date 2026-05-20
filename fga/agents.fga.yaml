@@ -1,0 +1,303 @@
+name: Agents as Principals Authorization Tests
+model_file: ./fga.mod
+
+tuples:
+  # === ORGANIZATION SETUP ===
+  - user: user:dan-admin
+    relation: admin
+    object: organization:acme
+
+  - user: user:alice-pm
+    relation: member
+    object: organization:acme
+
+  - user: user:bob-dev
+    relation: member
+    object: organization:acme
+
+  - user: user:carol-support
+    relation: member
+    object: organization:acme
+
+  # Agents belong to organization
+  - user: agent:triage-bot
+    relation: member
+    object: organization:acme
+
+  - user: agent:reporting-bot
+    relation: member
+    object: organization:acme
+
+  - user: agent:support-agent
+    relation: member
+    object: organization:acme
+
+  - user: agent:code-review-bot
+    relation: member
+    object: organization:acme
+
+  # === PROJECT SETUP ===
+  # Project Alpha - belongs to Acme org
+  - user: organization:acme
+    relation: organization
+    object: project:alpha
+
+  # Alice is owner of Project Alpha
+  - user: user:alice-pm
+    relation: owner
+    object: project:alpha
+
+  # Bob is editor on Project Alpha
+  - user: user:bob-dev
+    relation: editor
+    object: project:alpha
+
+  # Project Beta - belongs to Acme org
+  - user: organization:acme
+    relation: organization
+    object: project:beta
+
+  # === AGENT CAPABILITIES ===
+  # Triage Bot can triage both projects
+  - user: agent:triage-bot
+    relation: triager
+    object: project:alpha
+
+  - user: agent:triage-bot
+    relation: triager
+    object: project:beta
+
+  # Reporting Bot has viewer access via org membership (inherits from organization)
+
+  # Support Agent - only viewer access via org membership
+
+  # Code Review Bot can review Project Alpha only
+  - user: agent:code-review-bot
+    relation: reviewer
+    object: project:alpha
+
+  # === ISSUE SETUP ===
+  # Issue 123 belongs to Project Alpha
+  - user: project:alpha
+    relation: project
+    object: issue:issue-123
+
+  # Carol reported issue 123
+  - user: user:carol-support
+    relation: reporter
+    object: issue:issue-123
+
+  # Support Agent can comment on issue 123
+  - user: agent:support-agent
+    relation: commenter
+    object: issue:issue-123
+
+  # Issue 456 belongs to Project Beta
+  - user: project:beta
+    relation: project
+    object: issue:issue-456
+
+  # Support Agent can comment on issue 456
+  - user: agent:support-agent
+    relation: commenter
+    object: issue:issue-456
+
+tests:
+  # === ORGANIZATION TESTS ===
+  - name: Organization Admin Permissions
+    check:
+      - user: user:dan-admin
+        object: organization:acme
+        assertions:
+          admin: true
+          can_read: true
+          can_write: true
+          can_manage: true
+          can_delete: true
+
+  - name: Organization Member Permissions
+    check:
+      - user: user:alice-pm
+        object: organization:acme
+        assertions:
+          admin: false
+          member: true
+          can_read: true
+          can_write: false
+          can_manage: false
+
+  - name: Agent Organization Membership
+    check:
+      - user: agent:triage-bot
+        object: organization:acme
+        assertions:
+          member: true
+          can_read: true
+          can_write: false  # agents aren't admins
+
+  # === PROJECT TESTS ===
+  - name: Project Owner (Alice) Full Access
+    check:
+      - user: user:alice-pm
+        object: project:alpha
+        assertions:
+          owner: true
+          viewer: true
+          can_read: true
+          can_write: true
+          can_triage: true  # owner can triage
+          can_manage: true
+
+  - name: Project Editor (Bob) Limited Access
+    check:
+      - user: user:bob-dev
+        object: project:alpha
+        assertions:
+          owner: false
+          editor: true
+          viewer: true
+          can_read: true
+          can_write: true
+          can_manage: false
+
+  - name: Org Member Gets Viewer Access to Projects
+    check:
+      - user: user:carol-support
+        object: project:alpha
+        assertions:
+          owner: false
+          viewer: true  # via org membership
+          can_read: true
+          can_write: false
+
+  - name: Triage Bot Can Triage Projects
+    check:
+      - user: agent:triage-bot
+        object: project:alpha
+        assertions:
+          triager: true
+          viewer: true  # via org membership
+          can_read: true
+          can_triage: true
+          can_write: false
+          can_manage: false
+
+  - name: Code Review Bot Can Review Alpha Only
+    check:
+      - user: agent:code-review-bot
+        object: project:alpha
+        assertions:
+          reviewer: true
+          can_read: true
+          can_review: true
+      - user: agent:code-review-bot
+        object: project:beta
+        assertions:
+          reviewer: false
+          can_read: true  # via org membership
+          can_review: false
+
+  - name: Reporting Bot Read-Only Access
+    check:
+      - user: agent:reporting-bot
+        object: project:alpha
+        assertions:
+          viewer: true  # via org membership
+          can_read: true
+          can_write: false
+          can_triage: false
+          can_review: false
+
+  # === ISSUE TESTS ===
+  - name: Issue Reporter Can Read and Comment
+    check:
+      - user: user:carol-support
+        object: issue:issue-123
+        assertions:
+          reporter: true
+          viewer: true
+          can_read: true
+          can_comment: true
+          can_assign: false
+
+  - name: Support Agent Can Comment on Assigned Issues
+    check:
+      - user: agent:support-agent
+        object: issue:issue-123
+        assertions:
+          commenter: true
+          can_read: true
+          can_comment: true
+          can_assign: false
+      - user: agent:support-agent
+        object: issue:issue-456
+        assertions:
+          commenter: true
+          can_read: true
+          can_comment: true
+
+  - name: Triage Bot Can Assign Issues in Projects They Triage
+    check:
+      - user: agent:triage-bot
+        object: issue:issue-123
+        assertions:
+          viewer: true  # via project viewer inheritance
+          can_read: true
+          can_assign: true  # triager from project
+
+  - name: Project Owner Can Assign Issues
+    check:
+      - user: user:alice-pm
+        object: issue:issue-123
+        assertions:
+          can_read: true
+          can_assign: true  # owner from project
+          can_close: true   # owner from project can close
+
+  # === DUAL AUTHORIZATION SCENARIOS ===
+  # These test the "Agents as Principals" pattern where BOTH user AND agent
+  # need permission for an action to proceed
+
+  - name: "Dual Auth - Alice (PM) + Triage Bot on Project Alpha"
+    description: "Both have permissions - action should succeed"
+    check:
+      - user: user:alice-pm
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_manage: true
+      - user: agent:triage-bot
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_triage: true
+
+  - name: "Dual Auth - Carol (Support) + Reporting Bot on Project Alpha"
+    description: "Both have read-only access"
+    check:
+      - user: user:carol-support
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_write: false
+      - user: agent:reporting-bot
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_write: false
+
+  - name: "Dual Auth - Bob (Dev) + Code Review Bot"
+    description: "Bob can write, bot can review - complementary permissions"
+    check:
+      - user: user:bob-dev
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_write: true
+          can_review: false
+      - user: agent:code-review-bot
+        object: project:alpha
+        assertions:
+          can_read: true
+          can_write: false
+          can_review: true
