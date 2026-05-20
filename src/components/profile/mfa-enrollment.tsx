@@ -599,7 +599,11 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
               description: 'Scan the QR code with Auth0 Guardian app, then approve the push notification.',
             });
           } else {
-            // SMS/Email/etc - needs verification but no QR code
+            // SMS/Email - Auth0 My Account API sends OTP automatically when enrollment is created
+            // Just set up the OTP verification dialog
+            console.log('📋 SMS/Email enrollment created, OTP sent automatically:', data.method.id);
+
+            // Store OTP enrollment data for verification
             setOtpEnrollment({
               id: data.method.id,
               type: selectedFactor.type,
@@ -1948,18 +1952,68 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
               />
             </div>
 
-            {/* Instructions */}
+            {/* Instructions and Resend */}
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Didn't receive it?</strong> Check your spam folder or try enrolling again.
+                <strong>Didn't receive it?</strong> Check your spam folder or click below to resend.
               </p>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOtpEnrollment(null)}>
-              Cancel
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                if (!otpEnrollment) return;
+                setLoading(true);
+                try {
+                  // Try the challenge endpoint to resend OTP
+                  // Note: This may return 404 if Auth0 doesn't support resending for this enrollment type
+                  const challengeResponse = await fetch(`/api/mfa/methods/${encodeURIComponent(otpEnrollment.id)}/challenge`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                      auth_session: otpEnrollment.auth_session,
+                    }),
+                  });
+
+                  if (challengeResponse.ok) {
+                    toast.success('Code Resent', {
+                      description: `A new code was sent to your ${otpEnrollment.type === 'sms' ? 'phone' : 'email'}.`,
+                    });
+                  } else if (challengeResponse.status === 404) {
+                    // Challenge endpoint doesn't exist - suggest re-enrolling
+                    toast.info('Cannot resend', {
+                      description: 'Please cancel and start enrollment again to get a new code.',
+                    });
+                  } else {
+                    const errorData = await challengeResponse.json();
+                    toast.error('Failed to resend', {
+                      description: errorData.message || 'Could not resend code.',
+                    });
+                  }
+                } catch (error) {
+                  toast.error('Network error', {
+                    description: 'Failed to resend code.',
+                  });
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="text-blue-600"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" />
+              Resend Code
             </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setOtpEnrollment(null)}>
+                Cancel
+              </Button>
             <Button
               onClick={handleVerifyOtp}
               disabled={loading || verificationCode.length !== 6}
@@ -1973,6 +2027,7 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
                 'Verify & Complete'
               )}
             </Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
