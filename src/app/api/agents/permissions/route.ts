@@ -2,7 +2,7 @@
 // Fetches real permissions from FGA for personas and agents
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextResponse } from 'next/server';
-import fgaClient from '@/lib/fga-client';
+import fgaClient, { isFgaAvailable } from '@/lib/fga-client';
 
 // Simple in-memory cache with TTL
 const permissionCache = new Map<string, { data: Record<string, string[]>; timestamp: number }>();
@@ -159,6 +159,17 @@ export const GET = withApiAuthRequired(async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Check if FGA is configured
+    if (!isFgaAvailable()) {
+      return NextResponse.json(
+        {
+          error: 'FGA not configured',
+          message: 'FGA environment variables are not set. Set FGA_API_URL, FGA_STORE_ID, and credentials.',
+        },
+        { status: 503 }
+      );
+    }
+
     const url = new URL(request.url);
     const subjectType = url.searchParams.get('type') as 'user' | 'agent' | null;
     const subjectId = url.searchParams.get('id');
@@ -189,7 +200,7 @@ export const GET = withApiAuthRequired(async function GET(request: Request) {
   } catch (error) {
     console.error('Error fetching permissions:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch permissions' },
+      { error: 'Failed to fetch permissions', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -203,6 +214,17 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
 
     if (!user?.sub) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if FGA is configured
+    if (!isFgaAvailable() || !fgaClient) {
+      return NextResponse.json(
+        {
+          error: 'FGA not configured',
+          message: 'FGA environment variables are not set.',
+        },
+        { status: 503 }
+      );
     }
 
     const body = await request.json();
@@ -245,7 +267,7 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
   } catch (error) {
     console.error('Error checking permission:', error);
     return NextResponse.json(
-      { error: 'Failed to check permission' },
+      { error: 'Failed to check permission', message: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

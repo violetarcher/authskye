@@ -1123,6 +1123,48 @@ const fetchWithAuth = async (endpoint: string) => {
 - `kong/KONG-SETUP.md` - Complete setup guide for Kong Konnect
 - `kong/KONG-TESTING.md` - Testing scenarios and troubleshooting
 
+### 12. AI Agents Demo ("Agents as Principals")
+
+Demonstrates fine-grained authorization for AI agents using Auth0 FGA's "Agents as Principals" pattern.
+
+**Core Concept:** Both the **user** AND the **agent** must have permission for any action. Agents are first-class principals in FGA with their own permissions.
+
+**Key Components:**
+- `src/app/agents/page.tsx` - Chat UI with FGA permissions display
+- `src/app/api/agents/chat/route.ts` - LLM chat with dual authorization checks
+- `src/app/api/agents/permissions/route.ts` - Batch FGA permission fetching
+
+**FGA Model (Modular):**
+```
+type agent
+  relations
+    define can_act_as: [user]
+
+type project
+  relations
+    define triager: [user, agent]
+    define can_triage: triager or owner
+```
+
+**CIBA Escalation (Human-in-the-Loop):**
+When an agent lacks permission but the user has it, CIBA approval enables delegation:
+
+1. Agent detects: `agent:triage-bot can_close issue:issue-123` → **denied**
+2. Agent checks: `user:alice can_close issue:issue-123` → **allowed**
+3. Agent offers CIBA escalation via Guardian push notification
+4. User approves on mobile device
+5. Agent executes action on user's behalf
+
+**Flow:**
+```
+User Request → Dual FGA Check → Both Allowed? → Execute
+                    ↓ Agent Denied, User Allowed
+              Offer CIBA → Guardian Push → User Approves → Execute
+```
+
+**Demo Personas:** Alice (PM), Bob (Dev), Carol (Support), Dan (Admin)
+**Demo Agents:** Triage Bot, Reporting Bot, Support Agent, Code Review Bot
+
 ## Project Structure
 
 ```
@@ -1414,9 +1456,9 @@ When working on demo branches, remember that branding changes are cosmetic - the
 - `src/app/claims/page.tsx` - Claims management page
 - `src/app/api/organization/members/route.ts` - Organization invitations with custom domain header
 - `src/app/api/kong-protected/analytics/route.ts` - Kong-protected endpoint example
-- `src/app/agents/page.tsx` - AI Agents demo page with chat interface
-- `src/app/api/agents/chat/route.ts` - Chat endpoint with FGA permission checks
-- `src/app/api/agents/setup-demo/route.ts` - Setup/cleanup demo FGA tuples
+- `src/app/agents/page.tsx` - AI Agents demo with chat, FGA permissions, CIBA escalation
+- `src/app/api/agents/chat/route.ts` - Chat with dual FGA checks and CIBA detection
+- `src/app/api/agents/permissions/route.ts` - Batch FGA permission fetching with caching
 - `src/app/api-gateway/page.tsx` - Kong Gateway demo page
 - `src/components/admin/member-manager.tsx` - Member invitation UI
 - `src/components/mermaid-diagram.tsx` - Mermaid diagram component

@@ -2,7 +2,7 @@
 // Real AI agent powered by LightLLM with FGA authorization checks
 import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextResponse } from 'next/server';
-import fgaClient from '@/lib/fga-client';
+import fgaClient, { isFgaAvailable } from '@/lib/fga-client';
 
 interface Persona {
   id: string;
@@ -75,6 +75,12 @@ async function checkPermission(
   relation: string,
   object: string
 ): Promise<boolean> {
+  // If FGA is not configured, deny all permissions
+  if (!isFgaAvailable() || !fgaClient) {
+    console.warn('FGA not configured, denying permission check');
+    return false;
+  }
+
   const fgaUser = subjectType === 'agent'
     ? `agent:${subjectId}`
     : `user:${subjectId}`;
@@ -305,6 +311,28 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
 
     if (!user?.sub) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if required services are configured
+    const fgaConfigured = isFgaAvailable();
+    const llmConfigured = !!(process.env.LIGHTLLM_ENDPOINT && process.env.LIGHTLLM_API_KEY);
+
+    if (!fgaConfigured) {
+      return NextResponse.json({
+        response: 'FGA authorization service is not configured. Please set FGA_API_URL, FGA_STORE_ID, and FGA credentials in environment variables.',
+        permissionChecks: [],
+        error: 'FGA not configured',
+        configStatus: { fga: false, llm: llmConfigured },
+      });
+    }
+
+    if (!llmConfigured) {
+      return NextResponse.json({
+        response: 'LightLLM service is not configured. Please set LIGHTLLM_ENDPOINT and LIGHTLLM_API_KEY in environment variables.',
+        permissionChecks: [],
+        error: 'LLM not configured',
+        configStatus: { fga: fgaConfigured, llm: false },
+      });
     }
 
     const body: ChatRequest = await request.json();
