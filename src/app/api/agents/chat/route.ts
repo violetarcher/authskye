@@ -181,19 +181,98 @@ When CIBA is available (user has permission, you don't), explain:
 Be conversational but precise about authorization. This is a demo showcasing fine-grained authorization for AI agents.`;
 }
 
-// Call LightLLM
+// Generate fallback response when LLM is unavailable
+function generateFallbackResponse(
+  persona: Persona,
+  agent: AgentType,
+  authResults: { action: string; resource: string; userAllowed: boolean; agentAllowed: boolean }[],
+  cibaEscalations: CibaEscalation[]
+): string {
+  const lines: string[] = [];
+
+  // Analyze results
+  const authorized = authResults.filter(r => r.userAllowed && r.agentAllowed);
+  const deniedBoth = authResults.filter(r => !r.userAllowed && !r.agentAllowed);
+  const deniedUser = authResults.filter(r => !r.userAllowed && r.agentAllowed);
+  const deniedAgent = authResults.filter(r => r.userAllowed && !r.agentAllowed);
+
+  if (authorized.length > 0) {
+    lines.push(`✅ **Authorized Actions:**`);
+    authorized.forEach(r => {
+      lines.push(`- I can perform **${r.action.replace('can_', '')}** on **${r.resource}** on your behalf.`);
+    });
+    lines.push('');
+  }
+
+  if (deniedAgent.length > 0) {
+    lines.push(`⚠️ **CIBA Escalation Available:**`);
+    deniedAgent.forEach(r => {
+      lines.push(`- You (${persona.name}) have **${r.action}** permission on **${r.resource}**, but I (${agent.name}) do not.`);
+      lines.push(`- I can request your explicit approval via **CIBA push notification** to perform this action on your behalf.`);
+    });
+    lines.push(`\nClick the **"Request Approval via Guardian"** button below to authorize me.`);
+    lines.push('');
+  }
+
+  if (deniedUser.length > 0) {
+    lines.push(`❌ **User Permission Denied:**`);
+    deniedUser.forEach(r => {
+      lines.push(`- You (${persona.name}) lack **${r.action}** permission on **${r.resource}**. I cannot help with this action.`);
+    });
+    lines.push('');
+  }
+
+  if (deniedBoth.length > 0) {
+    lines.push(`❌ **Access Denied:**`);
+    deniedBoth.forEach(r => {
+      lines.push(`- Neither you nor I have **${r.action}** permission on **${r.resource}**.`);
+    });
+    lines.push('');
+  }
+
+  if (lines.length === 0) {
+    lines.push(`I'm ${agent.name}, acting on behalf of ${persona.name}. How can I help you today?`);
+    lines.push('');
+    lines.push('Try asking me to:');
+    lines.push('- Read or view a project (e.g., "Show me project alpha")');
+    lines.push('- Triage or assign an issue (e.g., "Triage issue 123")');
+    lines.push('- Close or resolve an issue (e.g., "Close issue 123")');
+  }
+
+  return lines.join('\n');
+}
+
+// Call LightLLM with fallback
 async function callLLM(
   systemPrompt: string,
   conversationHistory: ChatMessage[],
   userMessage: string,
-  authorizationContext: string
-): Promise<string> {
+  authorizationContext: string,
+  fallbackData?: {
+    persona: Persona;
+    agent: AgentType;
+    authResults: { action: string; resource: string; userAllowed: boolean; agentAllowed: boolean }[];
+    cibaEscalations: CibaEscalation[];
+  }
+): Promise<{ response: string; usedFallback: boolean }> {
   const endpoint = process.env.LIGHTLLM_ENDPOINT;
   const apiKey = process.env.LIGHTLLM_API_KEY;
   const model = process.env.LIGHTLLM_MODEL || 'claude-sonnet-4-5';
 
+  // If LLM not configured, use fallback
   if (!endpoint || !apiKey) {
-    throw new Error('LightLLM not configured');
+    if (fallbackData) {
+      return {
+        response: generateFallbackResponse(
+          fallbackData.persona,
+          fallbackData.agent,
+          fallbackData.authResults,
+          fallbackData.cibaEscalations
+        ),
+        usedFallback: true,
+      };
+    }
+    return { response: 'LLM service is not configured.', usedFallback: true };
   }
 
   // Build messages array
@@ -203,28 +282,62 @@ async function callLLM(
     { role: 'user', content: `${userMessage}\n\n---\nAUTHORIZATION CONTEXT (use this to inform your response):\n${authorizationContext}` },
   ];
 
-  const response = await fetch(`${endpoint}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages,
-      max_tokens: 1000,
-      temperature: 0.7,
-    }),
-  });
+  try {
+    const response = await fetch(`${endpoint}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error('LLM error:', error);
-    throw new Error(`LLM request failed: ${response.status}`);
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('LLM error:', response.status, error);
+
+      // Use fallback on LLM failure
+      if (fallbackData) {
+        return {
+          response: generateFallbackResponse(
+            fallbackData.persona,
+            fallbackData.agent,
+            fallbackData.authResults,
+            fallbackData.cibaEscalations
+          ),
+          usedFallback: true,
+        };
+      }
+      throw new Error(`LLM request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return {
+      response: data.choices?.[0]?.message?.content || 'I apologize, but I was unable to generate a response.',
+      usedFallback: false,
+    };
+  } catch (error) {
+    console.error('LLM call failed:', error);
+
+    // Use fallback on any error
+    if (fallbackData) {
+      return {
+        response: generateFallbackResponse(
+          fallbackData.persona,
+          fallbackData.agent,
+          fallbackData.authResults,
+          fallbackData.cibaEscalations
+        ),
+        usedFallback: true,
+      };
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || 'I apologize, but I was unable to generate a response.';
 }
 
 // Parse user message to determine intent
@@ -326,14 +439,7 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
       });
     }
 
-    if (!llmConfigured) {
-      return NextResponse.json({
-        response: 'LightLLM service is not configured. Please set LIGHTLLM_ENDPOINT and LIGHTLLM_API_KEY in environment variables.',
-        permissionChecks: [],
-        error: 'LLM not configured',
-        configStatus: { fga: fgaConfigured, llm: false },
-      });
-    }
+    // LLM is optional - we have fallback responses
 
     const body: ChatRequest = await request.json();
     const { message, persona, agent, conversationHistory } = body;
@@ -403,13 +509,14 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
 
     const fullAuthContext = `Requested actions and authorization results:\n${authContext}\n\nUser: ${persona.name} (${persona.role})\nAgent: ${agent.name}${cibaContext}`;
 
-    // Call the LLM
+    // Call the LLM (with fallback if unavailable)
     const systemPrompt = buildSystemPrompt(persona, agent);
-    const llmResponse = await callLLM(
+    const { response: llmResponse, usedFallback } = await callLLM(
       systemPrompt,
       conversationHistory,
       message,
-      fullAuthContext
+      fullAuthContext,
+      { persona, agent, authResults, cibaEscalations }
     );
 
     return NextResponse.json({
@@ -418,6 +525,7 @@ export const POST = withApiAuthRequired(async function POST(request: Request) {
       parsedIntent: { actions, resources },
       authResults,
       cibaEscalation: cibaEscalations.length > 0 ? cibaEscalations[0] : null,
+      usedFallback,
     });
   } catch (error) {
     console.error('Chat error:', error);
