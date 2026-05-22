@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { Auth0SessionManager } from '@/lib/auth0-session-manager';
 import { sessionIdSchema } from '@/lib/validations';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export const DELETE = withApiAuthRequired(async function DELETE(request: NextRequest) {
   try {
@@ -11,8 +12,8 @@ export const DELETE = withApiAuthRequired(async function DELETE(request: NextReq
     }
 
     const { user } = session;
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
-    
+    const roles = user[getClaimKey('roles')] || [];
+
     // Check if user is admin
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
@@ -23,7 +24,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(request: NextReq
 
     if (!validationResult.success) {
       return Response.json(
-        { 
+        {
           error: 'Invalid input',
           details: validationResult.error.issues
         },
@@ -32,7 +33,7 @@ export const DELETE = withApiAuthRequired(async function DELETE(request: NextReq
     }
 
     const { sessionId } = validationResult.data;
-    const currentSessionId = session.user['https://agency-inc-demo.com/session_id'];
+    const currentSessionId = session.user[getClaimKey('session_id')];
     
     // Warn if user is trying to terminate their own session
     if (sessionId === currentSessionId) {

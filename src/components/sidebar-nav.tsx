@@ -1,4 +1,4 @@
-// src/components/sidebar-nav.tsx - Paw0 AKC Navigation
+// src/components/sidebar-nav.tsx - Authskye Navigation
 'use client';
 
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import {
   FolderOpen,
   Shield,
   User,
-  Dog,
+  CreditCard,
   Building2,
   Bot
 } from 'lucide-react';
@@ -59,12 +59,12 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
 
       <Button
         asChild
-        variant={pathname === '/claims' ? 'secondary' : 'ghost'}
+        variant={pathname === '/billing' ? 'secondary' : 'ghost'}
         className="w-full justify-start"
       >
-        <Link href="/claims">
-          <Dog className="mr-2 h-4 w-4" />
-          Registrations
+        <Link href="/billing">
+          <CreditCard className="mr-2 h-4 w-4" />
+          Billing
         </Link>
       </Button>
 

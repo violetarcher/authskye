@@ -1,16 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { ChevronDown, Loader2 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
+import { ChevronDown, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -39,6 +31,7 @@ export function OrgSwitcher({ userEmail }: OrgSwitcherProps = {}) {
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isSwitching, setIsSwitching] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchOrganizations = async () => {
@@ -52,11 +45,6 @@ export function OrgSwitcher({ userEmail }: OrgSwitcherProps = {}) {
         }
 
         const data = await response.json();
-        console.log('🔍 Org Switcher Debug:', {
-          organizations: data.organizations,
-          organizationsLength: data.organizations?.length,
-          currentOrg: data.currentOrganization
-        });
         setOrganizations(data.organizations || []);
         setCurrentOrg(data.currentOrganization);
       } catch (err) {
@@ -70,28 +58,39 @@ export function OrgSwitcher({ userEmail }: OrgSwitcherProps = {}) {
     fetchOrganizations();
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   const handleOrgSwitch = async (orgId: string) => {
     try {
       setIsSwitching(true);
       setIsOpen(false);
 
-      console.log('🔄 Switching to organization:', orgId);
-
-      // Auth0 requires full re-authentication for organization switching
-      // Refresh tokens are bound to the organization they were issued for
       const loginUrl = new URL('/api/auth/login', window.location.origin);
       loginUrl.searchParams.set('organization', orgId);
       loginUrl.searchParams.set('returnTo', window.location.pathname);
 
-      // Pre-fill username with login_hint to speed up the process
       if (userEmail) {
         loginUrl.searchParams.set('login_hint', userEmail);
       }
 
-      // Redirect to login - if user has SSO session, this will be quick
       window.location.href = loginUrl.toString();
     } catch (err) {
-      console.error('❌ Error switching organization:', err);
+      console.error('Error switching organization:', err);
       setError('Failed to switch organization');
       setIsSwitching(false);
     }
@@ -101,90 +100,87 @@ export function OrgSwitcher({ userEmail }: OrgSwitcherProps = {}) {
     return (
       <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-muted-foreground">Loading organizations...</span>
+        <span className="text-muted-foreground">Loading...</span>
       </div>
     );
   }
-
-  console.log('🔍 Org Switcher Render Check:', {
-    currentOrg,
-    organizationsLength: organizations.length,
-    shouldHide: !currentOrg || organizations.length <= 1
-  });
 
   if (!currentOrg || organizations.length <= 1) {
     return null;
   }
 
-  const logoUrl = currentOrg.logo || "https://auth0images.s3.us-east-2.amazonaws.com/Auth0+Official+Icons/auth0-identicons/icon-api.png";
+  const logoUrl = currentOrg.logo || "https://ui-avatars.com/api/?name=Org&background=3b82f6&color=fff";
 
   if (isSwitching) {
     return (
       <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm">
-        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-        <span className="text-sm">Switching organization...</span>
+        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <span className="text-sm">Switching...</span>
       </div>
     );
   }
 
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          disabled={isSwitching}
-          className={cn(
-            'w-full justify-between',
-            isOpen && 'bg-accent'
-          )}
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <Image
-              src={logoUrl}
-              alt={`${currentOrg.name} Logo`}
-              width={16}
-              height={16}
-              className="h-4 w-4 rounded flex-shrink-0"
-            />
-            <span className="truncate text-sm">{currentOrg.name}</span>
+    <div className="relative" ref={dropdownRef}>
+      <Button
+        variant="outline"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full justify-between"
+      >
+        <div className="flex items-center gap-2 min-w-0">
+          <Image
+            src={logoUrl}
+            alt={`${currentOrg.name} Logo`}
+            width={16}
+            height={16}
+            className="h-4 w-4 rounded flex-shrink-0"
+          />
+          <span className="truncate text-sm">{currentOrg.name}</span>
+        </div>
+        <ChevronDown className={cn(
+          "ml-2 h-4 w-4 opacity-50 flex-shrink-0 transition-transform",
+          isOpen && "rotate-180"
+        )} />
+      </Button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-56 rounded-md border bg-popover text-popover-foreground shadow-lg z-50">
+          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+            Switch Organization
           </div>
-          <ChevronDown className="ml-2 h-4 w-4 opacity-50 flex-shrink-0" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
-        <DropdownMenuLabel className="text-xs font-semibold text-muted-foreground">
-          Switch Organization
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {organizations.map((org) => (
-          <DropdownMenuItem
-            key={org.id}
-            onClick={() => handleOrgSwitch(org.id)}
-            className={cn(
-              'cursor-pointer',
-              org.isCurrent && 'bg-accent'
-            )}
-          >
-            <div className="flex items-center gap-2 w-full">
-              {org.logo_url && (
-                <Image
-                  src={org.logo_url}
-                  alt={`${org.display_name} Logo`}
-                  width={16}
-                  height={16}
-                  className="h-4 w-4 rounded"
-                />
-              )}
-              <span className="flex-1 truncate">
-                {org.display_name || org.name}
-              </span>
-              {org.isCurrent && (
-                <span className="text-xs text-muted-foreground">(Current)</span>
-              )}
-            </div>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <div className="h-px bg-border mx-1" />
+          <div className="p-1">
+            {organizations.map((org) => (
+              <button
+                key={org.id}
+                onClick={() => handleOrgSwitch(org.id)}
+                className={cn(
+                  "flex items-center gap-2 w-full rounded-sm px-2 py-1.5 text-sm hover:bg-accent cursor-pointer",
+                  org.isCurrent && "bg-accent"
+                )}
+              >
+                {org.logo_url ? (
+                  <Image
+                    src={org.logo_url}
+                    alt={`${org.display_name} Logo`}
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 rounded"
+                  />
+                ) : (
+                  <div className="h-4 w-4 rounded bg-muted" />
+                )}
+                <span className="flex-1 truncate text-left">
+                  {org.display_name || org.name}
+                </span>
+                {org.isCurrent && (
+                  <Check className="h-4 w-4 text-primary" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,8 +14,8 @@ export async function GET(request: NextRequest) {
         email: user.email,
         name: user.name,
         org_id: user.org_id,
-        org_name: user['https://agency-inc-demo.com/org_name'],
-        roles: user['https://agency-inc-demo.com/roles'],
+        org_name: user[getClaimKey('org_name')],
+        roles: user[getClaimKey('roles')],
       } : null,
     }, { status: 200 });
   } catch (error: any) {

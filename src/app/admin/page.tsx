@@ -3,10 +3,11 @@ import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { managementClient } from "@/lib/auth0-mgmt-client";
 import { MemberManager } from "@/components/admin/member-manager";
 import { GroupManager } from "@/components/admin/group-manager";
+import { getClaimKey } from '@/lib/auth-utils';
 
 // Helper function to check for admin role
 const isAdmin = (session: any): boolean => {
-    const roles = session?.user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = session?.user?.[getClaimKey('roles')] || [];
     return roles.includes('Admin');
 };
 

@@ -55,13 +55,14 @@ export async function POST(request: NextRequest) {
     const orgId = organization.data.id!;
     console.log('✅ Organization created:', orgId);
 
-    // Get the Username-Password-Authentication connection
+    // Get the database connection (from env or default)
+    const connectionName = process.env.AUTH0_CONNECTION_ID || 'Username-Password-Authentication';
     const connections = await customDomainClient.connections.getAll({
       strategy: ['auth0'] as any,
     });
 
     const databaseConnection = connections.data.find(
-      (conn) => conn.name === 'Username-Password-Authentication'
+      (conn) => conn.name === connectionName
     );
 
     if (!databaseConnection) {

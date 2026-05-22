@@ -13,6 +13,7 @@ import { UserMetadata } from './user-metadata';
 import { Copy, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { AUTH0_NAMESPACE, getClaimKey } from '@/lib/auth-utils';
 
 interface User {
   sub: string;
@@ -27,9 +28,7 @@ interface User {
   picture?: string;
   updated_at?: string;
   org_id?: string;
-  ['https://agency-inc-demo.com/roles']?: string[];
-  ['https://agency-inc-demo.com/org_name']?: string;
-  user_metadata?: Record<string, any>;
+  [key: string]: any; // Allow dynamic namespace keys
 }
 
 interface ProfileClientProps {
@@ -329,12 +328,12 @@ export function ProfileClient({ user }: ProfileClientProps) {
             <Separator />
 
             {/* Organization Section */}
-            {user['https://agency-inc-demo.com/org_name'] && (
+            {user[getClaimKey('org_name')] && (
               <>
                 <div className="space-y-2">
                   <Label className="text-sm text-muted-foreground">Organization</Label>
                   <div className="text-sm font-medium break-words">
-                    {user['https://agency-inc-demo.com/org_name']}
+                    {user[getClaimKey('org_name')]}
                   </div>
                 </div>
                 <Separator />
@@ -342,12 +341,12 @@ export function ProfileClient({ user }: ProfileClientProps) {
             )}
 
             {/* Roles Section */}
-            {user['https://agency-inc-demo.com/roles'] && user['https://agency-inc-demo.com/roles'].length > 0 && (
+            {user[getClaimKey('roles')] && user[getClaimKey('roles')].length > 0 && (
               <>
                 <div className="space-y-2">
                   <Label className="text-sm text-muted-foreground">Roles</Label>
                   <div className="flex flex-wrap gap-2">
-                    {user['https://agency-inc-demo.com/roles'].map((role) => (
+                    {user[getClaimKey('roles')].map((role: string) => (
                       <Badge key={role} variant="secondary">
                         {role}
                       </Badge>

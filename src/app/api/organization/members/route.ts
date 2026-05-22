@@ -4,6 +4,7 @@ import { managementClient } from '@/lib/auth0-mgmt-client';
 import { ManagementClient } from 'auth0';
 import { inviteMemberSchema } from '@/lib/validations';
 import { z } from 'zod';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     const user = session.user;
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
 
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = session.user;
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
 
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });

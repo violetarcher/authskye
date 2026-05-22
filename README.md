@@ -1,674 +1,337 @@
-# Authskye, A B2B & B2C app to demonstrate Auth0 + FGA functionality
+# Authskye - Cloud Workspace Platform
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Auth0](https://img.shields.io/badge/Auth0-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![OpenFGA](https://img.shields.io/badge/OpenFGA-FF6B6B?style=for-the-badge&logo=auth0&logoColor=white)
 
-This project is a comprehensive demonstration of a modern B2B Software-as-a-Service (SaaS) application built with Next.js 14 App Router. It showcases enterprise-grade identity and authorization patterns using **Auth0** for a fictional company, "Agency Inc."
+**Authskye** is a comprehensive B2B/B2C cloud workspace platform demonstrating enterprise-grade identity, authorization, and security patterns using **Auth0** and **Auth0 FGA** (Fine-Grained Authorization).
 
-The application serves as a robust template for building multi-tenant, secure, and feature-rich enterprise applications with comprehensive session management, step-up MFA, access request workflows, and modern development practices.
+## What This Demo Showcases
 
-## 🚀 Architecture & Tech Stack
+| Feature | Description |
+|---------|-------------|
+| **Multi-Tenant Organizations** | Auth0 Organizations with role-based access, member management, and branded experiences |
+| **Fine-Grained Authorization** | Auth0 FGA (ReBAC) for documents, folders, and hierarchical permission inheritance |
+| **CIBA Push Notifications** | Client-Initiated Backchannel Authentication for high-assurance billing approvals |
+| **AI Agents Demo** | "Agents as Principals" pattern - AI bots with FGA-controlled permissions |
+| **My Account API** | User self-service MFA enrollment with Custom Token Exchange (CTE) |
+| **Session Management** | Real-time session monitoring, single-session enforcement, back-channel logout |
+| **Step-Up MFA** | Context-aware MFA challenges for sensitive operations |
+| **Kong API Gateway** | *(Optional)* JWT validation, rate limiting, and CORS at the gateway layer |
 
-### Frontend
-- **Next.js 14** with App Router (React 18+)
-- **TypeScript** for type safety
-- **Tailwind CSS** + **shadcn/ui** for modern UI components
-- **Radix UI** primitives for accessibility
-- **next-themes** for dark mode support
+---
 
-### Backend & APIs
-- **Next.js API Routes** (both App Router and Pages Router)
-- **Zod** for runtime input validation and type safety
-- **Auth0 Management API** integration
-- **Firebase Admin SDK** for Firestore operations
-- **Slack Webhooks** for notifications
+## Table of Contents
 
-### Authentication & Authorization
-- **Auth0** with Organizations for multi-tenancy
-- **Auth0 FGA (Fine-Grained Authorization)** for document permissions
-- **Role-Based Access Control (RBAC)** with custom permissions
-- **Session Management** with back-channel logout support
-- **Multi-Factor Authentication (MFA)** for step-up authentication
-- **Access Request Workflows** with admin approval
+1. [Prerequisites](#prerequisites)
+2. [Quick Start](#quick-start)
+3. [Environment Variables](#environment-variables)
+4. [Auth0 Setup](#auth0-setup)
+   - [Application Setup](#1-create-regular-web-application)
+   - [M2M Application](#2-create-m2m-application)
+   - [API Configuration](#3-create-api)
+   - [Roles Setup](#4-create-roles)
+   - [Organizations](#5-create-organization)
+   - [Auth0 Actions](#6-deploy-auth0-actions)
+5. [Auth0 FGA Setup](#auth0-fga-setup)
+6. [Firebase Setup](#firebase-setup)
+7. [Custom Token Exchange (CTE)](#custom-token-exchange-cte-setup)
+8. [My Account API Setup](#my-account-api-setup)
+9. [AI Agents / LLM Setup](#ai-agents-llm-setup)
+10. [Kong API Gateway (Optional)](#kong-api-gateway-optional)
+11. [User Personas](#user-personas-organization-vs-non-organization)
+12. [Demo Scenarios](#demo-scenarios)
+13. [Troubleshooting](#troubleshooting)
+14. [Additional Resources](#additional-resources)
 
-## ✨ Key Features
+---
 
-### 🔐 Authentication & Identity
-- **Multi-Tenant Logins**: Organization-specific authentication flows
-- **Custom Login Experience**: In-app organization selection
-- **Invitation-Based Sign-up**: Secure admin-managed onboarding with role assignment
-- **Single Session Enforcement**: Automatic termination of concurrent sessions
-- **Real-Time Session Validation**: Continuous session monitoring every 5 seconds
-- **Back-Channel Logout**: Reliable session revocation with proper parsing
-- **Session Monitoring**: Active session tracking and management
+## Prerequisites
 
-### 🛡️ Authorization & Security
-- **Role-Based Access Control**: Multi-role system (Admin, Editor, Viewer, Data Analyst)
-- **Permission-Based API Security**: Granular permission checks
-- **Step-Up MFA**: Sensitive operations require fresh MFA authentication
-- **Input Validation**: Comprehensive Zod schema validation
-- **Server-Side Authorization**: All security enforced server-side
-- **Session Revocation**: Persistent session blacklisting
-- **Error Boundaries**: Graceful error handling and recovery
+- **Node.js** v18 or later
+- **npm** or **yarn**
+- **Auth0 Account** (free tier available)
+- **Firebase Account** (free tier available)
+- **ngrok** (for local development with HTTPS callbacks)
+- *(Optional)* **Kong Konnect Account** (free tier available)
+- *(Optional)* **OpenAI API Key** or **LightLLM endpoint** (for AI Agents)
 
-### 👥 Admin Dashboard
-- **Protected Admin Routes**: Role-based route protection
-- **Member Management**: Complete user lifecycle management
-- **Role Assignment**: Dynamic role and permission management during invitation
-- **Session Administration**: View and terminate user sessions
-- **Organization Management**: Multi-tenant administration
+---
 
-### 📊 Advanced Features
-- **Analytics Dashboard**: Role-gated reporting interface
-- **In-App Access Requests**: Silent re-authentication workflow for role elevation
-- **Real-Time Notifications**: Slack integration for admin alerts
-- **Step-Up Authentication**: MFA-protected sensitive operations (report deletion)
-- **Loading States**: Skeleton loaders and optimistic UI
-- **Error Handling**: Comprehensive error boundaries
+## Quick Start
 
-### 📁 Document Management with Fine-Grained Authorization
-- **Hierarchical Folder Structure**: Nested folders with breadcrumb navigation
-- **Real-Time Permission Checks**: FGA-powered authorization on every document access
-- **Email-Based Sharing**: Share documents and folders with organization members
-- **Permission Inheritance**: Folders inherit viewer permissions to child documents
-- **Document Viewer**: Modal-based document viewing with permission enforcement
-- **Professional Error Handling**: Demo-ready permission denied modals
-- **URL-Based Navigation**: Bookmarkable folder paths with browser history support
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-org/authskye-dashboard.git
+cd authskye-dashboard
 
-### 🎨 UI/UX & Development
-- **Modern Design System**: Consistent component library
-- **Dark Mode**: System-aware theme switching
-- **Responsive Design**: Mobile-first approach
-- **Loading States**: Skeleton components and loading indicators
-- **Type Safety**: End-to-end TypeScript coverage
-- **Developer Tools**: Built-in token inspector and debugging utilities
+# 2. Install dependencies
+npm install
 
-## 🏗️ Project Structure
+# 3. Copy environment template and configure
+cp .env.example .env.local
+# Edit .env.local with your credentials (see Environment Variables section)
 
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── api/               # Modern API routes (route.ts)
-│   │   ├── auth/          # Authentication endpoints
-│   │   │   ├── [...auth0]/route.ts    # Auth0 handler with step-up MFA
-│   │   │   ├── backchannel-logout/route.ts # Back-channel logout
-│   │   │   └── session/   # Session management
-│   │   ├── organization/  # Member & role management
-│   │   │   └── members/   # CRUD operations with role assignment
-│   │   ├── request-access/ # Access request workflow
-│   │   ├── reports/       # Report management with step-up MFA
-│   │   ├── documents/     # Document management with FGA
-│   │   │   └── [documentId]/
-│   │   │       ├── route.ts      # Document CRUD operations
-│   │   │       └── share/route.ts # Document sharing with FGA
-│   │   ├── folders/       # Folder management with FGA
-│   │   │   └── [folderId]/
-│   │   │       ├── route.ts      # Folder CRUD operations
-│   │   │       └── share/route.ts # Folder sharing with FGA
-│   │   └── users/         # User management
-│   │       └── lookup/route.ts   # Email-based user lookup
-│   ├── admin/             # Admin dashboard pages
-│   ├── analytics/         # Analytics dashboard with access requests
-│   ├── reports/           # Reporting interface with step-up MFA
-│   └── documents/         # Document management UI
-│       └── page.tsx       # Hierarchical folder/document interface
-├── components/            # Reusable React components
-│   ├── ui/               # shadcn/ui components
-│   ├── admin/            # Admin-specific components
-│   │   ├── member-manager.tsx   # Role selection during invites
-│   │   └── session-management.tsx # Session admin interface
-│   ├── report-dashboard.tsx     # Step-up MFA implementation
-│   ├── session-validator.tsx    # Real-time session validation
-│   ├── session-enforcer.tsx     # Single session enforcement
-│   └── loading.tsx       # Loading state components
-├── lib/                  # Utilities and configurations
-│   ├── validations.ts    # Zod validation schemas
-│   ├── session-revocation.ts # File-based session revocation
-│   ├── auth0-session-manager.ts # Auth0 session enforcement
-│   ├── fga-service.ts    # Auth0 FGA client and utilities
-│   ├── firebase-admin.ts # Firebase Admin SDK setup
-│   ├── auth0-mgmt-client.ts # Auth0 Management API client
-│   ├── api-client.ts     # Type-safe API client
-│   └── auth0-*.ts        # Auth0 integrations
-└── pages/                # Legacy Pages Router (Auth0 handlers)
-    └── api/              # Legacy API routes (being phased out)
+# 4. Start ngrok tunnel (for Auth0 callbacks)
+ngrok http 4020 --domain your-static-domain.ngrok-free.app
+
+# 5. Run development server
+npm run dev
 ```
 
-## 🔧 Auth0 Actions Required
+Open [http://localhost:4020](http://localhost:4020) in your browser.
 
-**CRITICAL**: The following Auth0 Actions must be deployed for the demo to work properly:
+---
 
-### 1. Access Request Action
+## Environment Variables
 
-**Trigger**: `post-login`
-**Name**: `Access Request Handler`
+Create `.env.local` with the following configuration:
+
+### Core Auth0 Configuration
+
+```env
+# Auth0 SDK Configuration
+AUTH0_SECRET='[run: openssl rand -hex 32]'
+AUTH0_BASE_URL='https://your-domain.ngrok-free.app'
+AUTH0_ISSUER_BASE_URL='https://your-tenant.auth0.com'  # Or custom domain
+AUTH0_CLIENT_ID='your-app-client-id'
+AUTH0_CLIENT_SECRET='your-app-client-secret'
+AUTH0_AUDIENCE='https://authskye-api.example.com'
+AUTH0_SCOPE='openid profile email offline_access read:reports create:reports edit:reports delete:reports read:analytics'
+
+# Namespace for custom claims (must match Auth0 Action, no trailing slash)
+NEXT_PUBLIC_AUTH0_NAMESPACE='https://authskye.com'
+
+# Optional: Specify database connection (leave blank for default)
+AUTH0_CONNECTION_ID=''
+```
+
+### Auth0 Management API (M2M Application)
+
+```env
+AUTH0_MGMT_DOMAIN='your-tenant.auth0.com'  # Always use canonical domain here
+AUTH0_MGMT_CLIENT_ID='your-m2m-client-id'
+AUTH0_MGMT_CLIENT_SECRET='your-m2m-client-secret'
+```
+
+### Auth0 FGA (Fine-Grained Authorization)
+
+```env
+FGA_STORE_ID='your-fga-store-id'
+FGA_CLIENT_ID='your-fga-client-id'
+FGA_CLIENT_SECRET='your-fga-client-secret'
+FGA_API_URL='https://api.us1.fga.dev'
+FGA_MODEL_ID='your-authorization-model-id'
+```
+
+### Firebase
+
+```env
+FIREBASE_SERVICE_ACCOUNT_BASE64='[base64-encoded-service-account-json]'
+```
+
+### Custom Token Exchange (for My Account API)
+
+```env
+CTE_CLIENT_ID='your-cte-m2m-client-id'
+CTE_CLIENT_SECRET='your-cte-m2m-client-secret'
+```
+
+### AI Agents (Optional)
+
+```env
+# Option 1: LightLLM (Okta internal)
+LIGHTLLM_ENDPOINT='https://llm.example.com'
+LIGHTLLM_API_KEY='sk-...'
+LIGHTLLM_MODEL='gpt-4o'
+
+# Option 2: OpenAI
+OPENAI_API_KEY='sk-...'
+OPENAI_MODEL='gpt-4o'
+```
+
+### Kong API Gateway (Optional)
+
+```env
+NEXT_PUBLIC_KONG_GATEWAY_URL='https://your-gateway.kongcloud.dev'
+```
+
+---
+
+## Auth0 Setup
+
+### 1. Create Regular Web Application
+
+1. Go to **Auth0 Dashboard → Applications → Create Application**
+2. Select **Regular Web Application**
+3. Name it: `Authskye Dashboard`
+4. Configure settings:
+
+| Setting | Value |
+|---------|-------|
+| **Allowed Callback URLs** | `https://your-domain.ngrok-free.app/api/auth/callback` |
+| **Allowed Logout URLs** | `https://your-domain.ngrok-free.app` |
+| **Allowed Web Origins** | `https://your-domain.ngrok-free.app` |
+
+5. Under **Advanced Settings → Grant Types**, enable:
+   - Authorization Code
+   - Refresh Token
+   - Client Credentials
+
+6. Copy the **Client ID** and **Client Secret** to your `.env.local`
+
+### 2. Create M2M Application
+
+This application is used for server-side Auth0 Management API calls.
+
+1. Go to **Applications → Create Application**
+2. Select **Machine to Machine Application**
+3. Name it: `Authskye Backend Manager`
+4. Authorize for **Auth0 Management API**
+5. Grant the following scopes:
+
+```
+read:users
+update:users
+read:organization_members
+create:organization_invitations
+read:organization_member_roles
+create:organization_member_roles
+delete:organization_member_roles
+delete:organization_members
+read:roles
+read:sessions
+delete:sessions
+read:authenticators
+delete:authenticators
+create:guardian_enrollment_tickets
+```
+
+6. Copy credentials to `.env.local` as `AUTH0_MGMT_CLIENT_ID` and `AUTH0_MGMT_CLIENT_SECRET`
+
+### 3. Create API
+
+1. Go to **Applications → APIs → Create API**
+2. Configure:
+
+| Setting | Value |
+|---------|-------|
+| **Name** | Authskye API |
+| **Identifier** | `https://authskye-api.example.com` |
+
+3. Under **Permissions**, add:
+   - `read:reports`
+   - `create:reports`
+   - `edit:reports`
+   - `delete:reports`
+   - `read:analytics`
+
+4. Enable **RBAC** and **Add Permissions in the Access Token**
+
+### 4. Create Roles
+
+Go to **User Management → Roles** and create:
+
+| Role | Permissions |
+|------|-------------|
+| **Admin** | All permissions |
+| **Editor** | `read:reports`, `create:reports`, `edit:reports` |
+| **Viewer** | `read:reports` |
+| **Data Analyst** | `read:analytics` |
+
+### 5. Create Organization
+
+1. Go to **Organizations → Create Organization**
+2. Name it (e.g., "Acme Corp")
+3. Enable the following connections for the organization
+4. Enable your `Authskye Dashboard` application for the organization
+
+**Organization Branding (Optional):**
+
+Add logo URL in organization metadata:
+```json
+{
+  "url": "https://your-cdn.com/org-logo.png"
+}
+```
+
+### 6. Deploy Auth0 Actions
+
+Go to **Actions → Flows → Login** and deploy these Actions:
+
+#### Action 1: RBAC and Session Management
 
 ```javascript
-const { IncomingWebhook } = require("@slack/webhook");
-
 exports.onExecutePostLogin = async (event, api) => {
-  const webhook = new IncomingWebhook(event.secrets.SLACK_WEBHOOK_URL);
-  const namespace = 'https://agency-inc-demo.com';
+  const namespace = 'https://authskye.com';
 
-  // Add roles to the ID Token and permissions to the Access Token
-  if (event.authorization) {
-    if (event.authorization.roles) {
-      api.idToken.setCustomClaim(`${namespace}/roles`, event.authorization.roles);
-    }
-    if (event.authorization.permissions) {
-      api.accessToken.setCustomClaim(`${namespace}/permissions`, event.authorization.permissions);
-    }
-  }
-
-  // Use a try/catch block so a failed Slack message doesn't break the login
-  try {
-    // Check if there is a pending access request from our application
-    if (event.user.app_metadata && event.user.app_metadata.pending_access_request) {
-      const accessRequest = event.user.app_metadata.pending_access_request;
-      
-      // Send the detailed Slack message for the access request
-      const accessRequestText = `🔒 *Access Request - Analytics*
-*User:* ${event.user.email}
-*Requested Role:* ${accessRequest.role}
-*Organization:* ${event.organization?.name || 'N/A'}`;
-
-      await webhook.send({ 
-        text: accessRequestText,
-        username: "Auth0 Access Requests",
-        icon_emoji: ":lock:"
-      });
-
-      // Clear the pending request from the user's profile
-      api.user.setAppMetadata('pending_access_request', undefined);
-    }
-  } catch (error) {
-    // Log the error but do not block the login
-    console.log("Slack notification failed:", error.message);
-  }
-};
-```
-
-**Required Secrets**:
-- `SLACK_WEBHOOK_URL`: Your Slack webhook URL for notifications
-
-### 2. RBAC and Session Management Action
-
-**Trigger**: `post-login`
-**Name**: `RBAC and Single Session Enforcement`
-
-```javascript
-exports.onExecutePostLogin = async (event, api) => {
-  const namespace = 'https://agency-inc-demo.com';
-  
   // Add roles to token
   if (event.authorization) {
     api.idToken.setCustomClaim(`${namespace}/roles`, event.authorization.roles);
   }
-  
+
   // Add organization info
   if (event.organization) {
-    api.idToken.setCustomClaim('https://agency-inc-demo.com/org_logo', event.organization.metadata.url);
+    api.idToken.setCustomClaim(`${namespace}/org_logo`, event.organization.metadata.url);
     api.idToken.setCustomClaim(`${namespace}/org_id`, event.organization.id);
     api.idToken.setCustomClaim(`${namespace}/org_name`, event.organization.name);
   }
-  
-  // Add session ID to token
+
+  // Add session ID
   if (event.session) {
     api.idToken.setCustomClaim(`${namespace}/session_id`, event.session.id);
   }
-  
-  // SESSION MANAGEMENT
-  const userId = event.user.user_id;
-  const currentSessionId = event.session.id;
-  
-  try {
-    // Get management API token
-    const tokenResponse = await fetch(`https://${event.secrets.AUTH0_DOMAIN}/oauth/token`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        client_id: event.secrets.AUTH0_MGMT_CLIENT_ID,
-        client_secret: event.secrets.AUTH0_MGMT_CLIENT_SECRET,
-        audience: `https://${event.secrets.AUTH0_DOMAIN}/api/v2/`,
-        grant_type: 'client_credentials'
-      })
-    });
-    
-    if (!tokenResponse.ok) {
-      console.log("Token error");
-      return;
-    }
-    
-    const tokenData = await tokenResponse.json();
-    
-    // Get user's sessions
-    const sessionsResponse = await fetch(`https://${event.secrets.AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(userId)}/sessions`, {
-      headers: {
-        'Authorization': `Bearer ${tokenData.access_token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!sessionsResponse.ok) {
-      console.log("Sessions fetch error");
-      return;
-    }
-    
-    const sessionsData = await sessionsResponse.json();
-    const sessions = sessionsData.sessions || [];
-    
-    console.log(`Sessions: ${sessions.length}, Current: ${currentSessionId}`);
-    
-    // If more than 1 session, delete others
-    if (sessions.length > 1) {
-      const otherSessions = sessions.filter(s => s.id !== currentSessionId);
-      console.log(`Deleting ${otherSessions.length} sessions`);
-      
-      for (const session of otherSessions) {
-        await fetch(`https://${event.secrets.AUTH0_DOMAIN}/api/v2/sessions/${session.id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${tokenData.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      }
-      
-      console.log(`Deleted sessions for ${userId}`);
-    }
-    
-  } catch (error) {
-    console.log(`Error: ${error.message}`);
+
+  // Add user metadata
+  if (event.user.user_metadata) {
+    api.idToken.setCustomClaim(`${namespace}/user_metadata`, event.user.user_metadata);
   }
 };
 ```
 
-**Required Secrets**:
-- `AUTH0_DOMAIN`: Your Auth0 domain (e.g., `your-tenant.auth0.com`)
-- `AUTH0_MGMT_CLIENT_ID`: Your M2M app client ID
-- `AUTH0_MGMT_CLIENT_SECRET`: Your M2M app client secret
-
-### 3. Step-up MFA Action
-
-**Trigger**: `post-login`
-**Name**: `Step-up MFA Enforcement`
+#### Action 2: Step-Up MFA Enforcement
 
 ```javascript
-
 exports.onExecutePostLogin = async (event, api) => {
-  // Check if the application is requesting MFA via the `acr_values` parameter.
-  // This is the parameter our "Delete" button flow sends.
   if (event.client.client_id !== event.secrets.TARGET_CLIENT_ID) {
-    console.log(`Skipping action for client ${event.client.client_id}`);
     return;
   }
+
   const isMfaRequested = event.transaction.acr_values.includes(
     'http://schemas.openid.net/pape/policies/2007/06/multi-factor'
   );
 
   if (isMfaRequested) {
-    // If MFA is requested, enforce it for this login.
     api.multifactor.enable('any');
   }
 };
 ```
 
-**Required Secrets**:
-- `TARGET_CLIENT_ID`: Your Next.js application's client ID
+**Required Secret:** `TARGET_CLIENT_ID` = Your application's client ID
 
-## 🚦 Getting Started
+### 7. Configure Back-Channel Logout
 
-### Prerequisites
+In your application settings:
+- **Back-Channel Logout URI**: `https://your-domain.ngrok-free.app/api/auth/backchannel-logout`
 
-- **Node.js** (v18 or later)
-- **Git**
-- **Auth0 Account** (free tier available)
-- **Firebase Account** (free tier available) 
-- **ngrok Account** (free tier available)
-- **Slack Workspace** (for notifications)
+---
 
-### Quick Start
+## Auth0 FGA Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/violetarcher/agency-inc-demo.git
-   cd agency-inc-demo
-   ```
+### 1. Create FGA Store
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+1. Go to [Auth0 FGA Dashboard](https://dashboard.fga.dev/)
+2. Create a new store: `authskye-documents`
 
-3. **Set up environment variables**
-   ```bash
-   # Create .env.local with your Auth0, Firebase, and other credentials
-   # See Environment Variables section below for complete configuration
-   ```
+### 2. Deploy Authorization Model
 
-4. **Configure Auth0** (see detailed setup below)
+Navigate to **Authorization Models → Create Model** and paste:
 
-5. **Deploy Auth0 Actions** (CRITICAL - see Actions section above)
-
-6. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Set up ngrok tunnel** (for Auth0 callbacks)
-   ```bash
-   ngrok http 4020 --domain your-static-domain.ngrok-free.app
-   ```
-
-## ⚙️ Detailed Setup Instructions
-
-### Auth0 Configuration
-
-#### 1. Create Auth0 API
-- Go to **Applications > APIs**
-- Create API: `Agency Inc API` 
-- Identifier: `https://b2b-saas-api.example.com`
-- Add permissions: `read:reports`, `create:reports`, `edit:reports`, `delete:reports`, `read:analytics`
-- Enable **RBAC** and **Add Permissions in Access Token**
-
-#### 2. Create Next.js Application
-- Go to **Applications > Applications**
-- Create **Regular Web Application**: `Agency Inc Dashboard`
-- Configure callback URLs:
-  - Allowed Callback URLs: `https://your-domain.ngrok-free.app/api/auth/callback`
-  - Allowed Logout URLs: `https://your-domain.ngrok-free.app`
-  - Allowed Web Origins: `https://your-domain.ngrok-free.app`
-- Under **Advanced Settings > Grant Types**, ensure `Authorization Code`, `Refresh Token`, and `Client Credentials` are enabled
-
-#### 3. Set Up Roles
-- Go to **User Management > Roles**
-- Create roles with API permissions:
-  - `Admin`: All permissions (`read:reports`, `create:reports`, `edit:reports`, `delete:reports`, `read:analytics`)
-  - `Editor`: `read:reports`, `create:reports`, `edit:reports`
-  - `Viewer`: `read:reports`
-  - `Data Analyst`: `read:analytics`
-
-#### 4. Create M2M Application
-- Create **Machine to Machine** app: `Agency Inc Backend Manager`
-- Authorize for **Auth0 Management API**
-- Grant scopes: 
-  - `read:users`
-  - `update:users` 
-  - `read:organization_members`
-  - `create:organization_invitations`
-  - `read:organization_member_roles`
-  - `create:organization_member_roles`
-  - `delete:organization_member_roles`
-  - `delete:organization_members`
-  - `read:roles`
-  - `read:sessions`
-  - `delete:sessions`
-
-#### 5. Configure Organization
-- Go to **Organizations**
-- Create: `Agency Inc`
-- Enable applications and connections
-- Configure auto-membership settings
-- Add enabled connections (Database, Social, etc.)
-
-#### 5a. Configure Organization Branding (Optional)
-- In your Auth0 Organization settings, go to the **Metadata** tab
-- Add organization branding metadata:
-  ```json
-  {
-    "url": "https://organization-logo.png"
-  }
-  ```
-- **Logo Hosting Options:**
-  - **S3** (recommended): Upload to AWS S3 with public read access
-  - **Any CDN/hosting**: Cloudinary, imgix, or any public image hosting service
-  - **Direct upload**: Any publicly accessible HTTPS URL
-- The application will display this logo in the organization branding section
-
-#### 6. Deploy Auth0 Actions (CRITICAL)
-- Go to **Actions > Flows**
-- Select **Login** flow
-- Create and deploy all three Post-Login Actions (see Auth0 Actions section above)
-- Add required secrets to each Action (refer to the "Required Secrets" section under each action)
-- Test the flow
-
-#### 7. Configure Back-Channel Logout
-- In your Auth0 Application settings
-- Set **Back-Channel Logout URI**: `https://your-domain.ngrok-free.app/api/auth/backchannel-logout`
-
-### Environment Variables
-
-Create `.env.local` with:
-
-```env
-# Auth0 Configuration
-AUTH0_SECRET='use [openssl rand -hex 32] to generate a 32 bytes value'
-AUTH0_BASE_URL='https://your-domain.ngrok-free.app'
-AUTH0_ISSUER_BASE_URL='https://your-auth0-domain.auth0.com'
-AUTH0_CLIENT_ID='your-client-id'
-AUTH0_CLIENT_SECRET='your-client-secret'
-AUTH0_AUDIENCE='https://b2b-saas-api.example.com'
-
-# Auth0 Management API (M2M Application)
-AUTH0_MGMT_DOMAIN='your-auth0-domain.auth0.com'
-AUTH0_MGMT_CLIENT_ID='your-m2m-client-id'
-AUTH0_MGMT_CLIENT_SECRET='your-m2m-client-secret'
-
-# Auth0 FGA (Fine-Grained Authorization)
-FGA_STORE_ID='your-fga-store-id'
-FGA_CLIENT_ID='your-fga-client-id'
-FGA_CLIENT_SECRET='your-fga-client-secret'
-FGA_API_URL='https://api.us1.fga.dev'
-FGA_AUTHORIZATION_MODEL_ID='your-authorization-model-id'
-
-# Firebase (Base64 encoded service account JSON)
-FIREBASE_SERVICE_ACCOUNT_BASE64='your-base64-encoded-service-account'
-```
-
-### Ngrok Setup (Required for Organization Invites)
-
-**Why Ngrok is Required:**
-- Auth0 Organization invitations require HTTPS URLs for callback handling
-- Organization invite emails contain links that must redirect to your application
-- Ngrok provides a secure HTTPS tunnel to your local development server
-
-**Setup Steps:**
-1. **Install Ngrok**
-   ```bash
-   # Install via npm
-   npm install -g ngrok
-   
-   # Or download from https://ngrok.com/download
-   ```
-
-2. **Create Ngrok Account**
-   - Sign up at [ngrok.com](https://ngrok.com) (free tier available)
-   - Get your authtoken from the dashboard
-
-3. **Configure Ngrok**
-   ```bash
-   # Set your authtoken
-   ngrok config add-authtoken YOUR_AUTHTOKEN
-   
-   # Start tunnel on port 4020 (matches npm run dev port)
-   ngrok http 4020 --domain your-static-domain.ngrok-free.app
-   ```
-
-4. **Use Static Domain (Recommended)**
-   - Ngrok free tier provides static domains to avoid reconfiguring Auth0
-   - Use the same domain in all Auth0 callback URLs
-   - Example: `https://your-domain.ngrok-free.app`
-
-**Alternative: Web Hosting**
-- Instead of Ngrok, you can deploy to any web hosting service (Vercel, Netlify, etc.)
-- This provides a permanent HTTPS URL for production use
-- Update Auth0 callback URLs to your hosted domain
-
-### Firebase Setup
-
-1. **Create Firebase Project**
-   - Go to [Firebase Console](https://console.firebase.google.com)
-   - Create new project: `Agency Inc Demo`
-
-2. **Generate Service Account**
-   - Go to **Project Settings > Service accounts**
-   - Generate new private key
-   - Base64 encode the JSON file:
-     ```bash
-     base64 -i path/to/serviceAccountKey.json
-     ```
-   - Add to `FIREBASE_SERVICE_ACCOUNT_BASE64` in `.env.local`
-
-3. **Initialize Firestore**
-   - Go to **Firestore Database**
-   - Create database in test mode
-   - Create collections: `reports`, `analytics`
-
-### Slack Setup (Optional)
-
-1. **Create Slack App**
-   - Go to [Slack API](https://api.slack.com/apps)
-   - Create new app from scratch
-   - Select your workspace
-
-2. **Add Incoming Webhook**
-   - Go to **Incoming Webhooks**
-   - Activate incoming webhooks
-   - Add new webhook to workspace
-   - Copy webhook URL to `SLACK_WEBHOOK_LOGIN_URL`
-
-## 📜 Available Scripts
-
-```bash
-npm run dev     # Start development server (port 4020)
-npm run build   # Build for production
-npm run start   # Start production server
-npm run lint    # Run ESLint
-```
-
-## 🔒 Security Features
-
-- **Server-side session management** with Auth0
-- **Role-based access control** at API and UI levels
-- **Step-up MFA** for sensitive operations
-- **Input validation** with Zod schemas
-- **SQL injection prevention** through parameterized queries
-- **XSS protection** through React's built-in escaping
-- **CSRF protection** through SameSite cookies
-- **Session revocation** with persistent storage
-- **Federated logout** coordination
-
-## 📋 API Endpoints
-
-### Authentication
-- `GET /api/auth/[auth0]` - Auth0 authentication handler with step-up MFA
-- `POST /api/auth/backchannel-logout` - Back-channel logout webhook
-- `GET /api/auth/session/validate` - Real-time session validation
-- `GET /api/auth/session/list` - Active sessions for admin
-- `POST /api/auth/session/enforce-my-limit` - Single session enforcement
-- `POST /api/auth/session/terminate` - Manual session termination
-
-### Organization Management
-- `GET|POST /api/organization/members` - Member CRUD with role assignment
-- `POST /api/organization/members/[id]/roles` - Role management
-- `DELETE /api/organization/members/[id]` - Member removal
-
-### Reports & Analytics
-- `GET|POST /api/reports` - Report management
-- `DELETE /api/reports/[id]` - Report deletion (requires step-up MFA)
-- `POST /api/request-access` - Role elevation requests
-
-### Document Management (FGA-Protected)
-- `GET /api/documents` - List accessible documents
-- `POST /api/documents` - Create document (sets FGA owner)
-- `GET /api/documents/[id]` - Get document (requires `can_read`)
-- `PUT /api/documents/[id]` - Update document (requires `owner`)
-- `DELETE /api/documents/[id]` - Delete document (requires `owner`)
-- `POST /api/documents/[id]/share` - Share document (requires `can_share`)
-- `DELETE /api/documents/[id]/share` - Revoke access (requires `can_share`)
-
-### Folder Management (FGA-Protected)
-- `GET /api/folders` - List accessible folders
-- `POST /api/folders` - Create folder (sets FGA owner)
-- `GET /api/folders/[id]` - Get folder (requires `viewer`)
-- `PUT /api/folders/[id]` - Update folder (requires `owner`)
-- `DELETE /api/folders/[id]` - Delete folder (requires `owner`)
-- `POST /api/folders/[id]/share` - Share folder (requires `owner`)
-- `DELETE /api/folders/[id]/share` - Revoke folder access (requires `owner`)
-
-### User Lookup
-- `GET /api/users/lookup?email=...` - Find organization members by email
-
-## 🎯 Demo Scenarios
-
-### 1. Admin User Management
-1. Login as Admin
-2. Navigate to Admin Dashboard
-3. Invite new users with role selection
-4. Manage user roles and sessions
-
-### 2. Access Request Workflow
-1. Login as Viewer
-2. Navigate to Analytics page
-3. Click "Request Access"
-4. Check Slack for admin notification
-5. Admin approves via Auth0 dashboard
-6. User gains access on next login
-
-### 3. Step-Up MFA for Sensitive Operations
-1. Login as Admin/Editor
-2. Navigate to Reports
-3. Try to delete a report
-4. Complete step-up MFA challenge
-5. Operation completes successfully
-
-### 4. Session Management
-1. Login from multiple browsers
-2. Observe single session enforcement
-3. Admin can view/terminate sessions
-4. Real-time session validation
-
-### 5. Document Management with FGA
-1. Login as any user
-2. Navigate to Documents page
-3. Create folders and documents
-4. Share document/folder with colleague via email
-5. Login as second user
-6. View shared documents with FGA permissions enforced
-7. Try to access unshared document
-8. See professional "Access Denied" modal
-9. Test permission inheritance through folder hierarchy
-
-## 🎯 Core Concepts Demonstrated
-
-1. **Multi-Tenant Architecture** - Organization-based user isolation
-2. **Modern Next.js Patterns** - App Router, Server Components, API Routes
-3. **Enterprise Authentication** - Auth0 Organizations, RBAC, MFA
-4. **Session Management** - Active monitoring, revocation, back-channel logout
-5. **Step-Up Authentication** - Context-aware security for sensitive operations
-6. **Access Request Workflows** - Self-service role elevation with admin approval
-7. **Type Safety** - End-to-end TypeScript with Zod validation
-8. **Error Handling** - Graceful degradation and user feedback
-9. **Security Best Practices** - Server-side validation, authorization
-10. **Fine-Grained Authorization** - ReBAC with Auth0 FGA for document permissions
-
-## 📁 Document Management with Auth0 FGA
-
-### Overview
-
-The application implements a comprehensive document management system using **Auth0 Fine-Grained Authorization (FGA)** to provide relationship-based access control (ReBAC). This enables granular permissions for documents and folders, with support for sharing, permission inheritance, and real-time authorization checks.
-
-### Authorization Model
-
-We use the **Google Drive model** from Auth0's official FGA sample stores, which provides a proven authorization schema for hierarchical document systems.
-
-**Model Schema:**
-
-```
-schema 1.1
+```fga
+model
+  schema 1.1
 
 type user
 
@@ -694,371 +357,454 @@ type doc
     define viewer: [user, user:*, group#member]
 ```
 
-**Key Features of This Model:**
+### 3. Get FGA Credentials
 
-- **Permission Inheritance**: Documents inherit viewer permissions from their parent folder
-- **Hierarchical Folders**: Folders can contain other folders with cascading permissions
-- **Multiple Permission Types**:
-  - `owner`: Full control over document/folder
-  - `viewer`: Read-only access
-  - `can_read`, `can_write`, `can_share`: Granular operation permissions
-- **Group Support**: Share with groups of users
-- **Wildcard Sharing**: Support for `user:*` to share with all users
+1. Navigate to **Settings → API Keys**
+2. Create a new credential
+3. Copy Store ID, Client ID, Client Secret, and Model ID to `.env.local`
 
-### Auth0 FGA Setup
+### 4. (Optional) Deploy Agents Module
 
-#### 1. Create FGA Store
+For the AI Agents demo, deploy this additional model:
 
-1. **Sign up for Auth0 FGA**
-   - Go to [Auth0 FGA Dashboard](https://dashboard.fga.dev/)
-   - Create a new store: `agency-inc-documents`
+```fga
+# Agents as Principals - extends core model
+type agent
+  relations
+    define can_act_as: [user]
 
-2. **Deploy the Authorization Model**
-   - Navigate to your store
-   - Go to **Authorization Models**
-   - Click **Create Model**
-   - Paste the Google Drive schema (shown above)
-   - Save and deploy the model
+type project
+  relations
+    define owner: [user, agent]
+    define triager: [user, agent]
+    define reviewer: [user, agent]
+    define viewer: [user, agent]
+    define can_read: viewer or owner
+    define can_write: owner
+    define can_triage: triager or owner
+    define can_review: reviewer or owner
 
-3. **Get Store Credentials**
-   - Store ID: Found in store settings
-   - Client ID: Generated in store API settings
-   - Client Secret: Generated in store API settings
-   - API URL: Provided in store settings (typically `https://api.us1.fga.dev`)
+type organization
+  relations
+    define admin: [user, agent]
+    define member: [user, agent]
+    define can_read: member or admin
+    define can_manage: admin
 
-#### 2. Configure Environment Variables
-
-Add to your `.env.local`:
-
-```env
-# Auth0 FGA Configuration
-FGA_STORE_ID='your-store-id'
-FGA_CLIENT_ID='your-fga-client-id'
-FGA_CLIENT_SECRET='your-fga-client-secret'
-FGA_API_URL='https://api.us1.fga.dev'
-FGA_AUTHORIZATION_MODEL_ID='your-model-id'
+type issue
+  relations
+    define reporter: [user]
+    define assignee: [user, agent]
+    define can_read: reporter or assignee
+    define can_comment: reporter or assignee
+    define can_assign: [user, agent]
+    define can_close: assignee
 ```
 
-#### 3. Initialize FGA Client
+---
 
-The application includes a pre-configured FGA service (`/src/lib/fga-service.ts`) that provides:
+## Firebase Setup
 
-- **checkPermission()** - Verify if a user has a specific permission
-- **writeTuple()** - Grant permissions by writing relationship tuples
-- **deleteTuple()** - Revoke permissions
-- **readTuples()** - List all permissions for an object
-- **formatUserId()** - Format Auth0 user IDs for FGA
-- **formatDocId()** / **formatFolderId()** - Format object IDs
+### 1. Create Firebase Project
 
-**Example Usage:**
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create new project: `Authskye`
+
+### 2. Enable Firestore
+
+1. Navigate to **Firestore Database**
+2. Click **Create Database**
+3. Start in **Test Mode** (or configure security rules for production)
+
+### 3. Generate Service Account
+
+1. Go to **Project Settings → Service Accounts**
+2. Click **Generate New Private Key**
+3. Download the JSON file
+4. Base64 encode it:
+
+```bash
+base64 -i path/to/serviceAccountKey.json
+```
+
+5. Add to `.env.local` as `FIREBASE_SERVICE_ACCOUNT_BASE64`
+
+### 4. Firebase Access via SSO
+
+If your organization uses Google SSO:
+1. Ensure your corporate Google account has access to the Firebase project
+2. Add team members via **Project Settings → Users and permissions**
+
+---
+
+## Custom Token Exchange (CTE) Setup
+
+CTE is required for the My Account API to work (user self-service MFA enrollment).
+
+### 1. Create CTE M2M Application
+
+1. Go to **Applications → Create Application**
+2. Select **Machine to Machine Application**
+3. Name it: `Authskye CTE Client`
+4. **Do not** authorize for any APIs initially
+
+### 2. Enable Token Exchange Grant
+
+1. In the CTE application settings
+2. Go to **Advanced Settings → Grant Types**
+3. Enable **Token Exchange** (urn:ietf:params:oauth:grant-type:token-exchange)
+
+### 3. Create Token Exchange Action
+
+Go to **Actions → Library → Create Action**:
+
+**Trigger:** `custom-token-exchange`
+
+```javascript
+exports.onExecuteCustomTokenExchange = async (event, api) => {
+  // Only handle our custom token type
+  if (event.transaction.subject_token_type !== 'urn:myaccount:cte') {
+    api.access.deny('Invalid token type');
+    return;
+  }
+
+  // Set the audience to My Account API
+  api.accessToken.setCustomClaim('aud', `https://${event.secrets.AUTH0_DOMAIN}/me/`);
+};
+```
+
+**Secret:** `AUTH0_DOMAIN` = Your Auth0 domain
+
+### 4. Create Token Exchange Profile
+
+1. Go to **Authentication → Token Exchange Profiles**
+2. Click **Create Profile**
+3. Configure:
+   - **Name:** My Account API Exchange
+   - **Subject Token Type:** `urn:myaccount:cte`
+   - **Action:** Select your CTE Action
+4. Link both your main application and CTE client
+
+### 5. Add Credentials to Environment
+
+```env
+CTE_CLIENT_ID='your-cte-client-id'
+CTE_CLIENT_SECRET='your-cte-client-secret'
+```
+
+---
+
+## My Account API Setup
+
+The My Account API enables user self-service MFA enrollment.
+
+### 1. Activate My Account API
+
+1. Go to **Applications → APIs**
+2. Look for the **MyAccount API** banner
+3. Click **Activate**
+
+### 2. Create Client Grant
+
+1. In MyAccount API settings, go to **Machine to Machine Applications**
+2. Toggle **ON** your `Authskye Dashboard` application
+3. Expand and select these scopes:
+   - `create:me:authentication_methods`
+   - `read:me:authentication_methods`
+   - `update:me:authentication_methods`
+   - `delete:me:authentication_methods`
+   - `read:me:factors`
+4. Click **Update**
+
+### 3. Update Application Scopes
+
+Add My Account API scopes to your `AUTH0_SCOPE`:
+
+```env
+AUTH0_SCOPE='openid profile email offline_access read:me:authentication_methods create:me:authentication_methods update:me:authentication_methods delete:me:authentication_methods read:reports create:reports edit:reports delete:reports read:analytics'
+```
+
+---
+
+## AI Agents / LLM Setup
+
+The AI Agents demo requires an LLM provider for intelligent responses.
+
+### Option 1: OpenAI
+
+```env
+OPENAI_API_KEY='sk-...'
+OPENAI_MODEL='gpt-4o'  # or gpt-3.5-turbo
+```
+
+### Option 2: LightLLM (Okta Internal)
+
+```env
+LIGHTLLM_ENDPOINT='https://llm.atko.ai'
+LIGHTLLM_API_KEY='sk-...'
+LIGHTLLM_MODEL='gpt-4o'
+```
+
+### Option 3: No LLM (Fallback Mode)
+
+If no LLM is configured, the Agents demo uses rule-based responses demonstrating the authorization patterns without AI-generated content.
+
+---
+
+## Kong API Gateway (Optional)
+
+Kong provides an additional security layer for API protection.
+
+### 1. Sign Up for Kong Konnect
+
+Visit [Kong Konnect](https://konghq.com/products/kong-konnect/register) (Free tier available)
+
+### 2. Create Gateway Service
+
+1. **Service URL:** `https://your-domain.ngrok-free.app`
+2. **Route Path:** `/api/kong-protected/*`
+
+### 3. Configure OIDC Plugin
+
+```yaml
+issuer: https://your-tenant.auth0.com/
+client_id: your-client-id
+client_secret: your-client-secret
+auth_methods:
+  - bearer
+audience_required:
+  - https://authskye-api.example.com
+```
+
+### 4. Add Environment Variable
+
+```env
+NEXT_PUBLIC_KONG_GATEWAY_URL='https://your-gateway.kongcloud.dev'
+```
+
+See [kong/KONG-SETUP.md](kong/KONG-SETUP.md) for detailed configuration.
+
+---
+
+## User Personas: Organization vs Non-Organization
+
+The application supports **two types of users** with different experiences:
+
+### Organization Members
+
+Users who belong to an Auth0 Organization see:
+
+| Feature | Available |
+|---------|-----------|
+| **Home** | ✅ With organization branding |
+| **Reports** | ✅ Organization-scoped reports |
+| **Billing** | ✅ CIBA-protected payments |
+| **Inspector** | ✅ Token debugging |
+| **Documents** | ✅ FGA-protected document management |
+| **Agents** | ✅ AI Agents demo |
+| **API Gateway** | ✅ Kong demo (if configured) |
+| **Profile** | ✅ MFA self-service |
+| **Admin Dashboard** | ✅ (Admin role only) |
+| **Session Management** | ✅ (Admin role only) |
+| **Organization Settings** | ✅ (Admin role only) |
+
+**Session Data:**
+- `user.org_id` - Organization ID
+- `user['https://authskye.com/roles']` - Array of roles
+- `user['https://authskye.com/org_name']` - Organization name
+- `user['https://authskye.com/org_logo']` - Organization logo URL
+
+### Non-Organization Users (Personal Workspace)
+
+Users without an organization see a personal workspace:
+
+| Feature | Available |
+|---------|-----------|
+| **Home** | ✅ Personal dashboard |
+| **Reports** | ❌ Hidden (requires organization) |
+| **Billing** | ✅ Personal payments |
+| **Inspector** | ✅ Token debugging |
+| **Documents** | ✅ Personal documents |
+| **Agents** | ✅ AI Agents demo |
+| **API Gateway** | ✅ Kong demo |
+| **Profile** | ✅ MFA self-service |
+| **Admin Dashboard** | ❌ Hidden |
+
+**Session Data:**
+- `user.org_id` - `undefined`
+- No organization-specific claims
+
+### Authorization Pattern
+
+Both user types use the same FGA authorization pattern:
 
 ```typescript
-import { checkPermission, writeTuple, formatUserId, formatDocId } from '@/lib/fga-service';
-
-// Check if user can read a document
+// FGA is the single source of truth
 const canRead = await checkPermission(
-  formatUserId('auth0|123456'),
+  formatUserId(user.sub),  // user:auth0|123456
   'can_read',
-  formatDocId('doc-123')
+  formatDocId(docId)       // doc:abc123
 );
 
-// Grant viewer permission on a document
-await writeTuple({
-  user: formatUserId('auth0|123456'),
-  relation: 'viewer',
-  object: formatDocId('doc-123'),
-});
+// Organization ID in Firestore is metadata only, NOT for authorization
 ```
 
-### Permission System
+---
 
-#### Document Permissions
+## Demo Scenarios
 
-1. **Owner**:
-   - Can read, write, share, and delete the document
-   - Can change ownership
-   - Set when document is created
+### 1. Organization Onboarding
 
-2. **Viewer**:
-   - Can read the document
-   - Cannot modify or share
-   - Can be granted explicitly or inherited from parent folder
+1. Admin invites user via email
+2. User receives invitation with organization branding
+3. User signs up and joins organization
+4. User sees organization-branded experience
 
-3. **Parent Folder Inheritance**:
-   - Documents automatically inherit viewer permissions from their parent folder
-   - If a user is a viewer of a folder, they can read all documents in that folder
+### 2. Document Sharing with FGA
 
-#### Folder Permissions
+1. Create a document (automatic owner permission)
+2. Share with colleague by email
+3. Colleague sees document in their list
+4. Try accessing unshared document → Access Denied
 
-1. **Owner**:
-   - Can read, modify, delete the folder
-   - Can create documents/subfolders within it
-   - Can share the folder with others
+### 3. CIBA Billing Approval
 
-2. **Viewer**:
-   - Can view the folder and all its contents
-   - Can read documents within the folder (via inheritance)
-   - Cannot create, modify, or delete
+1. Navigate to Billing
+2. Fill payment form (use "Fill Demo" button)
+3. Submit → Guardian push notification sent
+4. Approve on mobile device
+5. Payment processed
 
-#### Real-Time Permission Checks
+### 4. AI Agents Authorization
 
-Every document and folder access is protected by FGA permission checks:
+1. Navigate to Agents
+2. Setup demo tuples
+3. Select persona (Alice/Bob/Carol/Dan)
+4. Select agent (Triage/Reporting/Support/Code Review)
+5. Ask questions about accessing resources
+6. Observe dual authorization (user AND agent must have permission)
 
-- **Document Viewing**: Checks `can_read` permission before displaying content
-- **Document Editing**: Checks `can_write` permission before allowing edits
-- **Folder Navigation**: Checks `viewer` permission before showing contents
-- **Sharing**: Checks `owner` or `can_share` permission before allowing share operations
-- **Deletion**: Checks `owner` permission before allowing deletion
+### 5. Step-Up MFA
 
-### API Endpoints
+1. Navigate to Reports
+2. Try to delete a report
+3. MFA challenge appears
+4. Complete MFA
+5. Report deleted
 
-#### Documents
+### 6. Session Management
 
-- **GET /api/documents** - List all documents user has access to
-  - Permission: Authenticated user (filters results by FGA permissions)
+1. Login from two browsers
+2. Second login terminates first session
+3. First browser shows "Session Revoked"
 
-- **POST /api/documents** - Create new document
-  - Permission: Authenticated user in organization
-  - Automatically sets creator as owner in FGA
+---
 
-- **GET /api/documents/[id]** - Get document with permission check
-  - Permission: `can_read` on document
-  - Returns user's permissions (`canRead`, `canWrite`, `canShare`)
+## Troubleshooting
 
-- **PUT /api/documents/[id]** - Update document
-  - Permission: `owner` on document
+### FGA Permission Issues
 
-- **DELETE /api/documents/[id]** - Delete document
-  - Permission: `owner` on document
-  - Cleans up all FGA tuples
-
-- **POST /api/documents/[id]/share** - Share document
-  - Permission: `can_share` on document
-  - Creates FGA tuple for target user
-
-- **DELETE /api/documents/[id]/share** - Revoke access
-  - Permission: `can_share` on document
-  - Deletes FGA tuple
-
-#### Folders
-
-- **GET /api/folders** - List all folders user has access to
-  - Permission: Authenticated user (filters results by FGA permissions)
-
-- **POST /api/folders** - Create new folder
-  - Permission: Authenticated user in organization
-  - Automatically sets creator as owner in FGA
-
-- **GET /api/folders/[id]** - Get folder with permission check
-  - Permission: `viewer` on folder
-  - Returns user's permissions (`canView`, `canCreateFile`)
-
-- **PUT /api/folders/[id]** - Update folder
-  - Permission: `owner` on folder
-
-- **DELETE /api/folders/[id]** - Delete folder
-  - Permission: `owner` on folder
-  - Cleans up all FGA tuples
-
-- **POST /api/folders/[id]/share** - Share folder
-  - Permission: `owner` on folder
-  - Creates FGA tuple for target user
-  - Supports `viewer` and `owner` roles
-
-- **DELETE /api/folders/[id]/share** - Revoke folder access
-  - Permission: `owner` on folder
-  - Deletes FGA tuple
-
-#### User Lookup
-
-- **GET /api/users/lookup?email=user@example.com** - Look up user by email
-  - Permission: Authenticated user in organization
-  - Returns user details for sharing purposes
-  - Only finds users within the same organization
-
-### Demo Scenarios
-
-#### 1. Document Creation and Ownership
-
-1. Login as any user
-2. Navigate to Documents page
-3. Create a new document
-4. User is automatically set as owner in FGA
-5. Document appears in user's document list
-
-#### 2. Sharing a Document
-
-1. Login as document owner
-2. Navigate to Documents
-3. Click "Share" on a document
-4. Enter organization member's email
-5. Select permission level (viewer/owner)
-6. FGA tuple is created
-7. Target user can now access the document
-
-#### 3. Permission Inheritance via Folders
-
-1. Login as folder owner
-2. Create a folder
-3. Create a document inside the folder
-4. Share the folder with another user as "viewer"
-5. Target user can now:
-   - View the folder
-   - View all documents in the folder (via inheritance)
-   - Cannot edit documents (viewer permission)
-
-#### 4. Permission Denied Flow
-
-1. Login as User A
-2. User B creates a private document (not shared)
-3. User A somehow obtains document ID
-4. User A tries to access `/documents?doc=xxx`
-5. FGA permission check fails
-6. Professional "Access Denied" modal appears
-7. Shows helpful suggestions and Auth0 FGA branding
-
-#### 5. Hierarchical Folders
-
-1. Create nested folder structure: `Projects/2024/Q1`
-2. Create documents in Q1 folder
-3. Share "Projects" folder with team member as viewer
-4. Team member can navigate entire hierarchy
-5. Team member can view all nested documents
-6. Permission inheritance flows through folder structure
-
-### Technical Implementation
-
-**Permission Check Flow:**
-
-```
-User Request → API Endpoint → Auth0 Session Check → FGA Permission Check → Operation/Denial
+```bash
+# Verify FGA is configured
+curl -X POST https://api.us1.fga.dev/stores/{store_id}/check \
+  -H "Authorization: Bearer {token}" \
+  -d '{"user":"user:auth0|123","relation":"can_read","object":"doc:abc"}'
 ```
 
-**Document Creation Flow:**
+- Check user ID format: `user:auth0|123456`
+- Check object ID format: `doc:documentId`, `folder:folderId`
+- Verify model is deployed
 
-```
-1. User creates document via UI
-2. POST /api/documents with metadata
-3. Save document to Firestore
-4. Write FGA tuple: user:auth0|xxx owner doc:doc-123
-5. Return success to UI
-```
+### CIBA Not Working
 
-**Sharing Flow:**
+- Ensure user is enrolled in Guardian
+- Check `requested_expiry` ≤ 300 seconds
+- Verify `binding_message` uses only allowed characters (alphanumerics, `+-_.,:#`)
+- Use canonical domain for `login_hint.iss`
 
-```
-1. Owner clicks "Share" on document
-2. Enter email → Lookup user via /api/users/lookup
-3. POST /api/documents/[id]/share with userId and permission
-4. Check if requester has can_share permission
-5. Write FGA tuple: user:auth0|yyy viewer doc:doc-123
-6. Target user can now access document
-```
+### My Account API 404 Errors
 
-**Permission Inheritance Example:**
+1. Verify client grant is created for MyAccount API
+2. Check token audience includes `/me/`
+3. Ensure CTE Action is deployed and linked
+4. Re-login to get fresh token
 
-```
-Tuple 1: user:alice owner folder:projects
-Tuple 2: user:bob viewer folder:projects
-Tuple 3: doc:report-1 parent folder:projects
+### Kong Gateway Issues
 
-Query: Can bob read doc:report-1?
-FGA evaluates: viewer from parent
-Result: YES (bob is viewer of parent folder)
-```
+- Disable VPN (may block Kong requests)
+- Check `X-Kong-Protected` header in responses
+- Verify CORS origins include your frontend URL
 
-## 🚨 Troubleshooting
+### Session Revocation Not Working
 
-### Common Issues
+- Check `revoked-sessions.json` exists and is writable
+- Verify back-channel logout URL is configured
+- Check M2M app has session scopes
 
-1. **Access Request not working**
-   - Ensure Auth0 Post-Login Action is deployed
-   - Check Slack webhook URL in Action secrets
-   - Verify `pending_access_request` metadata is being set
+---
 
-2. **Step-up MFA failing**
-   - Check `acr_values` in auth route
-   - Ensure MFA is enabled in Auth0 tenant
-   - Verify `stepup=true` parameter in login URL
+## Development Commands
 
-3. **Session enforcement issues**
-   - Check session revocation file permissions
-   - Verify back-channel logout webhook URL
-   - Ensure M2M app has session scopes
-
-4. **Role assignment during invite**
-   - Verify roles exist in Auth0 tenant
-   - Check M2M app has organization scopes
-   - Ensure API permissions are assigned to roles
-
-5. **FGA Permission Checks Failing**
-   - Verify FGA environment variables are set correctly
-   - Check that FGA Store ID and Authorization Model ID are valid
-   - Ensure FGA client credentials have proper access
-   - Verify user IDs are formatted correctly (e.g., `user:auth0|123456`)
-   - Check that object IDs are formatted correctly (e.g., `doc:doc-123`, `folder:folder-456`)
-   - Use FGA Dashboard to inspect existing tuples and verify relationships
-
-6. **Documents Not Appearing in List**
-   - Confirm user has FGA permissions (owner or viewer)
-   - Check that documents belong to user's organization (Firestore filter)
-   - Verify FGA tuples were written when document was created
-   - Check browser console for API errors
-
-7. **Sharing Not Working**
-   - Ensure user being shared with exists in the organization
-   - Verify `/api/users/lookup` endpoint is returning correct user ID
-   - Check that requester has `can_share` or `owner` permission
-   - Inspect FGA tuples to confirm relationship was written
-
-8. **Permission Inheritance Not Working**
-   - Verify `parent` relationship tuple exists (e.g., `doc:doc-123 parent folder:folder-456`)
-   - Check that authorization model is deployed correctly
-   - Confirm folder viewer tuples are in place
-   - Use FGA API's `list-objects` to debug which objects user has access to
-
-9. **User Lookup 404 Errors**
-   - Confirm user exists in Auth0 organization
-   - Check that user's email matches exactly (case-insensitive)
-   - Verify M2M app has `read:organization_members` scope
-   - Ensure organization ID is correct in user session
-
-### Debugging
-
-Enable detailed logging by adding to `.env.local`:
-```env
-DEBUG=1
-AUTH0_DEBUG=1
+```bash
+npm run dev     # Start development server (port 4020)
+npm run build   # Build for production
+npm run start   # Start production server
+npm run lint    # Run ESLint
 ```
 
-## 📚 Additional Resources
+---
 
-- [Auth0 Organizations Documentation](https://auth0.com/docs/manage-users/organizations)
-- [Auth0 Actions Documentation](https://auth0.com/docs/customize/actions)
-- [Auth0 FGA Documentation](https://auth0.com/docs/fine-grained-authorization)
-- [Auth0 FGA Sample Stores - Google Drive Model](https://github.com/openfga/sample-stores/tree/main/stores/gdrive)
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/           # Auth0 handlers, session management
+│   │   ├── billing/        # CIBA-protected payment submission
+│   │   ├── ciba/           # CIBA initiation and polling
+│   │   ├── agents/         # AI Agents with FGA checks
+│   │   ├── documents/      # FGA-protected documents
+│   │   ├── folders/        # FGA-protected folders
+│   │   ├── mfa/            # My Account API endpoints
+│   │   └── kong-protected/ # Kong Gateway demo
+│   ├── billing/            # Payment UI
+│   ├── documents/          # Document management UI
+│   ├── agents/             # AI Agents chat UI
+│   ├── profile/            # MFA enrollment UI
+│   └── admin/              # Admin dashboard
+├── components/
+│   ├── billing/            # Billing form, transactions list
+│   ├── admin/              # Member management, sessions
+│   └── ui/                 # shadcn/ui components
+└── lib/
+    ├── fga-service.ts      # FGA client and utilities
+    ├── auth0-mgmt-client.ts # Management API client
+    ├── firebase-admin.ts   # Firestore client
+    └── validations.ts      # Zod schemas
+```
+
+---
+
+## Additional Resources
+
+- [Auth0 Documentation](https://auth0.com/docs)
+- [Auth0 Organizations](https://auth0.com/docs/manage-users/organizations)
+- [Auth0 FGA Documentation](https://docs.fga.dev)
+- [Auth0 My Account API](https://auth0.com/docs/api/myaccount)
+- [Auth0 CIBA](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-initiated-backchannel-authentication-flow)
+- [Kong Konnect Documentation](https://docs.konghq.com/konnect/)
+- [Next.js App Router](https://nextjs.org/docs/app)
 - [OpenFGA Documentation](https://openfga.dev/docs)
-- [Next.js App Router Documentation](https://nextjs.org/docs/app)
-- [Zod Validation Documentation](https://zod.dev/)
 
-## 🤝 Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with proper TypeScript types
-4. Add tests for new functionality
-5. Submit a pull request
+## Support
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- Check the [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for architectural decisions
-- Review Auth0 documentation for authentication patterns
+- Check [CLAUDE.md](CLAUDE.md) for detailed architecture documentation
+- See [docs/](docs/) for feature-specific guides
 - Open an issue for bugs or feature requests
 
 ---
 
-Built with Next.js, Auth0, and modern web technologies.
+Built with Next.js, Auth0, Auth0 FGA, and Firebase.

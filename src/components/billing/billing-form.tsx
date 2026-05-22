@@ -23,14 +23,14 @@ import {
   AlertTriangle,
   Lock,
   Wand2,
-  Dog,
-  PawPrint
+  FileText,
+  Package
 } from 'lucide-react';
 import { GuardianEnrollmentModal } from './guardian-enrollment-modal';
 
-interface RegistrationFormProps {
+interface BillingFormProps {
   user: any;
-  onClaimSubmitted?: () => void; // Callback to refresh registrations list
+  onPaymentSubmitted?: () => void;
 }
 
 interface CIBAStatus {
@@ -39,55 +39,55 @@ interface CIBAStatus {
   message?: string;
 }
 
-// Demo data sets for autofill - cycles through different dog registration scenarios
+// Demo data sets for autofill - cycles through different payment scenarios
 const DEMO_DATA_SETS = [
   {
-    serviceDate: new Date().toISOString().split('T')[0],
-    providerName: "Champion's Golden Legacy",
-    providerNPI: 'DN85742310',
-    diagnosisCode: 'Golden Retriever',
-    claimAmount: '35.00',
-    description: 'AKC Full Registration - Male, DOB: Jan 15, 2024. Sire: GCH Sunfire Gold Standard. Dam: CH Meadowbrook Sunshine',
+    paymentDate: new Date().toISOString().split('T')[0],
+    itemName: 'Pro Plan Subscription',
+    invoiceNumber: 'INV-2024-001',
+    billingCycle: 'Monthly',
+    amount: '29.00',
+    description: 'Pro Plan - Monthly subscription with 10GB storage, priority support, and advanced features.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
-    serviceDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    providerName: 'Midnight Storm Runner',
-    providerNPI: 'DN86123456',
-    diagnosisCode: 'German Shepherd',
-    claimAmount: '35.00',
-    description: 'AKC Full Registration - Female, DOB: Feb 20, 2024. Sire: GCH Vom Haus Sentinel. Dam: CH Blackwood Night Sky',
+    paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+    itemName: 'Additional Storage',
+    invoiceNumber: 'INV-2024-002',
+    billingCycle: 'One-time',
+    amount: '49.00',
+    description: 'Storage upgrade - Additional 50GB storage capacity for your workspace.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
-    serviceDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    providerName: 'Royal Blue Diamond',
-    providerNPI: 'DN87654321',
-    diagnosisCode: 'Labrador Retriever',
-    claimAmount: '25.00',
-    description: 'AKC Limited Registration - Male, DOB: Mar 10, 2024. Sire: CH Lakeside Thunder. Dam: Bayshore Morning Star',
+    paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
+    itemName: 'Team Seats',
+    invoiceNumber: 'INV-2024-003',
+    billingCycle: 'Monthly',
+    amount: '75.00',
+    description: 'Team expansion - 5 additional team member seats for your organization.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
-    serviceDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
-    providerName: 'Starlight Serenade',
-    providerNPI: 'PR45678901',
-    diagnosisCode: 'Standard Poodle',
-    claimAmount: '35.00',
-    description: 'AKC Full Registration - Female, DOB: Dec 5, 2023. Champion bloodline with show potential.',
+    paymentDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
+    itemName: 'Enterprise Plan',
+    invoiceNumber: 'INV-2024-004',
+    billingCycle: 'Annual',
+    amount: '299.00',
+    description: 'Enterprise Plan - Annual subscription with unlimited storage, SSO, and dedicated support.',
     routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
   },
 ];
 
-export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationFormProps) {
+export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const [loading, setLoading] = useState(false);
   const [cibaStatus, setCibaStatus] = useState<CIBAStatus>({ status: 'idle' });
   const [currentDemoIndex, setCurrentDemoIndex] = useState(0);
@@ -95,17 +95,17 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationForm
   const [checkingEnrollment, setCheckingEnrollment] = useState(false);
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [formData, setFormData] = useState({
-    serviceDate: '',
-    providerName: '',
-    providerNPI: '',
-    diagnosisCode: '',
-    claimAmount: '',
+    paymentDate: '',
+    itemName: '',
+    invoiceNumber: '',
+    billingCycle: '',
+    amount: '',
     description: '',
     routingNumber: '',
     accountNumber: '',
     accountNumberConfirm: '',
   });
-  const [superbillFile, setSuperbillFile] = useState<File | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
 
   // Check Guardian enrollment status on mount
   useEffect(() => {
@@ -119,11 +119,10 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationForm
       if (response.ok) {
         const data = await response.json();
         setGuardianEnrolled(data.enrolled);
-        console.log('🔍 Guardian enrolled:', data.enrolled);
+        console.log('Guardian enrolled:', data.enrolled);
       }
     } catch (error) {
       console.error('Failed to check Guardian enrollment:', error);
-      // Assume not enrolled if check fails
       setGuardianEnrolled(false);
     } finally {
       setCheckingEnrollment(false);
@@ -133,19 +132,29 @@ export function ClaimSubmissionForm({ user, onClaimSubmitted }: RegistrationForm
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve registrations via push notification.',
+      description: 'You can now approve payments via push notification.',
     });
   };
 
-  // Autofill demo data - cycles through different dog registration scenarios
+  // Autofill demo data - cycles through different payment scenarios
   const fillDemoData = () => {
     const demoData = DEMO_DATA_SETS[currentDemoIndex];
-    setFormData(demoData);
+    setFormData({
+      paymentDate: demoData.paymentDate,
+      itemName: demoData.itemName,
+      invoiceNumber: demoData.invoiceNumber,
+      billingCycle: demoData.billingCycle,
+      amount: demoData.amount,
+      description: demoData.description,
+      routingNumber: demoData.routingNumber,
+      accountNumber: demoData.accountNumber,
+      accountNumberConfirm: demoData.accountNumberConfirm,
+    });
 
     // Cycle to next demo data set
     setCurrentDemoIndex((currentDemoIndex + 1) % DEMO_DATA_SETS.length);
 
-    // Create a mock PDF file for the pedigree document
+    // Create a mock PDF receipt/invoice
     const mockPdfContent = `%PDF-1.4
 1 0 obj
 <<
@@ -188,18 +197,18 @@ stream
 BT
 /F1 24 Tf
 100 700 Td
-(AKC PEDIGREE - DEMO) Tj
+(AUTHSKYE INVOICE - DEMO) Tj
 /F1 12 Tf
 100 650 Td
-(Dog Name: ${demoData.providerName}) Tj
+(Item: ${demoData.itemName}) Tj
 100 630 Td
-(Owner: ${user?.name || 'Demo Breeder'}) Tj
+(Customer: ${user?.name || 'Demo User'}) Tj
 100 610 Td
-(Registration Date: ${new Date(demoData.serviceDate).toLocaleDateString()}) Tj
+(Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
 100 590 Td
-(Breed: ${demoData.diagnosisCode}) Tj
+(Billing: ${demoData.billingCycle}) Tj
 100 570 Td
-(Registration Fee: $${demoData.claimAmount}) Tj
+(Amount: $${demoData.amount}) Tj
 ET
 endstream
 endobj
@@ -221,11 +230,11 @@ startxref
 %%EOF`;
 
     const blob = new Blob([mockPdfContent], { type: 'application/pdf' });
-    const file = new File([blob], `pedigree_${demoData.providerName.split(' ')[0].toLowerCase()}.pdf`, { type: 'application/pdf' });
-    setSuperbillFile(file);
+    const file = new File([blob], `invoice_${demoData.invoiceNumber.toLowerCase()}.pdf`, { type: 'application/pdf' });
+    setReceiptFile(file);
 
     toast.success('Demo data filled!', {
-      description: `${demoData.diagnosisCode}: ${demoData.providerName}`,
+      description: `${demoData.billingCycle}: ${demoData.itemName}`,
     });
   };
 
@@ -233,8 +242,8 @@ startxref
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.type === 'application/pdf' && file.size <= 10 * 1024 * 1024) {
-        setSuperbillFile(file);
-        toast.success('Pedigree document uploaded', {
+        setReceiptFile(file);
+        toast.success('Receipt uploaded', {
           description: `File: ${file.name}`,
         });
       } else {
@@ -255,16 +264,16 @@ startxref
   };
 
   const validateForm = (): boolean => {
-    if (!formData.serviceDate || !formData.providerName || !formData.claimAmount) {
+    if (!formData.paymentDate || !formData.itemName || !formData.amount) {
       toast.error('Missing required fields', {
         description: 'Please fill out all required fields',
       });
       return false;
     }
 
-    if (!superbillFile) {
-      toast.error('Pedigree document required', {
-        description: 'Please upload the pedigree or health certificate (PDF)',
+    if (!receiptFile) {
+      toast.error('Invoice/receipt required', {
+        description: 'Please upload the invoice or receipt (PDF)',
       });
       return false;
     }
@@ -297,7 +306,7 @@ startxref
     try {
       setCibaStatus({ status: 'pending', message: 'Initiating authentication request...' });
 
-      console.log('🔐 Initiating CIBA flow for dog registration');
+      console.log('Initiating CIBA flow for payment');
 
       // Step 1: Initiate CIBA authentication request
       const cibaResponse = await fetch('/api/ciba/initiate', {
@@ -305,7 +314,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email',
-          binding_message: `Approve registration: ${formData.claimAmount} USD`,
+          binding_message: `Approve payment: ${formData.amount} USD`,
         }),
       });
 
@@ -317,7 +326,7 @@ startxref
       const cibaData = await cibaResponse.json();
       const { auth_req_id, expires_in } = cibaData;
 
-      console.log('✅ CIBA initiated:', { auth_req_id, expires_in });
+      console.log('CIBA initiated:', { auth_req_id, expires_in });
 
       setCibaStatus({
         status: 'pending',
@@ -345,7 +354,7 @@ startxref
         return false;
       }
     } catch (error: any) {
-      console.error('❌ CIBA error:', error);
+      console.error('CIBA error:', error);
       setCibaStatus({ status: 'idle', message: error.message });
       toast.error('Authentication failed', {
         description: error.message || 'Failed to complete authentication',
@@ -359,17 +368,16 @@ startxref
     expiresIn: number
   ): Promise<{ status: 'approved' | 'denied' | 'expired' }> => {
     const startTime = Date.now();
-    // Give at least 1 minute for polling, or use the expiry time from Auth0
-    const maxDuration = Math.max(60000, expiresIn * 1000); // At least 60 seconds
-    const pollInterval = 5000; // Poll every 5 seconds (Auth0 recommended)
+    const maxDuration = Math.max(60000, expiresIn * 1000);
+    const pollInterval = 5000;
 
     return new Promise((resolve) => {
       const poll = async () => {
         const elapsed = Date.now() - startTime;
-        console.log(`🔄 Polling CIBA (${Math.floor(elapsed / 1000)}s elapsed)...`);
+        console.log(`Polling CIBA (${Math.floor(elapsed / 1000)}s elapsed)...`);
 
         if (elapsed > maxDuration) {
-          console.log('⏰ Polling timeout reached');
+          console.log('Polling timeout reached');
           resolve({ status: 'expired' });
           return;
         }
@@ -381,39 +389,35 @@ startxref
             body: JSON.stringify({ auth_req_id: authReqId }),
           });
 
-          console.log('📥 Poll HTTP status:', response.status);
+          console.log('Poll HTTP status:', response.status);
 
           if (!response.ok && response.status >= 500) {
-            // Server error - treat as temporary issue and keep polling
-            console.warn('⚠️ Server error, continuing to poll...');
+            console.warn('Server error, continuing to poll...');
             setTimeout(poll, pollInterval);
             return;
           }
 
           const data = await response.json();
-          console.log('📦 Poll data:', data);
+          console.log('Poll data:', data);
 
           if (data.status === 'approved') {
-            console.log('✅ CIBA Approved!');
+            console.log('CIBA Approved!');
             resolve({ status: 'approved' });
           } else if (data.status === 'denied') {
-            console.log('❌ CIBA Denied');
+            console.log('CIBA Denied');
             resolve({ status: 'denied' });
           } else if (data.status === 'expired') {
-            console.log('⏰ CIBA Expired');
+            console.log('CIBA Expired');
             resolve({ status: 'expired' });
           } else if (data.status === 'pending' || data.error === 'authorization_pending') {
-            // Continue polling
-            console.log('⏳ Still pending, polling again in 5 seconds...');
+            console.log('Still pending, polling again in 5 seconds...');
             setTimeout(poll, pollInterval);
           } else {
-            // Unknown status - log and continue polling
-            console.warn('⚠️ Unknown poll status, continuing:', data);
+            console.warn('Unknown poll status, continuing:', data);
             setTimeout(poll, pollInterval);
           }
         } catch (error) {
-          console.error('❌ Poll fetch error:', error);
-          // Network error - continue polling
+          console.error('Poll fetch error:', error);
           setTimeout(poll, pollInterval);
         }
       };
@@ -431,7 +435,6 @@ startxref
 
     // Check Guardian enrollment before proceeding
     if (guardianEnrolled === null) {
-      // Still checking, wait
       toast.info('Checking enrollment status...', {
         description: 'Please wait while we verify your Guardian setup.',
       });
@@ -439,7 +442,6 @@ startxref
     }
 
     if (!guardianEnrolled) {
-      // User not enrolled - show enrollment modal
       setShowEnrollmentModal(true);
       return;
     }
@@ -449,7 +451,7 @@ startxref
     try {
       // Step 1: Initiate CIBA authentication
       toast.info('Authentication required', {
-        description: 'Please approve the registration via Guardian app on your mobile device',
+        description: 'Please approve the payment via Guardian app on your mobile device',
       });
 
       const cibaApproved = await initiateCIBA();
@@ -459,59 +461,59 @@ startxref
         return;
       }
 
-      // Step 2: Submit registration after CIBA approval
+      // Step 2: Submit payment after CIBA approval
       const formDataToSend = new FormData();
-      formDataToSend.append('serviceDate', formData.serviceDate);
-      formDataToSend.append('providerName', formData.providerName);
-      formDataToSend.append('providerNPI', formData.providerNPI);
-      formDataToSend.append('diagnosisCode', formData.diagnosisCode);
-      formDataToSend.append('claimAmount', formData.claimAmount);
+      formDataToSend.append('serviceDate', formData.paymentDate);
+      formDataToSend.append('providerName', formData.itemName);
+      formDataToSend.append('providerNPI', formData.invoiceNumber);
+      formDataToSend.append('diagnosisCode', formData.billingCycle);
+      formDataToSend.append('claimAmount', formData.amount);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('routingNumber', formData.routingNumber);
       formDataToSend.append('accountNumber', formData.accountNumber);
-      if (superbillFile) {
-        formDataToSend.append('superbill', superbillFile);
+      if (receiptFile) {
+        formDataToSend.append('superbill', receiptFile);
       }
 
-      const response = await fetch('/api/claims/submit', {
+      const response = await fetch('/api/billing/submit', {
         method: 'POST',
         body: formDataToSend,
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to submit registration');
+        throw new Error(error.message || 'Failed to submit payment');
       }
 
       const result = await response.json();
 
-      toast.success('Dog registration submitted successfully!', {
-        description: `Registration ID: ${result.claimId}`,
+      toast.success('Payment submitted successfully!', {
+        description: `Transaction ID: ${result.claimId}`,
       });
 
-      // Trigger registrations list refresh
-      if (onClaimSubmitted) {
-        onClaimSubmitted();
+      // Trigger transactions list refresh
+      if (onPaymentSubmitted) {
+        onPaymentSubmitted();
       }
 
       // Reset form
       setFormData({
-        serviceDate: '',
-        providerName: '',
-        providerNPI: '',
-        diagnosisCode: '',
-        claimAmount: '',
+        paymentDate: '',
+        itemName: '',
+        invoiceNumber: '',
+        billingCycle: '',
+        amount: '',
         description: '',
         routingNumber: '',
         accountNumber: '',
         accountNumberConfirm: '',
       });
-      setSuperbillFile(null);
+      setReceiptFile(null);
       setCibaStatus({ status: 'idle' });
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit registration',
+        description: error.message || 'Failed to submit payment',
       });
     } finally {
       setLoading(false);
@@ -584,9 +586,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for registration approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting registration...'}
-            {cibaStatus.status === 'denied' && 'Registration denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Processing payment...'}
+            {cibaStatus.status === 'denied' && 'Payment denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -596,29 +598,29 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="serviceDate" className="text-xs">Registration Date *</Label>
+            <Label htmlFor="paymentDate" className="text-xs">Payment Date *</Label>
             <Input
-              id="serviceDate"
-              name="serviceDate"
+              id="paymentDate"
+              name="paymentDate"
               type="date"
               className="h-8 text-sm"
-              value={formData.serviceDate}
+              value={formData.paymentDate}
               onChange={handleInputChange}
               required
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="claimAmount" className="text-xs">Fee *</Label>
+            <Label htmlFor="amount" className="text-xs">Amount *</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
               <Input
-                id="claimAmount"
-                name="claimAmount"
+                id="amount"
+                name="amount"
                 type="number"
                 step="0.01"
                 className="pl-7 h-8 text-sm"
-                placeholder="35.00"
-                value={formData.claimAmount}
+                placeholder="29.00"
+                value={formData.amount}
                 onChange={handleInputChange}
                 required
               />
@@ -627,16 +629,16 @@ startxref
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="providerName" className="text-xs flex items-center gap-1">
-            <Dog className="w-3 h-3" />
-            Dog Name *
+          <Label htmlFor="itemName" className="text-xs flex items-center gap-1">
+            <Package className="w-3 h-3" />
+            Item / Service *
           </Label>
           <Input
-            id="providerName"
-            name="providerName"
+            id="itemName"
+            name="itemName"
             className="h-8 text-sm"
-            placeholder="Champion's Golden Legacy"
-            value={formData.providerName}
+            placeholder="Pro Plan Subscription"
+            value={formData.itemName}
             onChange={handleInputChange}
             required
           />
@@ -644,25 +646,25 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="providerNPI" className="text-xs">Registration Number</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">Invoice Number</Label>
             <Input
-              id="providerNPI"
-              name="providerNPI"
+              id="invoiceNumber"
+              name="invoiceNumber"
               className="h-8 text-sm"
-              placeholder="DN85742310"
-              maxLength={10}
-              value={formData.providerNPI}
+              placeholder="INV-2024-001"
+              maxLength={20}
+              value={formData.invoiceNumber}
               onChange={handleInputChange}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="diagnosisCode" className="text-xs">Breed</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Billing Cycle</Label>
             <Input
-              id="diagnosisCode"
-              name="diagnosisCode"
+              id="billingCycle"
+              name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Golden Retriever"
-              value={formData.diagnosisCode}
+              placeholder="Monthly / Annual"
+              value={formData.billingCycle}
               onChange={handleInputChange}
             />
           </div>
@@ -674,34 +676,34 @@ startxref
             id="description"
             name="description"
             className="text-sm"
-            placeholder="Registration details, lineage, etc."
+            placeholder="Payment details, notes, etc."
             rows={2}
             value={formData.description}
             onChange={handleInputChange}
           />
         </div>
 
-        {/* Pedigree Document Upload - Compact */}
+        {/* Receipt/Invoice Upload - Compact */}
         <div className="space-y-1">
-          <Label htmlFor="superbill" className="text-xs flex items-center gap-1">
+          <Label htmlFor="receipt" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Pedigree / Health Certificate (PDF) *
+            Invoice / Receipt (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
-            <Label htmlFor="superbill" className="cursor-pointer text-xs text-primary">
-              {superbillFile ? superbillFile.name : 'Click to upload'}
+            <Label htmlFor="receipt" className="cursor-pointer text-xs text-primary">
+              {receiptFile ? receiptFile.name : 'Click to upload'}
               <Input
-                id="superbill"
-                name="superbill"
+                id="receipt"
+                name="receipt"
                 type="file"
                 accept=".pdf"
                 className="sr-only"
                 onChange={handleFileChange}
               />
             </Label>
-            {superbillFile && (
+            {receiptFile && (
               <p className="text-xs text-muted-foreground mt-1">
-                {(superbillFile.size / 1024 / 1024).toFixed(2)} MB
+                {(receiptFile.size / 1024 / 1024).toFixed(2)} MB
               </p>
             )}
           </div>
@@ -760,7 +762,7 @@ startxref
 
       {/* Submit Button */}
       <div className="flex items-center justify-end pt-2">
-        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending' || checkingEnrollment} className="w-full bg-[#003594] hover:bg-[#002670]">
+        <Button type="submit" size="sm" disabled={loading || cibaStatus.status === 'pending' || checkingEnrollment} className="w-full">
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -773,8 +775,8 @@ startxref
             </>
           ) : (
             <>
-              <PawPrint className="mr-2 h-4 w-4" />
-              Submit Registration
+              <CreditCard className="mr-2 h-4 w-4" />
+              Submit Payment
             </>
           )}
         </Button>

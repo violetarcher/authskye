@@ -1,10 +1,11 @@
 // src/app/admin/sessions/page.tsx
 import { withPageAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { SessionManagement } from '../../../components/admin/session-management';
+import { getClaimKey } from '@/lib/auth-utils';
 
 // Helper function to check for admin role
 const isAdmin = (session: any): boolean => {
-    const roles = session?.user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = session?.user?.[getClaimKey('roles')] || [];
     return roles.includes('Admin');
 };
 

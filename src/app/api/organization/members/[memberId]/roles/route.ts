@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 import { memberIdSchema, updateMemberRolesSchema } from '@/lib/validations';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function POST(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function POST(
     }
 
     const user = session.user;
-    const userRoles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const userRoles = user?.[getClaimKey('roles')] || [];
 
     if (!userRoles.includes('Admin')) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });

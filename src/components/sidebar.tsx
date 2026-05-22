@@ -1,20 +1,21 @@
-// src/components/sidebar.tsx - Paw0 AKC Branding
+// src/components/sidebar.tsx - Authskye Branding
 import { getSession } from '@auth0/nextjs-auth0';
 import { SidebarNav } from './sidebar-nav';
 import { OrgSwitcher } from './org-switcher';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, PawPrint } from 'lucide-react';
+import { LogIn, LogOut, Cloud } from 'lucide-react';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function Sidebar() {
   const session = await getSession();
   const user = session?.user;
-  const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+  const roles = user?.[getClaimKey('roles')] || [];
   const orgId = user?.org_id;
 
-  const orgName = user?.['https://agency-inc-demo.com/org_name'] || '';
-  const orgLogo = user?.['https://agency-inc-demo.com/org_logo'];
-  const companyName = orgName ? `Paw0 | ${orgName}` : 'Paw0';
+  const orgName = user?.[getClaimKey('org_name')] || '';
+  const orgLogo = user?.[getClaimKey('org_logo')];
+  const companyName = orgName ? `Authskye | ${orgName}` : 'Authskye';
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
@@ -28,8 +29,8 @@ export async function Sidebar() {
             className="rounded-md"
           />
         ) : (
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-[#003594] text-white">
-            <PawPrint className="h-5 w-5" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br from-[#3b82f6] to-[#0ea5e9] text-white">
+            <Cloud className="h-5 w-5" />
           </div>
         )}
         <h2 className="text-xl font-bold">{companyName}</h2>

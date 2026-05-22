@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { Auth0SessionManager } from '@/lib/auth0-session-manager';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export const POST = withApiAuthRequired(async function POST(request: NextRequest) {
   try {
@@ -10,14 +11,14 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     }
 
     const { user } = session;
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
-    
+    const roles = user[getClaimKey('roles')] || [];
+
     // Check if user is admin
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const currentSessionId = session.user['https://agency-inc-demo.com/session_id'];
+    const currentSessionId = session.user[getClaimKey('session_id')];
 
     // Enforce single session limit for current user
     const result = await Auth0SessionManager.enforceSingleSession(

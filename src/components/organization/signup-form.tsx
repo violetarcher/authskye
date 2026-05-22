@@ -118,9 +118,9 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Create Your Kennel Club</CardTitle>
+        <CardTitle className="text-2xl">Create Your Workspace</CardTitle>
         <CardDescription>
-          Join Paw0 to manage dog registrations, track pedigrees, and participate in AKC events.
+          Join Authskye to collaborate with your team and manage your projects in the cloud.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -139,7 +139,7 @@ export function SignupForm() {
             </Label>
             <Input
               id="organizationName"
-              placeholder="Golden Valley Kennel Club"
+              placeholder="Acme Corporation"
               value={formData.organizationName}
               onChange={handleChange('organizationName')}
               disabled={isSubmitting}
@@ -158,7 +158,7 @@ export function SignupForm() {
             <Input
               id="adminEmail"
               type="email"
-              placeholder="admin@goldenvalleykennel.com"
+              placeholder="admin@acme.com"
               value={formData.adminEmail}
               onChange={handleChange('adminEmail')}
               disabled={isSubmitting}

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 import { Auth0SessionManager } from '@/lib/auth0-session-manager';
@@ -13,21 +14,21 @@ export async function GET(request: NextRequest) {
     }
 
     const { user } = session;
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
-    
+    const roles = user[getClaimKey('roles')] || [];
+
     // Check if user is admin
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     // Get organization ID
-    const orgId = user['https://agency-inc-demo.com/org_id'];
+    const orgId = user[getClaimKey('org_id')];
     if (!orgId) {
       return Response.json({ error: 'Organization not found' }, { status: 400 });
     }
 
     // Get current session ID from the user's token
-    const currentSessionId = user['https://agency-inc-demo.com/session_id'];
+    const currentSessionId = user[getClaimKey('session_id')];
 
     // Get all organization members
     const membersResponse = await managementClient.organizations.getMembers({ id: orgId });

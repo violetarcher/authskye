@@ -3,6 +3,7 @@ import { getSession, withApiAuthRequired } from '@auth0/nextjs-auth0';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 import { updateOrganizationSettingsSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
+import { getClaimKey } from '@/lib/auth-utils';
 
 /**
  * GET /api/organizations/[orgId]/settings
@@ -24,7 +25,7 @@ export async function GET(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -77,7 +78,7 @@ export async function PATCH(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

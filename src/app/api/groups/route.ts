@@ -3,6 +3,7 @@ import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { NextRequest, NextResponse } from 'next/server';
 import { createGroupSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
+import { getClaimKey } from '@/lib/auth-utils';
 
 /**
  * GET /api/groups
@@ -57,7 +58,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     }
 
     // Check if user is admin
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
+    const roles = user[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json(
         { error: 'Only admins can create groups' },

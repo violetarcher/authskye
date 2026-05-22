@@ -2,45 +2,45 @@
 
 import { useState } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { ClaimSubmissionForm } from '@/components/claims/claim-submission-form';
-import { ClaimsList } from '@/components/claims/claims-list';
+import { BillingForm } from '@/components/billing/billing-form';
+import { TransactionsList } from '@/components/billing/transactions-list';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Dog, Trash2 } from 'lucide-react';
+import { CreditCard, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function RegistrationsPage() {
+export default function BillingPage() {
   const { user } = useUser();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isClearing, setIsClearing] = useState(false);
   const [openClearDialog, setOpenClearDialog] = useState(false);
 
-  const handleRegistrationSubmitted = () => {
-    // Trigger re-render of registrations list by changing the key
+  const handlePaymentSubmitted = () => {
+    // Trigger re-render of transactions list by changing the key
     setRefreshTrigger(prev => prev + 1);
   };
 
-  const handleClearAllRegistrations = async () => {
+  const handleClearAllTransactions = async () => {
     setIsClearing(true);
     try {
-      const response = await fetch('/api/claims/clear', {
+      const response = await fetch('/api/billing/clear', {
         method: 'POST',
       });
 
       if (!response.ok) {
         const error = await response.json();
-        toast.error('Failed to clear registrations', {
+        toast.error('Failed to clear transactions', {
           description: error.message || 'An error occurred',
         });
         return;
       }
 
-      toast.success('All registrations cleared successfully');
+      toast.success('All transactions cleared successfully');
       setRefreshTrigger(prev => prev + 1);
       setOpenClearDialog(false);
     } catch (error: any) {
-      toast.error('Error clearing registrations', {
+      toast.error('Error clearing transactions', {
         description: error.message || 'An error occurred',
       });
     } finally {
@@ -52,32 +52,32 @@ export default function RegistrationsPage() {
     <div className="space-y-4">
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Dog className="w-8 h-8 text-[#003594]" />
-          Dog Registration
+          <CreditCard className="w-8 h-8 text-primary" />
+          Billing
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Register your dogs and track registration status
+          Manage your payments and view transaction history
         </p>
       </header>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Left column - Registration Form */}
+        {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Submit Registration</CardTitle>
+            <CardTitle className="text-lg">Make a Payment</CardTitle>
             <CardDescription className="text-xs">
               Complete the form below and approve via mobile push notification
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ClaimSubmissionForm user={user} onClaimSubmitted={handleRegistrationSubmitted} />
+            <BillingForm user={user} onPaymentSubmitted={handlePaymentSubmitted} />
           </CardContent>
         </Card>
 
-        {/* Right column - Registrations List */}
+        {/* Right column - Transactions List */}
         <div key={refreshTrigger}>
           <div className="flex flex-col gap-3">
-            <ClaimsList userId={user?.sub || undefined} />
+            <TransactionsList userId={user?.sub || undefined} />
             <Dialog open={openClearDialog} onOpenChange={setOpenClearDialog}>
               <DialogTrigger asChild>
                 <Button
@@ -87,14 +87,14 @@ export default function RegistrationsPage() {
                   disabled={isClearing}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear All Registrations
+                  Clear All Transactions
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Clear All Registrations?</DialogTitle>
+                  <DialogTitle>Clear All Transactions?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All registrations in your account will be permanently deleted.
+                    This action cannot be undone. All transactions in your account will be permanently deleted.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-2">
@@ -107,10 +107,10 @@ export default function RegistrationsPage() {
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={handleClearAllRegistrations}
+                    onClick={handleClearAllTransactions}
                     disabled={isClearing}
                   >
-                    {isClearing ? 'Clearing...' : 'Clear All Registrations'}
+                    {isClearing ? 'Clearing...' : 'Clear All Transactions'}
                   </Button>
                 </div>
               </DialogContent>

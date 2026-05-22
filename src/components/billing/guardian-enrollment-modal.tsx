@@ -82,6 +82,7 @@ export function GuardianEnrollmentModal({
       const response = await fetch('/api/guardian/check-enrollment');
       if (response.ok) {
         const data = await response.json();
+        console.log('🔍 Enrollment check response:', data);
         if (data.enrolled) {
           setEnrolled(true);
           setTimeout(() => {
@@ -109,18 +110,18 @@ export function GuardianEnrollmentModal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-[#003594]" />
+            <Smartphone className="h-5 w-5 text-primary" />
             Set Up Guardian Push
           </DialogTitle>
           <DialogDescription>
-            Enable push notifications to approve registration requests securely from your phone.
+            Enable push notifications to approve payment requests securely from your phone.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col items-center py-4">
           {loading && (
             <div className="flex flex-col items-center gap-3 py-6">
-              <Loader2 className="h-8 w-8 animate-spin text-[#003594]" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <p className="text-sm text-muted-foreground">Preparing enrollment...</p>
             </div>
           )}
@@ -144,24 +145,24 @@ export function GuardianEnrollmentModal({
               {/* Instructions */}
               <div className="bg-muted/50 rounded-lg p-4">
                 <p className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-[#003594]" />
+                  <Shield className="h-4 w-4 text-primary" />
                   Quick Setup
                 </p>
                 <ol className="text-sm text-muted-foreground space-y-2">
                   <li className="flex gap-2">
-                    <span className="font-semibold text-[#003594]">1.</span>
+                    <span className="font-semibold text-primary">1.</span>
                     <span>Download <strong>Auth0 Guardian</strong> app on your phone</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="font-semibold text-[#003594]">2.</span>
+                    <span className="font-semibold text-primary">2.</span>
                     <span>Click the button below to open enrollment</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="font-semibold text-[#003594]">3.</span>
+                    <span className="font-semibold text-primary">3.</span>
                     <span>Scan the QR code shown with the Guardian app</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="font-semibold text-[#003594]">4.</span>
+                    <span className="font-semibold text-primary">4.</span>
                     <span>Approve the enrollment in Guardian</span>
                   </li>
                 </ol>
@@ -170,7 +171,7 @@ export function GuardianEnrollmentModal({
               {/* Enroll Button */}
               <Button
                 onClick={openEnrollment}
-                className="w-full gap-2 bg-[#003594] hover:bg-[#002670]"
+                className="w-full gap-2 bg-primary hover:bg-primary/90"
                 size="lg"
               >
                 <ExternalLink className="h-4 w-4" />

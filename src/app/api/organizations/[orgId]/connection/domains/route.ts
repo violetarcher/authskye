@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 import { z } from 'zod';
+import { getClaimKey } from '@/lib/auth-utils';
 
 const addDomainSchema = z.object({
   domain: z.string().min(1, 'Domain is required').regex(
@@ -33,7 +34,7 @@ export async function POST(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -235,7 +236,7 @@ export async function DELETE(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

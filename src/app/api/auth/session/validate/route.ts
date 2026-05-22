@@ -1,22 +1,23 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { isSessionRevoked } from '@/lib/session-revocation';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getSession();
     if (!session?.user) {
       return Response.json(
-        { 
-          valid: false, 
-          error: 'No session found' 
+        {
+          valid: false,
+          error: 'No session found'
         },
         { status: 401 }
       );
     }
 
     const user = session.user;
-    const sessionId = user['https://agency-inc-demo.com/session_id'];
+    const sessionId = user[getClaimKey('session_id')];
 
     // console.log(`🔍 Session validation: sessionId=${sessionId}, userId=${user.sub}`);
 

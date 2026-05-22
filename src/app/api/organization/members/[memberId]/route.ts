@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { managementClient } from '@/lib/auth0-mgmt-client';
 import { memberIdSchema } from '@/lib/validations';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function DELETE(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function DELETE(
     }
 
     const user = session.user;
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
 
     if (!roles.includes('Admin')) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });

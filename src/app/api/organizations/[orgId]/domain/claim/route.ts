@@ -3,6 +3,7 @@ import { getSession } from '@auth0/nextjs-auth0';
 import { claimDomainSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
 import crypto from 'crypto';
+import { getClaimKey } from '@/lib/auth-utils';
 
 /**
  * POST /api/organizations/[orgId]/domain/claim
@@ -25,7 +26,7 @@ export async function POST(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

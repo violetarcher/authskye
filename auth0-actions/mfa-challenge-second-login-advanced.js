@@ -28,7 +28,7 @@ exports.onExecutePostLogin = async (event, api) => {
   }
 
   // Check if user is a member of any organization (additional safety check)
-  const userOrgs = event.user.org_id || event.user['https://agency-inc-demo.com/org_id'];
+  const userOrgs = event.user.org_id || event.user['https://authskye.com/org_id'];
   if (userOrgs) {
     console.log(`[MFA Action] Skipping - User is a member of organization ID: ${userOrgs}`);
     return;
@@ -68,8 +68,8 @@ exports.onExecutePostLogin = async (event, api) => {
     }
 
     // Optional: Add custom claim to token indicating MFA was challenged
-    api.idToken.setCustomClaim('https://agency-inc-demo.com/mfa_challenged_at', new Date().toISOString());
-    api.accessToken.setCustomClaim('https://agency-inc-demo.com/mfa_challenged_at', new Date().toISOString());
+    api.idToken.setCustomClaim('https://authskye.com/mfa_challenged_at', new Date().toISOString());
+    api.accessToken.setCustomClaim('https://authskye.com/mfa_challenged_at', new Date().toISOString());
 
   } catch (error) {
     console.error('[MFA Action] ✗ Error enabling MFA:', error.message);
@@ -90,8 +90,8 @@ exports.onContinuePostLogin = async (event, api) => {
   if (event.authentication?.methods) {
     const mfaMethods = event.authentication.methods.filter(m => m.name === 'mfa');
     if (mfaMethods.length > 0) {
-      api.idToken.setCustomClaim('https://agency-inc-demo.com/mfa_completed_at', new Date().toISOString());
-      api.accessToken.setCustomClaim('https://agency-inc-demo.com/mfa_completed_at', new Date().toISOString());
+      api.idToken.setCustomClaim('https://authskye.com/mfa_completed_at', new Date().toISOString());
+      api.accessToken.setCustomClaim('https://authskye.com/mfa_completed_at', new Date().toISOString());
     }
   }
 };

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { ssoTicketSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
+import { getClaimKey } from '@/lib/auth-utils';
 
 /**
  * POST /api/organizations/[orgId]/sso/ticket
@@ -28,7 +29,7 @@ export async function POST(
     }
 
     // Check admin role
-    const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+    const roles = user?.[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -58,7 +59,7 @@ export async function POST(
     console.log('🎫 Starting SSO configuration for organization:', orgId);
 
     // Get organization name
-    const orgName = user['https://agency-inc-demo.com/org_name'] || 'Your Organization';
+    const orgName = user[getClaimKey('org_name')] || 'Your Organization';
 
     // Get Management API access token
     const tokenResponse = await fetch(

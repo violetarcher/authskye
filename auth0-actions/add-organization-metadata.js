@@ -21,7 +21,7 @@ exports.onExecutePostLogin = async (event, api) => {
     return;
   }
 
-  const namespace = 'https://agency-inc-demo.com';
+  const namespace = 'https://authskye.com';
   const orgId = event.organization.id;
   const orgName = event.organization.display_name || event.organization.name;
 

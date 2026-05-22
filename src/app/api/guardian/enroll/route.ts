@@ -28,6 +28,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
 
     // Use raw API call to include `factor` parameter
     // This forces enrollment to only show push-notification option
+    // allow_multiple_enrollments: true allows adding push even if user has other MFA factors
     const response = await fetch(`https://${domain}/api/v2/guardian/enrollments/ticket`, {
       method: 'POST',
       headers: {
@@ -37,7 +38,8 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
       body: JSON.stringify({
         user_id: user.sub,
         send_mail: false,
-        factor: 'push-notification', // Force push notification only (works with Universal Login)
+        factor: 'push-notification',
+        allow_multiple_enrollments: true,
       }),
     });
 

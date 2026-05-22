@@ -15,6 +15,12 @@ export const GET = handleAuth({
         acr_values: 'urn:okta:loa:2fa:any'
       };
 
+      // Only force specific connection for organization invitations
+      // Otherwise, allow Home Realm Discovery to work for enterprise connections
+      // if (process.env.AUTH0_CONNECTION_ID) {
+      //   authorizationParams.connection = process.env.AUTH0_CONNECTION_ID;
+      // }
+
       // Configure audience and scopes based on request type
       if (isMyAccount) {
         // My Account API request

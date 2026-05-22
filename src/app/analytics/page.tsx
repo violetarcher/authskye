@@ -6,18 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BarChart3, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export default function AnalyticsPage() {
   const { user, isLoading: userLoading } = useUser();
 
-  const roles = user?.['https://agency-inc-demo.com/roles'] as string[] || [];
+  const roles = user?.[getClaimKey('roles')] as string[] || [];
   const hasAnalyticsAccess = roles.includes('Data Analyst');
-  
+
   // Check for pending access request in user metadata - try different possible locations
-  const appMetadata = user?.['https://agency-inc-demo.com/app_metadata'] as { pending_access_request?: string } | undefined;
+  const appMetadata = user?.[getClaimKey('app_metadata')] as { pending_access_request?: string } | undefined;
   const pendingAccessRequest = appMetadata?.pending_access_request ||
                                (user as any)?.app_metadata?.pending_access_request ||
-                               user?.['https://agency-inc-demo.com/pending_access_request'];
+                               user?.[getClaimKey('pending_access_request')];
   
   // Debug: Log user object to see what metadata is available
   console.log('User object:', user);

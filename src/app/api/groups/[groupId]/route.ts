@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { updateGroupSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
 import { readTuples, deleteTuples, formatGroupId, type FGATuple } from '@/lib/fga-service';
+import { getClaimKey } from '@/lib/auth-utils';
 
 
 /**
@@ -75,7 +76,7 @@ export async function PUT(
     }
 
     // Check if user is admin
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
+    const roles = user[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json(
         { error: 'Only admins can update groups' },
@@ -153,7 +154,7 @@ export async function DELETE(
     }
 
     // Check if user is admin
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
+    const roles = user[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json(
         { error: 'Only admins can delete groups' },

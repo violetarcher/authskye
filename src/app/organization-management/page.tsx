@@ -5,6 +5,7 @@ import { OrganizationProfile } from '@/components/admin/organization-profile';
 import { SSOConfiguration } from '@/components/admin/sso-configuration';
 import { ConnectionDomains } from '@/components/admin/connection-domains';
 import { Building2, Shield, Globe } from 'lucide-react';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export const metadata = {
   title: 'Organization Settings | SecureHealth Portal',
@@ -21,7 +22,7 @@ export default async function OrganizationManagementPage() {
   }
 
   // Check for Admin role
-  const roles = user?.['https://agency-inc-demo.com/roles'] || [];
+  const roles = user?.[getClaimKey('roles')] || [];
   if (!roles.includes('Admin')) {
     redirect('/?error=forbidden');
   }
@@ -32,7 +33,7 @@ export default async function OrganizationManagementPage() {
     redirect('/?error=no-organization');
   }
 
-  const orgName = user?.['https://agency-inc-demo.com/org_name'] || 'Your Organization';
+  const orgName = user?.[getClaimKey('org_name')] || 'Your Organization';
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-5xl">

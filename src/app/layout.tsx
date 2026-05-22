@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'Paw0',
-  description: 'Canine Registry and Management Platform',
+  title: 'Authskye',
+  description: 'Your workspace in the cloud',
 };
 
 export const viewport = {
-  themeColor: '#003594',
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({

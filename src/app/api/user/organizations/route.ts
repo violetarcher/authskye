@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export const dynamic = 'force-dynamic';
 import { managementClient } from '@/lib/auth0-mgmt-client';
@@ -24,16 +25,16 @@ export async function GET(request: NextRequest) {
     console.log('✅ Found organizations:', organizations.length);
 
     // Get the current organization from user claims
-    const currentOrgId = user['https://agency-inc-demo.com/org_id'];
-    const currentOrgName = user['https://agency-inc-demo.com/org_name'];
-    const currentOrgLogo = user['https://agency-inc-demo.com/org_logo'];
+    const currentOrgId = user[getClaimKey('org_id')];
+    const currentOrgName = user[getClaimKey('org_name')];
+    const currentOrgLogo = user[getClaimKey('org_logo')];
 
-    // Enhance organization data with metadata
+    // Enhance organization data with branding/metadata
     const enrichedOrgs = organizations.map(org => ({
       id: org.id || '',
       name: org.name || '',
       display_name: org.display_name || org.name || '',
-      logo_url: org.metadata?.logo_url || '',
+      logo_url: org.branding?.logo_url || (org as any).metadata?.logo_url || '',
       isCurrent: org.id === currentOrgId
     }));
 

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getSession } from '@auth0/nextjs-auth0';
 import { Auth0SessionManager } from '@/lib/auth0-session-manager';
+import { getClaimKey } from '@/lib/auth-utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { user } = session;
-    const currentSessionId = session.user['https://agency-inc-demo.com/session_id'];
+    const currentSessionId = session.user[getClaimKey('session_id')];
     
     console.log(`🔥 Session enforcement started for user: ${user.sub}, currentSession: ${currentSessionId}`);
 

@@ -5,6 +5,7 @@ import { addGroupMemberSchema } from '@/lib/validations';
 import { db } from '@/lib/firebase-admin';
 import { addUserToGroup, removeUserFromGroup, getGroupMembers } from '@/lib/fga-service';
 import { managementClient } from '@/lib/auth0-mgmt-client';
+import { getClaimKey } from '@/lib/auth-utils';
 
 /**
  * GET /api/groups/[groupId]/members
@@ -92,7 +93,7 @@ export async function POST(
     }
 
     // Check if user is admin
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
+    const roles = user[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json(
         { error: 'Only admins can add group members' },
@@ -181,7 +182,7 @@ export async function DELETE(
     }
 
     // Check if user is admin
-    const roles = user['https://agency-inc-demo.com/roles'] || [];
+    const roles = user[getClaimKey('roles')] || [];
     if (!roles.includes('Admin')) {
       return NextResponse.json(
         { error: 'Only admins can remove group members' },
