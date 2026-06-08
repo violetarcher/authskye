@@ -19,7 +19,6 @@
 | **My Account API** | User self-service MFA enrollment with Custom Token Exchange (CTE) |
 | **Session Management** | Real-time session monitoring, single-session enforcement, back-channel logout |
 | **Step-Up MFA** | Context-aware MFA challenges for sensitive operations |
-| **Kong API Gateway** | *(Optional)* JWT validation, rate limiting, and CORS at the gateway layer |
 
 ---
 
@@ -40,11 +39,8 @@
 7. [Custom Token Exchange (CTE)](#custom-token-exchange-cte-setup)
 8. [My Account API Setup](#my-account-api-setup)
 9. [AI Agents / LLM Setup](#ai-agents-llm-setup)
-10. [Kong API Gateway (Optional)](#kong-api-gateway-optional)
-11. [User Personas](#user-personas-organization-vs-non-organization)
-12. [Demo Scenarios](#demo-scenarios)
-13. [Troubleshooting](#troubleshooting)
-14. [Additional Resources](#additional-resources)
+10. [Troubleshooting](#troubleshooting)
+11. [Additional Resources](#additional-resources)
 
 ---
 
@@ -55,7 +51,6 @@
 - **Auth0 Account** (free tier available)
 - **Firebase Account** (free tier available)
 - **ngrok** (for local development with HTTPS callbacks)
-- *(Optional)* **Kong Konnect Account** (free tier available)
 - *(Optional)* **OpenAI API Key** or **LightLLM endpoint** (for AI Agents)
 
 ---
@@ -64,8 +59,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/authskye-dashboard.git
-cd authskye-dashboard
+git clone https://github.com/violetarcher/authskye.git
+cd authskye
 
 # 2. Install dependencies
 npm install
@@ -74,14 +69,37 @@ npm install
 cp .env.example .env.local
 # Edit .env.local with your credentials (see Environment Variables section)
 
-# 4. Start ngrok tunnel (for Auth0 callbacks)
-ngrok http 4020 --domain your-static-domain.ngrok-free.app
-
-# 5. Run development server
+# 4. Run development server
 npm run dev
 ```
 
-Open [http://localhost:4020](http://localhost:4020) in your browser.
+### Set up ngrok (required for HTTPS)
+
+Auth0 Organization invitations require the application's **Application Login URI** (Initiate Login URI) to be **HTTPS** — Auth0 rejects an `http://` value. Since local dev serves over plain HTTP on `localhost:4020`, ngrok provides the HTTPS URL the app needs. Use a **reserved static domain** (the random per-session URLs change on every restart, which would break your Login URI and callback URLs in Auth0).
+
+First-time setup:
+
+1. Create a free account at [dashboard.ngrok.com/signup](https://dashboard.ngrok.com/signup)
+2. Install the CLI:
+   ```bash
+   brew install ngrok          # macOS
+   # or download from https://ngrok.com/download
+   ```
+3. Add your authtoken (found at [dashboard.ngrok.com/get-started/your-authtoken](https://dashboard.ngrok.com/get-started/your-authtoken)):
+   ```bash
+   ngrok config add-authtoken <YOUR_AUTHTOKEN>
+   ```
+4. Claim a free static domain at [dashboard.ngrok.com/domains](https://dashboard.ngrok.com/domains) (e.g. `your-static-domain.ngrok-free.app`)
+
+Then start the tunnel (run this alongside `npm run dev`):
+
+```bash
+ngrok http 4020 --domain your-static-domain.ngrok-free.app
+```
+
+Use this static domain as your `AUTH0_BASE_URL` and in all Auth0 application URLs — **Application Login URI** (required as HTTPS for Organization invitations), callback, logout, and web origins.
+
+Open your ngrok static domain (e.g. `https://your-static-domain.ngrok-free.app`) in your browser — always access the app through the ngrok URL, never `http://localhost:4020`, so the HTTPS Login URI and Auth0 callbacks work.
 
 ---
 
@@ -152,12 +170,6 @@ OPENAI_API_KEY='sk-...'
 OPENAI_MODEL='gpt-4o'
 ```
 
-### Kong API Gateway (Optional)
-
-```env
-NEXT_PUBLIC_KONG_GATEWAY_URL='https://your-gateway.kongcloud.dev'
-```
-
 ---
 
 ## Auth0 Setup
@@ -195,18 +207,29 @@ This application is used for server-side Auth0 Management API calls.
 ```
 read:users
 update:users
+read:roles
+read:organizations
+create:organizations
+update:organizations
+delete:organizations
 read:organization_members
-create:organization_invitations
+delete:organization_members
 read:organization_member_roles
 create:organization_member_roles
 delete:organization_member_roles
-delete:organization_members
-read:roles
+create:organization_invitations
+read:organization_connections
+create:organization_connections
+read:connections
+update:connections
 read:sessions
 delete:sessions
-read:authenticators
-delete:authenticators
+read:authentication_methods
+read:guardian_enrollments
 create:guardian_enrollment_tickets
+create:user_tickets
+read:self_service_profiles
+create:self_service_profiles
 ```
 
 6. Copy credentials to `.env.local` as `AUTH0_MGMT_CLIENT_ID` and `AUTH0_MGMT_CLIENT_SECRET`
@@ -325,81 +348,29 @@ In your application settings:
 1. Go to [Auth0 FGA Dashboard](https://dashboard.fga.dev/)
 2. Create a new store: `authskye-documents`
 
-### 2. Deploy Authorization Model
+### 2. Deploy the Authorization Model
 
-Navigate to **Authorization Models → Create Model** and paste:
+The complete authorization model lives in the [`fga/`](fga/) directory as a **modular model** (`fga.mod`), which combines two modules:
 
-```fga
-model
-  schema 1.1
+- `core.fga` — `user`, `group`, `folder`, `doc` (documents demo)
+- `agents.fga` — `agent`, `organization`, `project`, `issue` (AI Agents demo)
 
-type user
+Both modules are **required** — the app's Agents demo will not work without the agents module, and an FGA store holds a single model that must contain all types. Deploy the whole model with the [FGA CLI](https://github.com/openfga/cli):
 
-type group
-  relations
-    define member: [user]
-
-type folder
-  relations
-    define can_create_file: owner
-    define owner: [user]
-    define parent: [folder]
-    define viewer: [user, user:*, group#member] or owner or viewer from parent
-
-type doc
-  relations
-    define can_change_owner: owner
-    define can_read: viewer or owner or viewer from parent
-    define can_share: owner or owner from parent
-    define can_write: owner or owner from parent
-    define owner: [user]
-    define parent: [folder]
-    define viewer: [user, user:*, group#member]
+```bash
+# Authenticate the CLI to your store (see FGA CLI docs for credential setup)
+fga model write --store-id "$FGA_STORE_ID" --file fga/fga.mod
 ```
+
+This writes one combined model containing all types. Copy the returned **authorization model ID** into `FGA_MODEL_ID` in `.env.local`.
+
+> The `fga/` directory is the single source of truth for the model. Do not hand-edit the model in the dashboard — update the `.fga` files and re-run `fga model write` so the repo stays in sync.
 
 ### 3. Get FGA Credentials
 
 1. Navigate to **Settings → API Keys**
 2. Create a new credential
 3. Copy Store ID, Client ID, Client Secret, and Model ID to `.env.local`
-
-### 4. (Optional) Deploy Agents Module
-
-For the AI Agents demo, deploy this additional model:
-
-```fga
-# Agents as Principals - extends core model
-type agent
-  relations
-    define can_act_as: [user]
-
-type project
-  relations
-    define owner: [user, agent]
-    define triager: [user, agent]
-    define reviewer: [user, agent]
-    define viewer: [user, agent]
-    define can_read: viewer or owner
-    define can_write: owner
-    define can_triage: triager or owner
-    define can_review: reviewer or owner
-
-type organization
-  relations
-    define admin: [user, agent]
-    define member: [user, agent]
-    define can_read: member or admin
-    define can_manage: admin
-
-type issue
-  relations
-    define reporter: [user]
-    define assignee: [user, agent]
-    define can_read: reporter or assignee
-    define can_comment: reporter or assignee
-    define can_assign: [user, agent]
-    define can_close: assignee
-```
 
 ---
 
@@ -475,15 +446,25 @@ exports.onExecuteCustomTokenExchange = async (event, api) => {
 
 **Secret:** `AUTH0_DOMAIN` = Your Auth0 domain
 
-### 4. Create Token Exchange Profile
+### 4. Create the Token Exchange Profile (Management API only)
 
-1. Go to **Authentication → Token Exchange Profiles**
-2. Click **Create Profile**
-3. Configure:
-   - **Name:** My Account API Exchange
-   - **Subject Token Type:** `urn:myaccount:cte`
-   - **Action:** Select your CTE Action
-4. Link both your main application and CTE client
+> A Custom Token Exchange profile **can only be created via the Management API** — there is no Dashboard UI for it. See [Auth0: Custom Token Exchange](https://auth0.com/docs/authenticate/custom-token-exchange).
+
+Get the **Action ID** of the CTE Action you created in step 3 (from the Action's URL in the Dashboard, or via `GET /api/v2/actions/actions`), then create the profile with a Management API token that has `create:token_exchange_profiles`:
+
+```bash
+curl -X POST "https://${AUTH0_MGMT_DOMAIN}/api/v2/token-exchange-profiles" \
+  -H "Authorization: Bearer ${MGMT_API_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Account API Exchange",
+    "subject_token_type": "urn:myaccount:cte",
+    "action_id": "YOUR_CTE_ACTION_ID",
+    "type": "custom_authentication"
+  }'
+```
+
+The `subject_token_type` must match the value your CTE client sends (and the value checked in the Action). Once created, the profile routes any token exchange request with that subject token type through your CTE Action.
 
 ### 5. Add Credentials to Environment
 
@@ -516,13 +497,7 @@ The My Account API enables user self-service MFA enrollment.
    - `read:me:factors`
 4. Click **Update**
 
-### 3. Update Application Scopes
-
-Add My Account API scopes to your `AUTH0_SCOPE`:
-
-```env
-AUTH0_SCOPE='openid profile email offline_access read:me:authentication_methods create:me:authentication_methods update:me:authentication_methods delete:me:authentication_methods read:reports create:reports edit:reports delete:reports read:analytics'
-```
+> My Account API scopes are requested at exchange time via Custom Token Exchange, **not** through `AUTH0_SCOPE`. Do not add `me:` scopes to `AUTH0_SCOPE`.
 
 ---
 
@@ -548,155 +523,6 @@ LIGHTLLM_MODEL='gpt-4o'
 ### Option 3: No LLM (Fallback Mode)
 
 If no LLM is configured, the Agents demo uses rule-based responses demonstrating the authorization patterns without AI-generated content.
-
----
-
-## Kong API Gateway (Optional)
-
-Kong provides an additional security layer for API protection.
-
-### 1. Sign Up for Kong Konnect
-
-Visit [Kong Konnect](https://konghq.com/products/kong-konnect/register) (Free tier available)
-
-### 2. Create Gateway Service
-
-1. **Service URL:** `https://your-domain.ngrok-free.app`
-2. **Route Path:** `/api/kong-protected/*`
-
-### 3. Configure OIDC Plugin
-
-```yaml
-issuer: https://your-tenant.auth0.com/
-client_id: your-client-id
-client_secret: your-client-secret
-auth_methods:
-  - bearer
-audience_required:
-  - https://authskye-api.example.com
-```
-
-### 4. Add Environment Variable
-
-```env
-NEXT_PUBLIC_KONG_GATEWAY_URL='https://your-gateway.kongcloud.dev'
-```
-
-See [kong/KONG-SETUP.md](kong/KONG-SETUP.md) for detailed configuration.
-
----
-
-## User Personas: Organization vs Non-Organization
-
-The application supports **two types of users** with different experiences:
-
-### Organization Members
-
-Users who belong to an Auth0 Organization see:
-
-| Feature | Available |
-|---------|-----------|
-| **Home** | ✅ With organization branding |
-| **Reports** | ✅ Organization-scoped reports |
-| **Billing** | ✅ CIBA-protected payments |
-| **Inspector** | ✅ Token debugging |
-| **Documents** | ✅ FGA-protected document management |
-| **Agents** | ✅ AI Agents demo |
-| **API Gateway** | ✅ Kong demo (if configured) |
-| **Profile** | ✅ MFA self-service |
-| **Admin Dashboard** | ✅ (Admin role only) |
-| **Session Management** | ✅ (Admin role only) |
-| **Organization Settings** | ✅ (Admin role only) |
-
-**Session Data:**
-- `user.org_id` - Organization ID
-- `user['https://authskye.com/roles']` - Array of roles
-- `user['https://authskye.com/org_name']` - Organization name
-- `user['https://authskye.com/org_logo']` - Organization logo URL
-
-### Non-Organization Users (Personal Workspace)
-
-Users without an organization see a personal workspace:
-
-| Feature | Available |
-|---------|-----------|
-| **Home** | ✅ Personal dashboard |
-| **Reports** | ❌ Hidden (requires organization) |
-| **Billing** | ✅ Personal payments |
-| **Inspector** | ✅ Token debugging |
-| **Documents** | ✅ Personal documents |
-| **Agents** | ✅ AI Agents demo |
-| **API Gateway** | ✅ Kong demo |
-| **Profile** | ✅ MFA self-service |
-| **Admin Dashboard** | ❌ Hidden |
-
-**Session Data:**
-- `user.org_id` - `undefined`
-- No organization-specific claims
-
-### Authorization Pattern
-
-Both user types use the same FGA authorization pattern:
-
-```typescript
-// FGA is the single source of truth
-const canRead = await checkPermission(
-  formatUserId(user.sub),  // user:auth0|123456
-  'can_read',
-  formatDocId(docId)       // doc:abc123
-);
-
-// Organization ID in Firestore is metadata only, NOT for authorization
-```
-
----
-
-## Demo Scenarios
-
-### 1. Organization Onboarding
-
-1. Admin invites user via email
-2. User receives invitation with organization branding
-3. User signs up and joins organization
-4. User sees organization-branded experience
-
-### 2. Document Sharing with FGA
-
-1. Create a document (automatic owner permission)
-2. Share with colleague by email
-3. Colleague sees document in their list
-4. Try accessing unshared document → Access Denied
-
-### 3. CIBA Billing Approval
-
-1. Navigate to Billing
-2. Fill payment form (use "Fill Demo" button)
-3. Submit → Guardian push notification sent
-4. Approve on mobile device
-5. Payment processed
-
-### 4. AI Agents Authorization
-
-1. Navigate to Agents
-2. Setup demo tuples
-3. Select persona (Alice/Bob/Carol/Dan)
-4. Select agent (Triage/Reporting/Support/Code Review)
-5. Ask questions about accessing resources
-6. Observe dual authorization (user AND agent must have permission)
-
-### 5. Step-Up MFA
-
-1. Navigate to Reports
-2. Try to delete a report
-3. MFA challenge appears
-4. Complete MFA
-5. Report deleted
-
-### 6. Session Management
-
-1. Login from two browsers
-2. Second login terminates first session
-3. First browser shows "Session Revoked"
 
 ---
 
@@ -729,12 +555,6 @@ curl -X POST https://api.us1.fga.dev/stores/{store_id}/check \
 3. Ensure CTE Action is deployed and linked
 4. Re-login to get fresh token
 
-### Kong Gateway Issues
-
-- Disable VPN (may block Kong requests)
-- Check `X-Kong-Protected` header in responses
-- Verify CORS origins include your frontend URL
-
 ### Session Revocation Not Working
 
 - Check `revoked-sessions.json` exists and is writable
@@ -766,8 +586,7 @@ src/
 │   │   ├── agents/         # AI Agents with FGA checks
 │   │   ├── documents/      # FGA-protected documents
 │   │   ├── folders/        # FGA-protected folders
-│   │   ├── mfa/            # My Account API endpoints
-│   │   └── kong-protected/ # Kong Gateway demo
+│   │   └── mfa/            # My Account API endpoints
 │   ├── billing/            # Payment UI
 │   ├── documents/          # Document management UI
 │   ├── agents/             # AI Agents chat UI
@@ -793,7 +612,6 @@ src/
 - [Auth0 FGA Documentation](https://docs.fga.dev)
 - [Auth0 My Account API](https://auth0.com/docs/api/myaccount)
 - [Auth0 CIBA](https://auth0.com/docs/get-started/authentication-and-authorization-flow/client-initiated-backchannel-authentication-flow)
-- [Kong Konnect Documentation](https://docs.konghq.com/konnect/)
 - [Next.js App Router](https://nextjs.org/docs/app)
 - [OpenFGA Documentation](https://openfga.dev/docs)
 
