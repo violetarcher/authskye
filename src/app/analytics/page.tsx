@@ -1,80 +1,23 @@
-'use client';
-
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { Button } from '@/components/ui/button';
+import { withPageAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BarChart3, TrendingUp, Users, DollarSign, AlertCircle } from 'lucide-react';
-import Link from 'next/link';
-import { getClaimKey } from '@/lib/auth-utils';
+import { BarChart3, TrendingUp, Users, DollarSign } from 'lucide-react';
+import { RequestAccessCard } from '@/components/analytics/request-access-card';
 
-export default function AnalyticsPage() {
-  const { user, isLoading: userLoading } = useUser();
+export default withPageAuthRequired(async function AnalyticsPage() {
+  const session = await getSession();
+  const scopes = session?.accessTokenScope?.split(' ') || [];
+  const hasAnalyticsAccess = scopes.includes('read:analytics');
 
-  const roles = user?.[getClaimKey('roles')] as string[] || [];
-  const hasAnalyticsAccess = roles.includes('Data Analyst');
+  if (!hasAnalyticsAccess) {
+    return (
+      <div className="container mx-auto py-8">
+        <RequestAccessCard />
+      </div>
+    );
+  }
 
-  // Check for pending access request in user metadata - try different possible locations
-  const appMetadata = user?.[getClaimKey('app_metadata')] as { pending_access_request?: string } | undefined;
-  const pendingAccessRequest = appMetadata?.pending_access_request ||
-                               (user as any)?.app_metadata?.pending_access_request ||
-                               user?.[getClaimKey('pending_access_request')];
-  
-  // Debug: Log user object to see what metadata is available
-  console.log('User object:', user);
-  console.log('Pending access request:', pendingAccessRequest);
-  
-
-  const handleRequestAccess = async () => {
-    try {
-      // First, submit the access request via API to set user metadata
-      const response = await fetch('/api/request-access', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          role: 'Data Analyst',
-          reason: 'Request access to view analytics dashboard and reporting data'
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // If successful, trigger silent re-authentication to fire Auth0 Action
-        if (data.next_step === 'logout_and_login') {
-          // Use hidden iframe for silent authentication to trigger Auth0 Action
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = '/api/auth/login?access_request=true&prompt=none&returnTo=' + encodeURIComponent('/analytics');
-          
-          iframe.onload = () => {
-            // After silent auth completes, refresh the current page to get updated permissions
-            window.location.reload();
-          };
-          
-          iframe.onerror = () => {
-            // If silent auth fails, fallback to manual login
-            window.location.href = '/api/auth/login?access_request=true&returnTo=' + encodeURIComponent('/analytics');
-          };
-          
-          document.body.appendChild(iframe);
-        }
-      } else {
-        const error = await response.json();
-        console.error('Access request failed:', error);
-        alert('Failed to submit access request: ' + (error.message || 'Unknown error'));
-      }
-    } catch (error) {
-      console.error('Access request error:', error);
-      alert('Failed to submit access request. Please try again.');
-    }
-  };
-
-  // Renders the full dashboard for authorized users
-  const renderDashboard = () => (
-    <>
+  return (
+    <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
         <p className="text-muted-foreground">
@@ -145,80 +88,6 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
       </div>
-    </>
-  );
-
-  // Renders the "request access" UI for unauthorized users
-  const renderRequestAccess = () => (
-     <div className="flex items-center justify-center h-full">
-        <div className="max-w-2xl mx-auto">
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              You need the "Data Analyst" role to access this page.
-            </AlertDescription>
-          </Alert>
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center gap-2">
-                <BarChart3 className="h-6 w-6" />
-                Analytics Dashboard
-              </CardTitle>
-              <CardDescription>Access reporting analytics and data insights</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              {pendingAccessRequest ? (
-                <>
-                  <Alert className="mb-6">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Your access request for "{pendingAccessRequest.role}" is pending review.
-                      <br />
-                      Submitted: {new Date(pendingAccessRequest.requested_at).toLocaleDateString()}
-                    </AlertDescription>
-                  </Alert>
-                  <p className="text-muted-foreground mb-6">
-                    Your administrator has been notified. You'll receive updated permissions once approved.
-                  </p>
-                  <Button disabled size="lg">
-                    Request Pending
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <p className="text-muted-foreground mb-6">
-                    Request access from your administrator to gain Data Analyst permissions.
-                  </p>
-                  <Button onClick={handleRequestAccess} size="lg">
-                    Request Access
-                  </Button>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-  );
-  
-  // Main return statement
-  return (
-    <div className="container mx-auto py-8">
-      {userLoading ? (
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-        </div>
-      ) : !user ? (
-        <div className="text-center">
-          <p>Please log in to access analytics.</p>
-          <Button asChild>
-            <a href="/api/auth/login?returnTo=/analytics">Login</a>
-          </Button>
-        </div>
-      ) : hasAnalyticsAccess ? (
-        renderDashboard()
-      ) : (
-        renderRequestAccess()
-      )}
     </div>
   );
-}
+}, { returnTo: '/analytics' });

@@ -57,11 +57,11 @@ export function TransactionsList({ userId }: TransactionsListProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-600">Completed</Badge>;
+        return <Badge className="bg-green-600">Paid</Badge>;
       case 'denied':
-        return <Badge variant="destructive">Declined</Badge>;
+        return <Badge variant="destructive">Denied</Badge>;
       case 'processing':
-        return <Badge className="bg-blue-600">Processing</Badge>;
+        return <Badge className="bg-blue-600">Under Review</Badge>;
       default:
         return <Badge variant="secondary">Pending</Badge>;
     }
@@ -98,13 +98,13 @@ export function TransactionsList({ userId }: TransactionsListProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Receipt className="w-5 h-5 text-primary" />
-            Transaction History
+            Claims History
           </CardTitle>
-          <CardDescription className="text-xs">Your payment transactions will appear here</CardDescription>
+          <CardDescription className="text-xs">Your submitted claims will appear here</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-6 text-center">
           <CreditCard className="w-8 h-8 text-muted-foreground mb-2" />
-          <p className="text-xs text-muted-foreground mb-2">No transactions yet</p>
+          <p className="text-xs text-muted-foreground mb-2">No claims submitted yet</p>
           <Button onClick={fetchTransactions} variant="outline" size="sm" className="h-7">
             Refresh
           </Button>
@@ -120,9 +120,9 @@ export function TransactionsList({ userId }: TransactionsListProps) {
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
               <Receipt className="w-5 h-5 text-primary" />
-              Transaction History
+              Claims History
             </CardTitle>
-            <CardDescription className="text-xs">{transactions.length} transaction(s)</CardDescription>
+            <CardDescription className="text-xs">{transactions.length} claim(s)</CardDescription>
           </div>
           <Button onClick={fetchTransactions} variant="outline" size="sm" disabled={loading} className="h-7 text-xs">
             {loading ? 'Refreshing...' : 'Refresh'}
@@ -147,7 +147,7 @@ export function TransactionsList({ userId }: TransactionsListProps) {
 
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div>
-                <p className="text-muted-foreground">Date</p>
+                <p className="text-muted-foreground">Service Date</p>
                 <p className="font-medium">{new Date(txn.serviceDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
               </div>
               <div>
@@ -155,7 +155,7 @@ export function TransactionsList({ userId }: TransactionsListProps) {
                 <p className="font-medium">${txn.claimAmount.toFixed(2)}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Submitted</p>
+                <p className="text-muted-foreground">Filed</p>
                 <p className="font-medium">{new Date(txn.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
               </div>
             </div>

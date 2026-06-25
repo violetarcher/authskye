@@ -118,9 +118,9 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Create Your Workspace</CardTitle>
+        <CardTitle className="text-2xl">Register Your Organization</CardTitle>
         <CardDescription>
-          Join Authskye to collaborate with your team and manage your projects in the cloud.
+          Join BlueCrest Health to manage member benefits, submit claims, and access your provider network.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -139,7 +139,7 @@ export function SignupForm() {
             </Label>
             <Input
               id="organizationName"
-              placeholder="Acme Corporation"
+              placeholder="Sunrise Medical Group"
               value={formData.organizationName}
               onChange={handleChange('organizationName')}
               disabled={isSubmitting}
@@ -158,7 +158,7 @@ export function SignupForm() {
             <Input
               id="adminEmail"
               type="email"
-              placeholder="admin@acme.com"
+              placeholder="admin@sunrisemedical.com"
               value={formData.adminEmail}
               onChange={handleChange('adminEmail')}
               disabled={isSubmitting}

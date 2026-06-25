@@ -124,6 +124,27 @@ export async function POST(
 
     console.log('✅ Domain added to SSO connection for home realm discovery');
 
+    // Also associate the domain with the organization as a verified discovery domain
+    try {
+      const discoveryDomains = await managementClient.organizations.getAllDiscoveryDomains({
+        id: orgId,
+      });
+
+      const alreadyAssociated = discoveryDomains.data.domains?.some((d) => d.domain === domain);
+
+      if (!alreadyAssociated) {
+        await managementClient.organizations.createDiscoveryDomain(
+          { id: orgId },
+          { domain, status: 'verified' }
+        );
+        console.log('✅ Domain associated with organization as verified discovery domain');
+      } else {
+        console.log('ℹ️ Domain already associated with organization');
+      }
+    } catch (discoveryError) {
+      console.error('⚠️ Failed to associate domain with organization:', discoveryError);
+    }
+
     return NextResponse.json({
       success: true,
       domain,
@@ -313,6 +334,27 @@ export async function DELETE(
     );
 
     console.log('✅ Domain removed from SSO connection');
+
+    // Also remove the domain's association with the organization
+    try {
+      const discoveryDomains = await managementClient.organizations.getAllDiscoveryDomains({
+        id: orgId,
+      });
+
+      const match = discoveryDomains.data.domains?.find((d) => d.domain === domain);
+
+      if (match) {
+        await managementClient.organizations.deleteDiscoveryDomain({
+          id: orgId,
+          discovery_domain_id: match.id,
+        });
+        console.log('✅ Domain association removed from organization');
+      } else {
+        console.log('ℹ️ Domain was not associated with organization');
+      }
+    } catch (discoveryError) {
+      console.error('⚠️ Failed to remove domain association from organization:', discoveryError);
+    }
 
     return NextResponse.json({
       success: true,

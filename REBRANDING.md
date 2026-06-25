@@ -209,6 +209,24 @@ Pages that commonly need updates:
 - Error pages
 - Email templates (if any)
 
+### `src/app/page.tsx` (Critical — do not skip)
+
+This file contains **two** components that both need rebranding:
+
+**`WelcomePage`** (shown to unauthenticated users at `/`):
+- Nav logo icon, gradient colors, and brand name
+- Nav links (e.g. Features/Pricing/Docs → domain-appropriate equivalents)
+- Hero headline and subtext
+- CTA box title, button labels, and fine-print disclaimer
+- Trust indicators (icons, titles, descriptions)
+- Footer brand name, tagline, nav columns, and copyright year
+
+**`Dashboard`** (shown to authenticated users at `/`):
+- Welcome subtitle ("your workspace" → domain equivalent)
+- `kpiData` array — all four KPI cards (titles, values, change text, icons)
+- `recentActivity` array — all five activity rows (action, resource, status)
+- Preferences panel labels and descriptions
+
 ---
 
 ## 10. Auth0 Dashboard Configuration

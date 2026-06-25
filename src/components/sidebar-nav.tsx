@@ -64,7 +64,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
       >
         <Link href="/billing">
           <CreditCard className="mr-2 h-4 w-4" />
-          Billing
+          Claims
         </Link>
       </Button>
 
@@ -79,8 +79,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
         </Link>
       </Button>
       
-      {/* Analytics - Hidden (keeping code for future use) */}
-      {/* <Button
+      <Button
         asChild
         variant={pathname === '/analytics' ? 'secondary' : 'ghost'}
         className="w-full justify-start"
@@ -89,7 +88,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
           <BarChart3 className="mr-2 h-4 w-4" />
           Analytics
         </Link>
-      </Button> */}
+      </Button>
 
       {/* Documents - Show for everyone, access control via FGA */}
       <Button

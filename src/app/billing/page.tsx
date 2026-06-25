@@ -7,7 +7,7 @@ import { TransactionsList } from '@/components/billing/transactions-list';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CreditCard, Trash2 } from 'lucide-react';
+import { FileText, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function BillingPage() {
@@ -52,11 +52,11 @@ export default function BillingPage() {
     <div className="space-y-4">
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <CreditCard className="w-8 h-8 text-primary" />
-          Billing
+          <FileText className="w-8 h-8 text-primary" />
+          Claims
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage your payments and view transaction history
+          Submit and track your insurance claims
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export default function BillingPage() {
         {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Make a Payment</CardTitle>
+            <CardTitle className="text-lg">Submit a Claim</CardTitle>
             <CardDescription className="text-xs">
               Complete the form below and approve via mobile push notification
             </CardDescription>

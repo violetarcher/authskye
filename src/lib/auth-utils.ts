@@ -60,8 +60,7 @@ export function hasPermission(user: Record<string, any> | undefined, permission:
 }
 
 export function hasAnalyticsAccess(user: Record<string, any> | undefined): boolean {
-  return hasRole(user, REQUIRED_ROLES.DATA_ANALYST) &&
-         hasPermission(user, REQUIRED_PERMISSIONS.READ_ANALYTICS);
+  return hasPermission(user, REQUIRED_PERMISSIONS.READ_ANALYTICS);
 }
 
 // Custom hook for role checking

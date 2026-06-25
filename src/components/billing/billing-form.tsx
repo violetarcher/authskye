@@ -39,48 +39,48 @@ interface CIBAStatus {
   message?: string;
 }
 
-// Demo data sets for autofill - cycles through different payment scenarios
+// Demo data sets for autofill - insurance claim scenarios
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'Pro Plan Subscription',
-    invoiceNumber: 'INV-2024-001',
-    billingCycle: 'Monthly',
-    amount: '29.00',
-    description: 'Pro Plan - Monthly subscription with 10GB storage, priority support, and advanced features.',
+    itemName: 'Dr. Sarah Martinez, MD — Primary Care',
+    invoiceNumber: 'CLM-2024-001',
+    billingCycle: 'Z00.00',
+    amount: '185.00',
+    description: 'Annual wellness exam and preventive care screening. CPT: 99396. Network: In-Network.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'Additional Storage',
-    invoiceNumber: 'INV-2024-002',
-    billingCycle: 'One-time',
-    amount: '49.00',
-    description: 'Storage upgrade - Additional 50GB storage capacity for your workspace.',
+    itemName: 'Pacific Heart & Vascular — Cardiology',
+    invoiceNumber: 'CLM-2024-002',
+    billingCycle: 'I10',
+    amount: '320.00',
+    description: 'Cardiology consultation and resting ECG. CPT: 99243, 93000. Network: In-Network.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'Team Seats',
-    invoiceNumber: 'INV-2024-003',
-    billingCycle: 'Monthly',
-    amount: '75.00',
-    description: 'Team expansion - 5 additional team member seats for your organization.',
+    itemName: 'CareNow Urgent Care — Urgent Care',
+    invoiceNumber: 'CLM-2024-003',
+    billingCycle: 'J06.9',
+    amount: '215.00',
+    description: 'Urgent care visit, rapid strep test, and antibiotic prescription. CPT: 99213. Network: In-Network.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
     paymentDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
-    itemName: 'Enterprise Plan',
-    invoiceNumber: 'INV-2024-004',
-    billingCycle: 'Annual',
-    amount: '299.00',
-    description: 'Enterprise Plan - Annual subscription with unlimited storage, SSO, and dedicated support.',
+    itemName: 'Quest Diagnostics — Laboratory',
+    invoiceNumber: 'CLM-2024-004',
+    billingCycle: 'E11.65',
+    amount: '142.00',
+    description: 'Comprehensive metabolic panel and HbA1c testing. CPT: 80053, 83036. Network: In-Network.',
     routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
@@ -132,7 +132,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve payments via push notification.',
+      description: 'You can now approve claim submissions via push notification.',
     });
   };
 
@@ -197,18 +197,18 @@ stream
 BT
 /F1 24 Tf
 100 700 Td
-(AUTHSKYE INVOICE - DEMO) Tj
+(BLUECREST HEALTH - SUPERBILL) Tj
 /F1 12 Tf
 100 650 Td
-(Item: ${demoData.itemName}) Tj
+(Provider: ${demoData.itemName}) Tj
 100 630 Td
-(Customer: ${user?.name || 'Demo User'}) Tj
+(Member: ${user?.name || 'Demo Member'}) Tj
 100 610 Td
-(Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
+(Service Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
 100 590 Td
-(Billing: ${demoData.billingCycle}) Tj
+(Diagnosis Code: ${demoData.billingCycle}) Tj
 100 570 Td
-(Amount: $${demoData.amount}) Tj
+(Claim Amount: $${demoData.amount}) Tj
 ET
 endstream
 endobj
@@ -233,8 +233,8 @@ startxref
     const file = new File([blob], `invoice_${demoData.invoiceNumber.toLowerCase()}.pdf`, { type: 'application/pdf' });
     setReceiptFile(file);
 
-    toast.success('Demo data filled!', {
-      description: `${demoData.billingCycle}: ${demoData.itemName}`,
+    toast.success('Demo claim filled!', {
+      description: `${demoData.itemName} — $${demoData.amount}`,
     });
   };
 
@@ -314,7 +314,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email',
-          binding_message: `Approve payment: ${formData.amount} USD`,
+          binding_message: `Approve claim: ${formData.amount} USD`,
         }),
       });
 
@@ -450,8 +450,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Authentication required', {
-        description: 'Please approve the payment via Guardian app on your mobile device',
+      toast.info('Claim approval required', {
+        description: 'Please approve the claim submission via Guardian app on your mobile device',
       });
 
       const cibaApproved = await initiateCIBA();
@@ -487,8 +487,8 @@ startxref
 
       const result = await response.json();
 
-      toast.success('Payment submitted successfully!', {
-        description: `Transaction ID: ${result.claimId}`,
+      toast.success('Claim submitted successfully!', {
+        description: `Claim ID: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -513,7 +513,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit payment',
+        description: error.message || 'Failed to submit claim',
       });
     } finally {
       setLoading(false);
@@ -542,7 +542,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Guardian push not set up
+              Push approval not set up — required for claim submission
             </span>
           </div>
           <Button
@@ -561,7 +561,7 @@ startxref
         <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Guardian push ready
+            Push approval ready — claim submission enabled
           </span>
         </div>
       )}
@@ -586,9 +586,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Processing payment...'}
-            {cibaStatus.status === 'denied' && 'Payment denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for claim approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting claim...'}
+            {cibaStatus.status === 'denied' && 'Claim submission denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -598,7 +598,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="paymentDate" className="text-xs">Payment Date *</Label>
+            <Label htmlFor="paymentDate" className="text-xs">Service Date *</Label>
             <Input
               id="paymentDate"
               name="paymentDate"
@@ -631,13 +631,13 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="itemName" className="text-xs flex items-center gap-1">
             <Package className="w-3 h-3" />
-            Item / Service *
+            Provider / Service *
           </Label>
           <Input
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="Pro Plan Subscription"
+            placeholder="Dr. Jane Smith, MD"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -646,24 +646,24 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="invoiceNumber" className="text-xs">Invoice Number</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">Claim / NPI Number</Label>
             <Input
               id="invoiceNumber"
               name="invoiceNumber"
               className="h-8 text-sm"
-              placeholder="INV-2024-001"
+              placeholder="CLM-2024-001"
               maxLength={20}
               value={formData.invoiceNumber}
               onChange={handleInputChange}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Billing Cycle</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Diagnosis Code (ICD-10)</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Monthly / Annual"
+              placeholder="Z00.00"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -671,12 +671,12 @@ startxref
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="description" className="text-xs">Description</Label>
+          <Label htmlFor="description" className="text-xs">Description / Notes</Label>
           <Textarea
             id="description"
             name="description"
             className="text-sm"
-            placeholder="Payment details, notes, etc."
+            placeholder="Procedure details, CPT codes, network status, etc."
             rows={2}
             value={formData.description}
             onChange={handleInputChange}
@@ -687,7 +687,7 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="receipt" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Invoice / Receipt (PDF) *
+            Superbill / EOB (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
             <Label htmlFor="receipt" className="cursor-pointer text-xs text-primary">
@@ -713,7 +713,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Payment Account (Push approval required)
+            Reimbursement Account (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -776,7 +776,7 @@ startxref
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Submit Payment
+              Submit Claim
             </>
           )}
         </Button>
