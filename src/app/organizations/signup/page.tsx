@@ -1,8 +1,8 @@
 import { SignupForm } from '@/components/organization/signup-form';
 
 export const metadata = {
-  title: 'Register Your Organization | BlueCrest Health',
-  description: 'Join BlueCrest Health to manage your member benefits and claims.',
+  title: 'Register Your Organization | Authskye',
+  description: 'Join Authskye to manage your organization and team access.',
 };
 
 export default function OrganizationSignupPage() {
@@ -11,9 +11,9 @@ export default function OrganizationSignupPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to BlueCrest Health</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Authskye</h1>
           <p className="text-lg text-muted-foreground">
-            Register your organization and start managing member benefits in minutes
+            Register your organization and start collaborating securely in minutes
           </p>
         </div>
 

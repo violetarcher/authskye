@@ -23,22 +23,21 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { AlertTriangle, Building2, Cross, FileText, Activity, Users, HeartPulse, Shield, Lock, ClipboardList } from "lucide-react"
+import { AlertTriangle, Building2, Cloud, FileText, Activity, Users, BarChart3, Shield, Lock, FolderOpen } from "lucide-react"
 
-// BlueCrest Health Dashboard Data
 const kpiData = [
-  { title: "Active Claims", value: "3", change: "2 under review", icon: FileText, color: "text-blue-500" },
-  { title: "Covered Members", value: "6", change: "Plan: BlueCrest PPO", icon: Users, color: "text-green-600" },
-  { title: "In-Network Providers", value: "4,200+", change: "In your area", icon: HeartPulse, color: "text-purple-600" },
-  { title: "Benefits Remaining", value: "$1,850", change: "of $2,000 deductible", icon: Activity, color: "text-amber-500" },
+  { title: "Documents", value: "24", change: "3 shared this week", icon: FileText, color: "text-blue-500" },
+  { title: "Team Members", value: "8", change: "2 orgs connected", icon: Users, color: "text-green-600" },
+  { title: "Reports", value: "12", change: "4 new this month", icon: BarChart3, color: "text-purple-600" },
+  { title: "Storage Used", value: "4.2 GB", change: "of 10 GB plan", icon: Activity, color: "text-amber-500" },
 ];
 
 const recentActivity = [
-  { id: "ACT-001", action: "Claim submitted", resource: "CLM-2024-003 — CareNow Urgent Care", status: "Pending", time: "2 min ago" },
-  { id: "ACT-002", action: "EOB available", resource: "CLM-2024-001 — Dr. Sarah Martinez", status: "Completed", time: "1 hour ago" },
-  { id: "ACT-003", action: "Prior auth approved", resource: "MRI — Pacific Imaging Center", status: "Completed", time: "Yesterday" },
-  { id: "ACT-004", action: "Member added", resource: "Dependant: James Doe", status: "Active", time: "2 days ago" },
-  { id: "ACT-005", action: "Benefits updated", resource: "2024 Plan Year renewal", status: "Completed", time: "3 days ago" },
+  { id: "ACT-001", action: "Document shared", resource: "Q4 Report.pdf — with Marketing", status: "Active", time: "2 min ago" },
+  { id: "ACT-002", action: "Report generated", resource: "Monthly Summary — Nov 2024", status: "Completed", time: "1 hour ago" },
+  { id: "ACT-003", action: "User invited", resource: "jane@acme.com — Editor role", status: "Pending", time: "Yesterday" },
+  { id: "ACT-004", action: "Permission updated", resource: "Finance Folder — read-only", status: "Completed", time: "2 days ago" },
+  { id: "ACT-005", action: "Workspace created", resource: "Product Team — 5 members", status: "Completed", time: "3 days ago" },
 ];
 
 export default function HomePage() {
@@ -96,15 +95,15 @@ function WelcomePage() {
       <nav className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
-              <Cross className="h-4 w-4 text-white" />
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#3b82f6] to-[#60a5fa] flex items-center justify-center">
+              <Cloud className="h-4 w-4 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">BlueCrest Health</span>
+            <span className="text-2xl font-bold text-gray-900">Authskye</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Coverage</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Providers</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Member Resources</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Features</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Pricing</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Docs</a>
             <Button asChild variant="outline" className="border-primary text-primary hover:bg-blue-50">
               <a href="/api/auth/login">Sign In</a>
             </Button>
@@ -117,22 +116,22 @@ function WelcomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Your health coverage,<br />simplified
+              Secure access for<br />every team
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Submit claims, manage benefits, and access your care team securely through the BlueCrest Health member portal.
+              Manage documents, collaborate with your team, and control access with fine-grained permissions — all in one workspace.
             </p>
 
             {/* CTA Box */}
             <Card className="max-w-xl mx-auto shadow-xl border-2 border-blue-100">
               <CardContent className="pt-8 pb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Access your member portal
+                  Access your workspace
                 </h3>
                 <div className="space-y-3">
                   <Button asChild size="lg" className="w-full h-14 text-lg">
                     <a href="/api/auth/login">
-                      Sign In to Member Portal
+                      Sign In to Authskye
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full h-14 text-lg border-2">
@@ -143,7 +142,7 @@ function WelcomePage() {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">
-                  HIPAA-compliant. Your health data is protected.
+                  SOC 2 Type II compliant. Your data is protected.
                 </p>
               </CardContent>
             </Card>
@@ -159,22 +158,22 @@ function WelcomePage() {
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">HIPAA-Compliant Security</h4>
-              <p className="text-sm text-gray-600">End-to-end encryption with push-based claim approval</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Enterprise-Grade Security</h4>
+              <p className="text-sm text-gray-600">End-to-end encryption with push-based approval</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                <FileText className="h-6 w-6 text-green-600" />
+                <FolderOpen className="h-6 w-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Claims Management</h4>
-              <p className="text-sm text-gray-600">Submit claims and track EOBs in real time</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Document Management</h4>
+              <p className="text-sm text-gray-600">Share and collaborate on files with your team</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
                 <Lock className="h-6 w-6 text-purple-600" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-1">Fine-Grained Access</h4>
-              <p className="text-sm text-gray-600">Role-based access for members, providers, and admins</p>
+              <p className="text-sm text-gray-600">Role-based permissions for every user and resource</p>
             </div>
           </div>
         </div>
@@ -186,27 +185,27 @@ function WelcomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
-                  <Cross className="h-3 w-3 text-white" />
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#3b82f6] to-[#60a5fa] flex items-center justify-center">
+                  <Cloud className="h-3 w-3 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">BlueCrest Health</span>
+                <span className="text-xl font-bold text-white">Authskye</span>
               </div>
               <p className="text-sm">
-                Your health coverage, simplified.
+                Secure access for every team.
               </p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Members</h4>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Coverage &amp; Benefits</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Find a Provider</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Submit a Claim</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Integrations</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Resources</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Member Handbook</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
               </ul>
             </div>
@@ -220,7 +219,7 @@ function WelcomePage() {
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2026 BlueCrest Health. All rights reserved.</p>
+            <p>&copy; 2026 Authskye. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -320,7 +319,7 @@ function Dashboard({ user }: { user: any }) {
       <header>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! Here's a summary of your coverage and recent activity.
+          Welcome back, {user.name || user.email}! Here's a summary of your workspace activity.
         </p>
       </header>
 
@@ -382,7 +381,7 @@ function Dashboard({ user }: { user: any }) {
         <Card className="lg:col-span-3">
           <CardHeader>
             <CardTitle>Preferences</CardTitle>
-            <CardDescription>Manage your member notification settings.</CardDescription>
+            <CardDescription>Manage your workspace notification settings.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {isLoading ? (
@@ -394,10 +393,10 @@ function Dashboard({ user }: { user: any }) {
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="autoSync" className="text-sm font-medium">
-                      Push Claim Approvals
+                      Auto Sync
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive push notifications for claim submissions
+                      Automatically sync documents across devices
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -419,7 +418,7 @@ function Dashboard({ user }: { user: any }) {
                       Email Notifications
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive claim status updates and EOBs by email
+                      Receive updates about shared documents and activity
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -460,10 +459,10 @@ function Dashboard({ user }: { user: any }) {
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label htmlFor="usageReports" className="text-sm font-medium">
-                      Benefits Summaries
+                      Usage Reports
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive monthly benefits and deductible summaries
+                      Receive monthly workspace usage summaries
                     </p>
                   </div>
                   <div className="flex items-center gap-3">

@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'BlueCrest Health',
-  description: 'Your member portal for benefits and claims',
+  title: 'Authskye',
+  description: 'Your secure B2B workspace',
 };
 
 export const viewport = {
-  themeColor: '#1d4ed8',
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
