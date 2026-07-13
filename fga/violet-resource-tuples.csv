@@ -1,0 +1,5 @@
+user_type,user_id,user_relation,relation,object_type,object_id,condition_name,condition_context
+user,auth0|67a1183f438f78a33863e422,,editor,project,alpha,,
+user,auth0|67a1183f438f78a33863e422,,editor,project,beta,,
+project,alpha,,project,issue,issue-123,,
+project,beta,,project,issue,issue-456,,

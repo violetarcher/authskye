@@ -1,7 +1,7 @@
 // src/lib/fga-service.ts
 import fgaClient from './fga-client';
 
-export type FGAObjectType = 'user' | 'group' | 'folder' | 'doc' | 'agent' | 'project' | 'organization' | 'issue';
+export type FGAObjectType = 'user' | 'group' | 'folder' | 'doc' | 'agent' | 'project' | 'organization' | 'issue' | 'mcp_tool';
 export type FGARelation =
   | 'owner'
   | 'viewer'
@@ -17,7 +17,8 @@ export type FGARelation =
   | 'can_review'
   | 'can_comment'
   | 'can_manage'
-  | 'can_delete';
+  | 'can_delete'
+  | 'can_call';
 
 export interface FGATuple {
   user: string;
@@ -386,6 +387,15 @@ export async function revokeAgentPermission(
     relation,
     object,
   });
+}
+
+/**
+ * Helper function to format an MCP tool ID for FGA
+ * @param toolName - Tool name (e.g., "list_projects")
+ * @returns Formatted tool string (e.g., "mcp_tool:list_projects")
+ */
+export function formatToolId(toolName: string): string {
+  return `mcp_tool:${toolName}`;
 }
 
 /**

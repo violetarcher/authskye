@@ -16,7 +16,8 @@ import {
   User,
   CreditCard,
   Building2,
-  Bot
+  Bot,
+  Plug,
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -111,6 +112,18 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
         <Link href="/agents">
           <Bot className="mr-2 h-4 w-4" />
           Agents
+        </Link>
+      </Button>
+
+      {/* MCP Demo - Auth for MCP + FGA tool authorization */}
+      <Button
+        asChild
+        variant={pathname === '/mcp' ? 'secondary' : 'ghost'}
+        className="w-full justify-start"
+      >
+        <Link href="/mcp">
+          <Plug className="mr-2 h-4 w-4" />
+          MCP Server
         </Link>
       </Button>
 

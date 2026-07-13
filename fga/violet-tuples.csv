@@ -1,0 +1,4 @@
+user_type,user_id,user_relation,relation,object_type,object_id,condition_name,condition_context
+user,auth0|67a1183f438f78a33863e422,,can_call,mcp_tool,list_projects,,
+user,auth0|67a1183f438f78a33863e422,,can_call,mcp_tool,get_issue,,
+user,auth0|67a1183f438f78a33863e422,,can_call,mcp_tool,comment_on_issue,,

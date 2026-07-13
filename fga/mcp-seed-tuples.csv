@@ -1,0 +1,6 @@
+user_type,user_id,user_relation,relation,object_type,object_id,condition_name,condition_context
+user,alice-pm,,can_call,mcp_tool,list_projects,,
+user,alice-pm,,can_call,mcp_tool,get_issue,,
+user,alice-pm,,can_call,mcp_tool,comment_on_issue,,
+user,bob-dev,,can_call,mcp_tool,list_projects,,
+user,bob-dev,,can_call,mcp_tool,get_issue,,

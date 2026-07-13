@@ -1,0 +1,5 @@
+module mcp
+
+type mcp_tool
+  relations
+    define can_call: [user, agent]
