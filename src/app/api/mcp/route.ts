@@ -6,7 +6,7 @@ import { checkPermission, listObjects, formatUserId, formatToolId } from '@/lib/
 import fgaClient, { isFgaAvailable } from '@/lib/fga-client';
 
 const SERVER_INFO = {
-  name: 'authskye-mcp-server',
+  name: 'rxnational-mcp-server',
   version: '1.0.0',
 };
 

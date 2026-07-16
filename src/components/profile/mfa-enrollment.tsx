@@ -1479,7 +1479,7 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
       </Card>
 
       {/* Passkeys */}
-      <Card>
+      {/* <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
@@ -1558,7 +1558,7 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
             <p className="text-sm text-muted-foreground">No passkeys enrolled</p>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* MFA */}
       <Card>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withApiAuthRequired, getSession } from '@auth0/nextjs-auth0';
 import { db } from '@/lib/firebase-admin';
+import { validateMcpToken, tokenHasScope } from '@/lib/mcp-token-validator';
 
 /**
  * POST /api/claims/submit
@@ -28,30 +28,30 @@ import { db } from '@/lib/firebase-admin';
  *   submittedAt: string
  * }
  */
-export const POST = withApiAuthRequired(async function POST(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getSession();
-    const user = session?.user;
-
-    console.log('📋 Claim submission - Session check:', {
-      hasSession: !!session,
-      hasUser: !!user,
-      hasSub: !!user?.sub,
-      hasOrgId: !!user?.org_id,
-      sub: user?.sub,
-    });
-
-    if (!user?.sub) {
+    // Validate CIBA access token — must carry transaction:pay scope
+    let tokenPayload;
+    try {
+      tokenPayload = await validateMcpToken(request.headers.get('authorization'), process.env.CIBA_AUDIENCE);
+    } catch {
       return NextResponse.json(
-        { error: 'Unauthorized', message: 'User not authenticated' },
+        { error: 'Unauthorized', message: 'Valid CIBA access token required' },
         { status: 401 }
       );
     }
 
-    // Use org_id from session if available, otherwise allow without it for demo
-    const orgId = user.org_id || 'default-org';
+    if (!tokenHasScope(tokenPayload, 'transaction:pay')) {
+      return NextResponse.json(
+        { error: 'Forbidden', message: 'Token missing transaction:pay scope' },
+        { status: 403 }
+      );
+    }
 
-    console.log('📋 Receiving claim submission for user:', user.sub);
+    const userId = tokenPayload.sub;
+    const orgId = (tokenPayload['org_id'] as string) || 'default-org';
+
+    console.log('📋 Receiving claim submission for user:', userId);
 
     // Parse form data
     const formData = await request.formData();
@@ -88,7 +88,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
 
     // For demo purposes, we'll store basic claim data
     const claimData = {
-      userId: user.sub,
+      userId,
       organizationId: orgId,
       serviceDate,
       providerName,
@@ -141,4 +141,4 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
       { status: 500 }
     );
   }
-});
+}

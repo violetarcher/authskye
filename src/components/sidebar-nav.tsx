@@ -1,4 +1,4 @@
-// src/components/sidebar-nav.tsx - Authskye Navigation
+// src/components/sidebar-nav.tsx - RxNational Navigation
 'use client';
 
 import Link from 'next/link';
@@ -65,7 +65,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
       >
         <Link href="/billing">
           <CreditCard className="mr-2 h-4 w-4" />
-          Billing
+          Rx Refills
         </Link>
       </Button>
 

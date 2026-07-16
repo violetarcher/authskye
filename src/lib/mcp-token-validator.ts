@@ -45,7 +45,7 @@ export function tokenHasScope(payload: McpTokenPayload, scope: string): boolean 
   return scopes.includes(scope);
 }
 
-export async function validateMcpToken(authHeader: string | null): Promise<McpTokenPayload> {
+export async function validateMcpToken(authHeader: string | null, audience?: string): Promise<McpTokenPayload> {
   if (!authHeader?.startsWith('Bearer ')) {
     throw new Error('Missing or invalid Authorization header');
   }
@@ -67,7 +67,7 @@ export async function validateMcpToken(authHeader: string | null): Promise<McpTo
   const payload = jwt.verify(token, signingKey, {
     algorithms: ['RS256'],
     issuer: `https://${process.env.AUTH0_MGMT_DOMAIN}/`,
-    audience: process.env.AUTH0_AUDIENCE,
+    audience: audience ?? process.env.AUTH0_AUDIENCE,
   }) as McpTokenPayload;
 
   return payload;

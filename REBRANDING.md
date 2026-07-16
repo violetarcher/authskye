@@ -253,6 +253,12 @@ After code changes, update in Auth0 Dashboard:
 5. **Actions**
    - Redeploy any actions with namespace changes
 
+6. **CIBA `audience` parameter**
+
+   The bc-authorize request in `src/app/api/ciba/initiate/route.ts` includes `audience: process.env.AUTH0_AUDIENCE`. Update `AUTH0_AUDIENCE` in `.env.local` to match the new brand's API identifier. Without it, Auth0 has no Resource Server context and will reject any RAR-related parameters.
+
+   > **Note on `authorization_details` (RAR):** Auth0 Guardian requires custom RAR types to have a pre-registered JSON schema before they can be sent in a CIBA push request. Without that schema registration (which requires an Auth0 support/enterprise process), including `authorization_details` in the bc-authorize call produces the error _"authorization_details does not match the required schema for use with the Auth0 Guardian App"_. The token inspector in this app displays the authorized transaction details from the form instead.
+
 ---
 
 ## Verification Checklist
@@ -267,6 +273,7 @@ After rebranding, verify:
 - [ ] All API routes read claims from new namespace
 - [ ] No console errors about missing claims
 - [ ] Email templates (if any) show new branding
+- [ ] CIBA flow completes and token inspector shows approved transaction details
 - [ ] Documentation is updated
 
 ---

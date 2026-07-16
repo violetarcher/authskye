@@ -118,9 +118,9 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Register Your Organization</CardTitle>
+        <CardTitle className="text-2xl">Register Your Pharmacy</CardTitle>
         <CardDescription>
-          Join Authskye to manage your team, collaborate on projects, and control access securely.
+          Join RxNational to manage your pharmacy staff, prescriptions, and patient access securely.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -139,7 +139,7 @@ export function SignupForm() {
             </Label>
             <Input
               id="organizationName"
-              placeholder="Acme Corporation"
+              placeholder="City Pharmacy Group"
               value={formData.organizationName}
               onChange={handleChange('organizationName')}
               disabled={isSubmitting}
@@ -158,7 +158,7 @@ export function SignupForm() {
             <Input
               id="adminEmail"
               type="email"
-              placeholder="admin@acme.com"
+              placeholder="admin@citypharmacy.com"
               value={formData.adminEmail}
               onChange={handleChange('adminEmail')}
               disabled={isSubmitting}

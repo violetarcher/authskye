@@ -37,7 +37,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
 
     // Parse request body
     const body = await request.json();
-    const { scope = 'openid profile email', binding_message } = body;
+    const { scope = 'openid profile email', binding_message, authorization_details } = body;
 
     console.log('🔐 Initiating CIBA request for user:', user.sub);
     console.log('   Scope:', scope);
@@ -56,12 +56,17 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
       client_id: process.env.AUTH0_CLIENT_ID!,
       client_secret: process.env.AUTH0_CLIENT_SECRET!,
       scope,
+      audience: process.env.CIBA_AUDIENCE!,
       login_hint: loginHintPayload,
       requested_expiry: '300',  // 300 seconds or lower triggers push notifications
     });
 
     if (binding_message) {
       cibaParams.append('binding_message', binding_message);
+    }
+
+    if (authorization_details) {
+      cibaParams.append('authorization_details', JSON.stringify(authorization_details));
     }
 
     // Call Auth0 backchannel authorization endpoint

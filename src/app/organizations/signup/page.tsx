@@ -1,8 +1,8 @@
 import { SignupForm } from '@/components/organization/signup-form';
 
 export const metadata = {
-  title: 'Register Your Organization | Authskye',
-  description: 'Join Authskye to manage your organization and team access.',
+  title: 'Register Your Pharmacy | RxNational',
+  description: 'Join RxNational to manage your pharmacy, staff, and prescriptions securely.',
 };
 
 export default function OrganizationSignupPage() {
@@ -11,9 +11,9 @@ export default function OrganizationSignupPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Authskye</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to RxNational</h1>
           <p className="text-lg text-muted-foreground">
-            Register your organization and start collaborating securely in minutes
+            Register your pharmacy and start managing prescriptions securely in minutes
           </p>
         </div>
 

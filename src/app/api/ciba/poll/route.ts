@@ -73,6 +73,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
         id_token: tokenData.id_token,
         token_type: tokenData.token_type,
         expires_in: tokenData.expires_in,
+        authorization_details: tokenData.authorization_details ?? null,
       });
     } else if (tokenData.error === 'authorization_pending') {
       // Still waiting for user approval

@@ -23,21 +23,21 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { AlertTriangle, Building2, Cloud, FileText, Activity, Users, BarChart3, Shield, Lock, FolderOpen } from "lucide-react"
+import { AlertTriangle, Building2, Cross, FileText, Activity, Users, BarChart3, Shield, Lock, Pill } from "lucide-react"
 
 const kpiData = [
-  { title: "Documents", value: "24", change: "3 shared this week", icon: FileText, color: "text-blue-500" },
-  { title: "Team Members", value: "8", change: "2 orgs connected", icon: Users, color: "text-green-600" },
-  { title: "Reports", value: "12", change: "4 new this month", icon: BarChart3, color: "text-purple-600" },
-  { title: "Storage Used", value: "4.2 GB", change: "of 10 GB plan", icon: Activity, color: "text-amber-500" },
+  { title: "Active Prescriptions", value: "127", change: "12 pending refills", icon: Pill, color: "text-teal-600" },
+  { title: "Pharmacy Staff", value: "8", change: "3 locations connected", icon: Users, color: "text-green-600" },
+  { title: "Rx Reports", value: "34", change: "6 new this month", icon: BarChart3, color: "text-purple-600" },
+  { title: "Patient Records", value: "2.4K", change: "of 5K plan", icon: Activity, color: "text-amber-500" },
 ];
 
 const recentActivity = [
-  { id: "ACT-001", action: "Document shared", resource: "Q4 Report.pdf — with Marketing", status: "Active", time: "2 min ago" },
-  { id: "ACT-002", action: "Report generated", resource: "Monthly Summary — Nov 2024", status: "Completed", time: "1 hour ago" },
-  { id: "ACT-003", action: "User invited", resource: "jane@acme.com — Editor role", status: "Pending", time: "Yesterday" },
-  { id: "ACT-004", action: "Permission updated", resource: "Finance Folder — read-only", status: "Completed", time: "2 days ago" },
-  { id: "ACT-005", action: "Workspace created", resource: "Product Team — 5 members", status: "Completed", time: "3 days ago" },
+  { id: "RX-001", action: "Rx refill approved", resource: "Metformin 500mg — Patient #4821", status: "Completed", time: "2 min ago" },
+  { id: "RX-002", action: "New prescription filed", resource: "Lisinopril 10mg — Dr. Chen", status: "Pending", time: "1 hour ago" },
+  { id: "RX-003", action: "Staff invited", resource: "sarah@rxnational.com — Pharmacist role", status: "Pending", time: "Yesterday" },
+  { id: "RX-004", action: "Access updated", resource: "Schedule II Vault — read-only", status: "Completed", time: "2 days ago" },
+  { id: "RX-005", action: "Location added", resource: "Downtown Branch — 12 staff", status: "Completed", time: "3 days ago" },
 ];
 
 export default function HomePage() {
@@ -95,15 +95,15 @@ function WelcomePage() {
       <nav className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#3b82f6] to-[#60a5fa] flex items-center justify-center">
-              <Cloud className="h-4 w-4 text-white" />
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center">
+              <Cross className="h-4 w-4 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Authskye</span>
+            <span className="text-2xl font-bold text-gray-900">RxNational</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
             <a href="#" className="text-gray-700 hover:text-primary font-medium">Features</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Pricing</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Docs</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">For Pharmacies</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Contact</a>
             <Button asChild variant="outline" className="border-primary text-primary hover:bg-blue-50">
               <a href="/api/auth/login">Sign In</a>
             </Button>
@@ -116,33 +116,33 @@ function WelcomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Secure access for<br />every team
+              Secure Rx management<br />for every pharmacy
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Manage documents, collaborate with your team, and control access with fine-grained permissions — all in one workspace.
+              Manage prescriptions, patient records, and staff access — all in one HIPAA-compliant platform with push-based authorization.
             </p>
 
             {/* CTA Box */}
             <Card className="max-w-xl mx-auto shadow-xl border-2 border-blue-100">
               <CardContent className="pt-8 pb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Access your workspace
+                  Access your pharmacy portal
                 </h3>
                 <div className="space-y-3">
                   <Button asChild size="lg" className="w-full h-14 text-lg">
                     <a href="/api/auth/login">
-                      Sign In to Authskye
+                      Sign In to RxNational
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full h-14 text-lg border-2">
                     <Link href="/organizations/signup">
                       <Building2 className="mr-2 h-5 w-5" />
-                      Register Your Organization
+                      Register Your Pharmacy
                     </Link>
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">
-                  SOC 2 Type II compliant. Your data is protected.
+                  HIPAA compliant. Your patient data is protected.
                 </p>
               </CardContent>
             </Card>
@@ -155,25 +155,25 @@ function WelcomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+              <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Enterprise-Grade Security</h4>
-              <p className="text-sm text-gray-600">End-to-end encryption with push-based approval</p>
+              <h4 className="font-semibold text-gray-900 mb-1">HIPAA-Compliant Security</h4>
+              <p className="text-sm text-gray-600">End-to-end encryption with push-based Rx authorization</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                <FolderOpen className="h-6 w-6 text-green-600" />
+                <Pill className="h-6 w-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Document Management</h4>
-              <p className="text-sm text-gray-600">Share and collaborate on files with your team</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Prescription Management</h4>
+              <p className="text-sm text-gray-600">File, track, and refill prescriptions with full audit logs</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
                 <Lock className="h-6 w-6 text-purple-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Fine-Grained Access</h4>
-              <p className="text-sm text-gray-600">Role-based permissions for every user and resource</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Staff Access Control</h4>
+              <p className="text-sm text-gray-600">Role-based permissions for every pharmacist and location</p>
             </div>
           </div>
         </div>
@@ -185,13 +185,13 @@ function WelcomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#3b82f6] to-[#60a5fa] flex items-center justify-center">
-                  <Cloud className="h-3 w-3 text-white" />
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center">
+                  <Cross className="h-3 w-3 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">Authskye</span>
+                <span className="text-xl font-bold text-white">RxNational</span>
               </div>
               <p className="text-sm">
-                Secure access for every team.
+                HIPAA-compliant Rx management for every pharmacy.
               </p>
             </div>
             <div>
@@ -219,7 +219,7 @@ function WelcomePage() {
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2026 Authskye. All rights reserved.</p>
+            <p>&copy; 2026 RxNational. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -319,7 +319,7 @@ function Dashboard({ user }: { user: any }) {
       <header>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! Here's a summary of your workspace activity.
+          Welcome back, {user.name || user.email}! Here's a summary of your pharmacy activity.
         </p>
       </header>
 

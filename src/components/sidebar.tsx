@@ -3,7 +3,7 @@ import { SidebarNav } from './sidebar-nav';
 import { OrgSwitcher } from './org-switcher';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { LogIn, LogOut, Cloud } from 'lucide-react';
+import { LogIn, LogOut, Cross } from 'lucide-react';
 import { getClaimKey } from '@/lib/auth-utils';
 
 export async function Sidebar() {
@@ -14,7 +14,7 @@ export async function Sidebar() {
 
   const orgName = user?.[getClaimKey('org_name')] || '';
   const orgLogo = user?.[getClaimKey('org_logo')];
-  const companyName = orgName ? `Authskye | ${orgName}` : 'Authskye';
+  const companyName = orgName ? `RxNational | ${orgName}` : 'RxNational';
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
@@ -28,8 +28,8 @@ export async function Sidebar() {
             className="rounded-md"
           />
         ) : (
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br from-[#3b82f6] to-[#60a5fa] text-white">
-            <Cloud className="h-5 w-5" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br from-[#0d9488] to-[#14b8a6] text-white">
+            <Cross className="h-4 w-4" />
           </div>
         )}
         <h2 className="text-xl font-bold">{companyName}</h2>

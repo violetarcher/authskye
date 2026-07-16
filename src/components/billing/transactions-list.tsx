@@ -98,9 +98,9 @@ export function TransactionsList({ userId }: TransactionsListProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center gap-2">
             <Receipt className="w-5 h-5 text-primary" />
-            Transaction History
+            Rx History
           </CardTitle>
-          <CardDescription className="text-xs">Your submitted payments will appear here</CardDescription>
+          <CardDescription className="text-xs">Your submitted prescription requests will appear here</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-6 text-center">
           <CreditCard className="w-8 h-8 text-muted-foreground mb-2" />
@@ -120,7 +120,7 @@ export function TransactionsList({ userId }: TransactionsListProps) {
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
               <Receipt className="w-5 h-5 text-primary" />
-              Transaction History
+              Rx History
             </CardTitle>
             <CardDescription className="text-xs">{transactions.length} transaction(s)</CardDescription>
           </div>

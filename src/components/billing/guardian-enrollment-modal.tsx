@@ -114,7 +114,7 @@ export function GuardianEnrollmentModal({
             Set Up Guardian Push
           </DialogTitle>
           <DialogDescription>
-            Enable push notifications to approve payment requests securely from your phone.
+            Enable push notifications to authorize prescription requests securely from your phone.
           </DialogDescription>
         </DialogHeader>
 
