@@ -9,13 +9,14 @@ export function GET() {
 
   const metadata = {
     client_id: `${baseUrl}/api/mcp-client-metadata`,
-    client_name: 'RxNational MCP Client',
+    client_name: 'Authskye MCP Client',
     description: 'Demo MCP client for Auth for MCP showcase',
     application_type: 'web',
     grant_types: ['authorization_code', 'refresh_token'],
     redirect_uris: [`${baseUrl}/mcp/callback`],
     token_endpoint_auth_method: 'none',
     response_types: ['code'],
+    scope: 'openid profile email mcp:list_projects mcp:get_issue mcp:comment_on_issue',
   };
 
   return Response.json(metadata, {

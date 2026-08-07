@@ -33,7 +33,7 @@ export async function POST(
     const { documentId } = params;
 
     // Check if user can share this document
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaDocId = formatDocId(documentId);
     const canShare = await checkPermission(fgaUserId, 'can_share', fgaDocId);
 
@@ -103,7 +103,7 @@ export async function DELETE(
     const { documentId } = params;
 
     // Check if user can share this document
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaDocId = formatDocId(documentId);
     const canShare = await checkPermission(fgaUserId, 'can_share', fgaDocId);
 

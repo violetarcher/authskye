@@ -3,7 +3,7 @@
 export function GET() {
   return Response.json({
     auth0Domain: process.env.AUTH0_MGMT_DOMAIN,
-    audience: process.env.AUTH0_AUDIENCE,
+    audience: process.env.AUTH0_MCP_AUDIENCE ?? process.env.AUTH0_AUDIENCE,
     baseUrl: process.env.AUTH0_BASE_URL,
   });
 }

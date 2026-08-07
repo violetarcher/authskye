@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'RxNational',
-  description: 'HIPAA-compliant pharmacy management platform',
+  title: 'Authskye',
+  description: 'The digital platform for modern collaboration',
 };
 
 export const viewport = {
-  themeColor: '#14b8a6',
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({

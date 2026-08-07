@@ -53,10 +53,10 @@ export default function BillingPage() {
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <FileText className="w-8 h-8 text-primary" />
-          Rx Refills
+          Billing
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Request and track prescription refills
+          Submit and track payment requests
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export default function BillingPage() {
         {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">New Rx Refill Request</CardTitle>
+            <CardTitle className="text-lg">New Payment</CardTitle>
             <CardDescription className="text-xs">
               Complete the form and authorize via mobile push notification
             </CardDescription>
@@ -87,14 +87,14 @@ export default function BillingPage() {
                   disabled={isClearing}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear All Rx Records
+                  Clear All Transactions
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Clear All Rx Records?</DialogTitle>
+                  <DialogTitle>Clear All Transactions?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All Rx records in your account will be permanently deleted.
+                    This action cannot be undone. All transactions in your account will be permanently deleted.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-2">
@@ -110,7 +110,7 @@ export default function BillingPage() {
                     onClick={handleClearAllTransactions}
                     disabled={isClearing}
                   >
-                    {isClearing ? 'Clearing...' : 'Clear All Rx Records'}
+                    {isClearing ? 'Clearing...' : 'Clear All Transactions'}
                   </Button>
                 </div>
               </DialogContent>

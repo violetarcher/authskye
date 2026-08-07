@@ -34,7 +34,7 @@ export async function GET(
     const { documentId } = params;
 
     // Check if user can read this document
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaDocId = formatDocId(documentId);
     const canRead = await checkPermission(fgaUserId, 'can_read', fgaDocId);
 
@@ -107,7 +107,7 @@ export async function PUT(
     const { documentId } = params;
 
     // Check if user can write to this document
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaDocId = formatDocId(documentId);
     const canWrite = await checkPermission(fgaUserId, 'can_write', fgaDocId);
 
@@ -189,7 +189,7 @@ export async function DELETE(
     const { documentId } = params;
 
     // Check if user owns this document (only owner can delete)
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaDocId = formatDocId(documentId);
     const canChangeOwner = await checkPermission(fgaUserId, 'can_change_owner', fgaDocId);
 

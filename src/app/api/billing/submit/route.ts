@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSession } from '@auth0/nextjs-auth0';
 import { db } from '@/lib/firebase-admin';
 import { validateMcpToken, tokenHasScope } from '@/lib/mcp-token-validator';
 
@@ -49,7 +50,10 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = tokenPayload.sub;
-    const orgId = (tokenPayload['org_id'] as string) || 'default-org';
+
+    // Use session org_id for data storage — CIBA token audience is different and won't carry it
+    const session = await getSession();
+    const orgId = session?.user?.org_id || 'default-org';
 
     console.log('📋 Receiving claim submission for user:', userId);
 

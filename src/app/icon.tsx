@@ -8,7 +8,7 @@ export default function Icon() {
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
+          background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -23,7 +23,7 @@ export default function Icon() {
           viewBox="0 0 24 24"
           fill="white"
         >
-          <path d="M10 2h4v8h8v4h-8v8h-4v-8H2v-4h8z" />
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
         </svg>
       </div>
     ),

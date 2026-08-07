@@ -53,33 +53,33 @@ interface CIBAStatus {
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'Metformin 500mg — 90-day supply',
+    itemName: 'Professional Services — Q3 2026',
     invoiceNumber: 'RX-2024-8821',
-    billingCycle: 'Refill',
+    billingCycle: 'Monthly',
     amount: '15.00',
-    description: '90-day supply refill. Generic substitution authorized.',
+    description: 'Monthly subscription — Professional tier. Auto-renew enabled.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'Atorvastatin 40mg — 30-day supply',
+    itemName: 'Platform License — Enterprise',
     invoiceNumber: 'RX-2024-4417',
-    billingCycle: 'Refill',
+    billingCycle: 'Monthly',
     amount: '25.00',
-    description: '30-day refill for cholesterol management. Generic equivalent authorized.',
+    description: 'Annual enterprise license renewal. Includes SSO and SCIM add-ons.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'Lisinopril 10mg — 30-day supply',
+    itemName: 'Consulting Services — August',
     invoiceNumber: 'RX-2024-6032',
     billingCycle: 'New',
     amount: '10.00',
-    description: 'New prescription for hypertension management. Prescriber: Dr. Sarah Johnson.',
+    description: 'Implementation consulting. Project: Auth0 FGA integration.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
@@ -218,7 +218,7 @@ BT
 100 610 Td
 (Prescription Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
 100 590 Td
-(Refill Type: ${demoData.billingCycle}) Tj
+(Plan Type: ${demoData.billingCycle}) Tj
 100 570 Td
 (Copay: $${demoData.amount}) Tj
 ET
@@ -326,7 +326,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email transaction:pay',
-          binding_message: `Approve Rx Refill: ${formData.amount} USD`,
+          binding_message: `Approve Payment: ${formData.amount} USD`,
         }),
       });
 
@@ -355,9 +355,9 @@ startxref
           authorization_details: [{
             type: 'payment_initiation',
             instructedAmount: { amount: Math.round(parseFloat(formData.amount) * 100), currency: 'USD' },
-            creditorName: 'RxNational Pharmacy',
+            creditorName: 'Authskye',
             creditorAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
-            remittanceInformationUnstructured: `Rx Refill ${formData.invoiceNumber}`,
+            remittanceInformationUnstructured: `Invoice ${formData.invoiceNumber}`,
           }],
           access_token: pollResult.access_token,
           expires_in: pollResult.expires_in,
@@ -475,8 +475,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Rx authorization required', {
-        description: 'Please authorize the Rx refill via Guardian app on your mobile device',
+      toast.info('Payment authorization required', {
+        description: 'Please authorize the payment via Guardian app on your mobile device',
       });
 
       const cibaResult = await initiateCIBA();
@@ -486,7 +486,7 @@ startxref
         return;
       }
 
-      // Step 2: Submit Rx refill using CIBA access token as Bearer auth
+      // Step 2: Submit payment using CIBA access token as Bearer auth
       const formDataToSend = new FormData();
       formDataToSend.append('serviceDate', formData.paymentDate);
       formDataToSend.append('providerName', formData.itemName);
@@ -513,8 +513,8 @@ startxref
 
       const result = await response.json();
 
-      toast.success('Rx refill request submitted!', {
-        description: `Rx ID: ${result.claimId}`,
+      toast.success('Payment submitted!', {
+        description: `Transaction ID: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -539,7 +539,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit Rx request',
+        description: error.message || 'Failed to submit payment',
       });
     } finally {
       setLoading(false);
@@ -568,7 +568,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Push approval not set up — required for Rx submission
+              Push approval not set up — required for payment submission
             </span>
           </div>
           <Button
@@ -587,7 +587,7 @@ startxref
         <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Push approval ready — Rx submission enabled
+            Push approval ready — payment submission enabled
           </span>
         </div>
       )}
@@ -612,9 +612,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for Rx approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting Rx request...'}
-            {cibaStatus.status === 'denied' && 'Rx request denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
+            {cibaStatus.status === 'denied' && 'Payment denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -622,11 +622,11 @@ startxref
 
       {/* authorization_details response preview */}
       {cibaTokenData && (
-        <div className="rounded-lg border border-teal-200 bg-teal-50/50 overflow-hidden">
+        <div className="rounded-lg border border-blue-200 bg-blue-50/50 overflow-hidden">
           <button
             type="button"
             onClick={() => setTokenExpanded(v => !v)}
-            className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-teal-800 hover:bg-teal-100/60 transition-colors"
+            className="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-blue-800 hover:bg-blue-100/60 transition-colors"
           >
             <span className="flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5" />
@@ -635,7 +635,7 @@ startxref
             {tokenExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
           </button>
           {tokenExpanded && (
-            <pre className="border-t border-teal-200 px-3 py-2 text-xs font-mono text-gray-700 bg-white overflow-x-auto">
+            <pre className="border-t border-blue-200 px-3 py-2 text-xs font-mono text-gray-700 bg-white overflow-x-auto">
               {JSON.stringify(cibaTokenData.authorization_details, null, 2)}
             </pre>
           )}
@@ -649,16 +649,16 @@ startxref
         const expiry = payload?.exp ? new Date(payload.exp * 1000) : null;
         const issued = payload?.iat ? new Date(payload.iat * 1000) : null;
         return (
-          <div className="rounded-lg border border-teal-200 bg-teal-50/50 overflow-hidden text-xs">
-            <div className="px-3 py-2 font-medium text-teal-800 flex items-center gap-1.5">
+          <div className="rounded-lg border border-blue-200 bg-blue-50/50 overflow-hidden text-xs">
+            <div className="px-3 py-2 font-medium text-blue-800 flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5" />
               CIBA Access Token
             </div>
-            <div className="border-t border-teal-200 bg-white px-3 py-2 space-y-1.5 font-mono">
+            <div className="border-t border-blue-200 bg-white px-3 py-2 space-y-1.5 font-mono">
               <div className="flex flex-wrap gap-1 items-center">
                 <span className="text-gray-400 font-sans">scope</span>
                 {scopes.map(s => (
-                  <span key={s} className={`px-1.5 py-0.5 rounded text-xs font-medium ${s === 'transaction:pay' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  <span key={s} className={`px-1.5 py-0.5 rounded text-xs font-medium ${s === 'transaction:pay' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
                     {s}
                   </span>
                 ))}
@@ -741,7 +741,7 @@ startxref
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="Metformin 500mg"
+            placeholder="Professional Services"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -750,7 +750,7 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="invoiceNumber" className="text-xs">Rx Number</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">Invoice Number</Label>
             <Input
               id="invoiceNumber"
               name="invoiceNumber"
@@ -762,12 +762,12 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Refill Type</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Plan Type</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Refill / New / Emergency"
+              placeholder="Monthly / Annual / One-time"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -791,7 +791,7 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="receipt" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Insurance Card / Prescription (PDF) *
+            Supporting Document (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
             <Label htmlFor="receipt" className="cursor-pointer text-xs text-primary">
@@ -817,7 +817,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Insurance Information (Push approval required)
+            Payment Details (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -880,7 +880,7 @@ startxref
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Submit Rx Refill
+              Submit Payment
             </>
           )}
         </Button>

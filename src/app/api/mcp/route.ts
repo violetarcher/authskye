@@ -6,7 +6,7 @@ import { checkPermission, listObjects, formatUserId, formatToolId } from '@/lib/
 import fgaClient, { isFgaAvailable } from '@/lib/fga-client';
 
 const SERVER_INFO = {
-  name: 'rxnational-mcp-server',
+  name: 'authskye-mcp-server',
   version: '1.0.0',
 };
 
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
   let tokenPayload: Awaited<ReturnType<typeof validateMcpToken>>;
   try {
     tokenPayload = await validateMcpToken(request.headers.get('Authorization'));
-    userId = tokenPayload.sub;
+    userId = tokenPayload['https://test.app.com/email'] ?? tokenPayload.email ?? tokenPayload.sub;
   } catch (err) {
     const baseUrl = process.env.AUTH0_BASE_URL;
     const domain = process.env.AUTH0_MGMT_DOMAIN;

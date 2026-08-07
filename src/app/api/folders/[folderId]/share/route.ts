@@ -33,7 +33,7 @@ export async function POST(
     const { folderId } = params;
 
     // Check if user owns this folder (only owner can share)
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
     const isOwner = await checkPermission(fgaUserId, 'owner', fgaFolderId);
 
@@ -107,7 +107,7 @@ export async function DELETE(
     const { folderId } = params;
 
     // Check if user owns this folder (only owner can manage sharing)
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
     const isOwner = await checkPermission(fgaUserId, 'owner', fgaFolderId);
 

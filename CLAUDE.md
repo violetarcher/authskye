@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-B2B SaaS demo app using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA, step-up MFA, Kong API Gateway, and AI Agents demo.
+B2B + B2C digital collaboration platform demo using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA, step-up MFA, Kong API Gateway, AI Agents demo, and Auth for MCP.
 
 **Brand:** Authskye | **Namespace:** `https://authskye.com` | **Primary Color:** `#3b82f6`
 
@@ -35,8 +35,8 @@ export const POST = withApiAuthRequired(async function POST(request) {
   const validation = mySchema.safeParse(body);
   if (!validation.success) return Response.json({ error: 'Validation error' }, { status: 400 });
 
-  // Check FGA permission
-  const canRead = await checkPermission(formatUserId(user.sub), 'can_read', formatDocId(resourceId));
+  // Check FGA permission — use email to get username-based FGA subject
+  const canRead = await checkPermission(formatUserId(user.email ?? user.sub), 'can_read', formatDocId(resourceId));
   if (!canRead) return Response.json({ error: 'Permission denied' }, { status: 403 });
 
   // Business logic...
@@ -58,15 +58,17 @@ user['https://authskye.com/org_logo']       // Org logo URL
 ```typescript
 import { checkPermission, writeTuple, formatUserId, formatDocId, formatGroupMember } from '@/lib/fga-service';
 
-// Check permission
-await checkPermission(formatUserId(userId), 'can_read', formatDocId(docId));
+// Check permission — always pass email so FGA subject is username-based
+await checkPermission(formatUserId(user.email ?? user.sub), 'can_read', formatDocId(docId));
 
 // Grant ownership
-await writeTuple({ user: formatUserId(userId), relation: 'owner', object: formatDocId(docId) });
+await writeTuple({ user: formatUserId(user.email ?? user.sub), relation: 'owner', object: formatDocId(docId) });
 
 // Share with group
 await writeTuple({ user: formatGroupMember(groupId), relation: 'viewer', object: formatDocId(docId) });
 ```
+
+**FGA User ID mapping:** `formatUserId` extracts the local part of an email (`violet.archer@okta.com` → `user:violet.archer`). Falls back to raw value if no `@` present. Always prefer `user.email ?? user.sub` as the input — never pass `user.sub` alone.
 
 **FGA Object Types:** `user:{id}`, `group:{id}`, `folder:{id}`, `doc:{id}`, `agent:{id}`, `project:{id}`
 
@@ -86,6 +88,7 @@ await writeTuple({ user: formatGroupMember(groupId), relation: 'viewer', object:
 ```env
 AUTH0_ISSUER_BASE_URL    # Custom domain for login (https://login.authskye.org)
 AUTH0_MGMT_DOMAIN        # Canonical domain for API (archfaktor.us.auth0.com)
+AUTH0_MCP_AUDIENCE       # Audience for MCP Tools API (http://localhost:3001/)
 FGA_STORE_ID / FGA_CLIENT_ID / FGA_CLIENT_SECRET
 FIREBASE_SERVICE_ACCOUNT_BASE64
 CTE_CLIENT_ID / CTE_CLIENT_SECRET  # Custom Token Exchange for My Account API
@@ -134,6 +137,14 @@ if (!kongProtected) return Response.json({ error: 'Must go through Kong' }, { st
 
 Dual authorization: both user AND agent must have permission. Uses FGA types: `agent:{id}`, `project:{id}`, `issue:{id}`.
 
+### Auth for MCP
+
+MCP server at `/api/mcp` uses CIMD (Client ID Metadata Document) for client registration. The CIMD endpoint is `/api/mcp-client-metadata` — it must declare a `scope` field listing all allowed scopes or Auth0 will issue empty scope on consent.
+
+Token validation uses `AUTH0_MCP_AUDIENCE`. Scopes are checked via `scope` claim only (not RBAC `permissions`). FGA `can_call` gates tool discovery and execution as a second layer.
+
+**Critical:** The MCP Tools API (`http://localhost:3001/`) must have RBAC (`enforce_policies`) **disabled** for scope-based consent to work.
+
 ## Do's and Don'ts
 
 **Always:**
@@ -156,10 +167,12 @@ Dual authorization: both user AND agent must have permission. Uses FGA types: `a
 
 ## Rebranding
 
-See `REBRANDING.md` for complete checklist. Key areas:
+See `REBRANDING.md` for complete checklist and the **Authskye baseline** (default brand). Key areas:
 1. JWT namespace in Auth0 Actions + all claim-reading code
 2. `src/app/layout.tsx` metadata
 3. `src/app/icon.tsx` favicon
 4. `src/app/globals.css` colors
-5. `auth0-templates/universal-login-template.html`
-6. Organization signup page and form
+5. `src/app/page.tsx` — WelcomePage and Dashboard content
+6. `src/components/sidebar.tsx` and `sidebar-nav.tsx`
+7. Organization signup page and form
+8. Billing page labels and demo data

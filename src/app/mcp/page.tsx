@@ -318,12 +318,10 @@ export default function McpDemoPage() {
                     <p className="text-xs text-muted-foreground">Token claims:</p>
                     <div className="text-[10px] font-mono space-y-0.5">
                       <div>
-                        <span className="text-muted-foreground">permissions: </span>
-                        {Array.isArray(tokenClaims.permissions) && tokenClaims.permissions.length > 0 ? (
-                          <span className="text-green-600">{(tokenClaims.permissions as string[]).join(', ')}</span>
-                        ) : (
-                          <span className="text-red-500">(none)</span>
-                        )}
+                        <span className="text-muted-foreground">scope: </span>
+                        {typeof tokenClaims.scope === 'string' && tokenClaims.scope
+                          ? <span className="text-green-600">{tokenClaims.scope}</span>
+                          : <span className="text-red-500">(none)</span>}
                       </div>
                       <div><span className="text-muted-foreground">aud: </span>{JSON.stringify(tokenClaims.aud)}</div>
                       <div><span className="text-muted-foreground">azp: </span>{String(tokenClaims.azp ?? '—')}</div>

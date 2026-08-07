@@ -2,16 +2,41 @@
 
 This document outlines all areas that need to be updated when rebranding this application.
 
+## Authskye Baseline (Default Brand)
+
+When reverting to default, the app should look like this:
+
+| Property | Value |
+|----------|-------|
+| Brand name | Authskye |
+| Tagline | "The digital platform for modern collaboration" |
+| Platform type | B2B + B2C collaboration platform |
+| Primary color | `#3b82f6` (blue) |
+| Gradient | `from-[#1d4ed8] to-[#3b82f6]` |
+| Icon | Shield (lucide `Shield`) |
+| Namespace | `https://authskye.com` |
+| Theme color (viewport) | `#3b82f6` |
+
+### Baseline content
+
+- **KPI cards:** Active Users, Organizations, Documents Shared, API Requests
+- **Activity feed:** document sharing, user invites, org creation, MFA enrollment, role assignment
+- **Preferences:** Email Notifications, Activity Alerts, Usage Reports, API Webhooks
+- **Billing demo items:** Professional Services, Platform License, Consulting Services
+- **Trust indicators:** Enterprise-Grade Security, Multi-Tenant Organizations, Fine-Grained Access Control
+- **Footer nav columns:** Product (Features/Pricing/Integrations), Solutions (B2B SaaS/Enterprise/Developers), Company (About/Security/Privacy)
+
+---
+
 ## Quick Reference
 
 When rebranding, you need to update:
 1. **JWT Namespace** - Custom claims prefix in Auth0 Actions and all code reading claims
 2. **App Metadata** - Title, description, theme color
 3. **Visual Assets** - Favicon, logos, icons
-4. **Auth0 Templates** - Universal Login customization
-5. **CSS Theme** - Primary colors, gradients
-6. **UI Components** - All user-facing text and placeholders
-7. **Documentation** - README, CLAUDE.md, .env.example
+4. **CSS Theme** - Primary colors, gradients
+5. **UI Components** - All user-facing text and placeholders
+6. **Documentation** - README, CLAUDE.md, .env.example
 
 ---
 
@@ -71,35 +96,15 @@ export const viewport = {
 ```
 
 ### `src/app/icon.tsx`
-Update the favicon - either the SVG path or the gradient colors:
+Update the favicon gradient colors and SVG path:
 ```tsx
-background: 'linear-gradient(135deg, #PRIMARY 0%, #SECONDARY 100%)',
-// SVG icon inside
+background: 'linear-gradient(135deg, #PRIMARY_DARK 0%, #PRIMARY 100%)',
+// SVG icon path inside
 ```
 
 ---
 
-## 3. Universal Login Template
-
-### `auth0-templates/universal-login-template.html`
-
-Update:
-- Background gradient colors
-- Feature cards content (titles, descriptions, icons)
-- Any brand-specific messaging
-
-Key CSS to change:
-```css
-background: linear-gradient(to right, #PRIMARY 0%, #PRIMARY 40%, #ffffff 40%, #ffffff 100%);
-
-.feature-icon.blue {
-  background: linear-gradient(135deg, #PRIMARY 0%, #PRIMARY_LIGHT 100%);
-}
-```
-
----
-
-## 4. CSS Theme Colors
+## 3. CSS Theme Colors
 
 ### `src/app/globals.css`
 
@@ -107,7 +112,7 @@ Update HSL values for primary color:
 ```css
 :root {
   --primary: HUE SATURATION% LIGHTNESS%;
-  /* Example: 217 91% 60% for blue */
+  /* Example: 217 91% 60% for Authskye blue (#3b82f6) */
 }
 ```
 
@@ -115,59 +120,99 @@ Calculate HSL from hex at: https://htmlcolors.com/hex-to-hsl
 
 ---
 
-## 5. Sidebar Branding
+## 4. Sidebar Branding
 
 ### `src/components/sidebar.tsx`
 
 Update:
+- Import: replace icon import (e.g. `Shield` → brand icon)
+- Gradient colors on the logo badge
 - Default company name (when no org)
-- Fallback icon/logo
-- Any hardcoded brand references
 
 ```tsx
 const companyName = orgName ? `APP_NAME | ${orgName}` : 'APP_NAME';
 ```
 
+### `src/components/sidebar-nav.tsx`
+
+Check for any hardcoded brand-specific nav labels (e.g. "Billing", "Documents").
+
 ---
 
-## 6. Organization Signup Page
+## 5. Home Page
+
+### `src/app/page.tsx` (Critical — do not skip)
+
+This file contains **two** components that both need rebranding:
+
+**`WelcomePage`** (shown to unauthenticated users at `/`):
+- Nav logo icon, gradient colors, and brand name
+- Nav links (Features/Pricing/Docs/Enterprise → domain-appropriate equivalents)
+- Hero badge, headline, and subtext
+- CTA box title and button labels
+- Fine-print disclaimer (e.g. "SOC 2 Type II certified")
+- Trust indicators (icons, titles, descriptions) — 3 cards
+- Footer brand name, tagline, nav columns, and copyright year
+
+**`Dashboard`** (shown to authenticated users at `/`):
+- Welcome subtitle ("your workspace" → domain equivalent)
+- `kpiData` array — all four KPI cards (titles, values, change text, icons)
+- `recentActivity` array — all five activity rows (action, resource, status)
+- Preferences panel: card title, description, all four toggle labels and descriptions
+- Metadata keys sent to `/api/user/preferences` (must match what you read back)
+
+---
+
+## 6. Organization Signup
 
 ### `src/app/organizations/signup/page.tsx`
 
 Update:
-- Page metadata (title, description)
-- Header text ("Welcome to APP_NAME")
+- Page metadata (`title`, `description`)
+- Header `<h1>` text ("Welcome to APP_NAME")
 - Subheader/tagline
 
 ### `src/components/organization/signup-form.tsx`
 
 Update:
 - Card title and description
-- Input placeholders (organization name, email examples)
+- Input placeholders (organization name, admin email examples)
 
 ---
 
-## 7. Billing/Transactions (if applicable)
+## 7. Billing / CIBA Demo
 
 ### `src/components/billing/billing-form.tsx`
 
-Update demo data scenarios:
-- Transaction descriptions
-- Service names
-- Amount examples
+Update demo data scenarios (`demoScenarios` array):
+- `itemName` values
+- `billingCycle` values
+- `description` values
+- `binding_message` text (shown on push notification)
+- `creditorName` value
+- Toast messages referencing brand or domain terms
+- Button label ("Submit Payment" → domain equivalent)
+- Field labels ("Invoice Number", "Plan Type", "Supporting Document")
+- Status/info panel colors (teal → primary, etc.)
 
 ### `src/components/billing/transactions-list.tsx`
 
 Update:
-- Column headers
-- Status labels
-- Any domain-specific terminology
+- Card title ("Transaction History" → domain equivalent)
+- Card description
 
 ### `src/components/billing/guardian-enrollment-modal.tsx`
 
 Update:
-- Modal text and descriptions
-- Button labels
+- Modal description referencing payment/request type
+
+### `src/app/billing/page.tsx`
+
+Update:
+- Page `<h1>` title ("Billing" → domain equivalent, e.g. "Rx Refills")
+- Page subtitle
+- Card title ("New Payment" → domain equivalent)
+- Clear dialog title, description, and button label
 
 ---
 
@@ -176,7 +221,6 @@ Update:
 ### `README.md`
 - Project name and description
 - Any brand references in setup instructions
-- Example URLs and domains
 
 ### `CLAUDE.md`
 - Project overview
@@ -185,7 +229,6 @@ Update:
 
 ### `.env.example`
 - Example audience URLs
-- Example domain placeholders
 - Comments referencing the brand
 
 ---
@@ -194,38 +237,12 @@ Update:
 
 Run this to find potential brand references:
 ```bash
-# Search for common brand terms
-grep -ri "energyco\|paw0\|kennel\|dog\|energy" src/app/ src/components/
+# Search for brand terms
+grep -ri "BRAND_NAME" src/app/ src/components/
 
 # Search for old namespace
 grep -r "OLD_NAMESPACE" src/
 ```
-
-Pages that commonly need updates:
-- Landing/home page
-- About page
-- Profile pages
-- Settings pages
-- Error pages
-- Email templates (if any)
-
-### `src/app/page.tsx` (Critical — do not skip)
-
-This file contains **two** components that both need rebranding:
-
-**`WelcomePage`** (shown to unauthenticated users at `/`):
-- Nav logo icon, gradient colors, and brand name
-- Nav links (e.g. Features/Pricing/Docs → domain-appropriate equivalents)
-- Hero headline and subtext
-- CTA box title, button labels, and fine-print disclaimer
-- Trust indicators (icons, titles, descriptions)
-- Footer brand name, tagline, nav columns, and copyright year
-
-**`Dashboard`** (shown to authenticated users at `/`):
-- Welcome subtitle ("your workspace" → domain equivalent)
-- `kpiData` array — all four KPI cards (titles, values, change text, icons)
-- `recentActivity` array — all five activity rows (action, resource, status)
-- Preferences panel labels and descriptions
 
 ---
 
@@ -238,26 +255,22 @@ After code changes, update in Auth0 Dashboard:
    - Logo URL
    - Application description
 
-2. **Branding → Universal Login**
-   - Upload custom template
-   - Set logo and colors
-
-3. **Branding → Email Templates**
+2. **Branding → Email Templates**
    - Update email branding
    - Change email sender name
 
-4. **Organizations** (if using)
+3. **Organizations** (if using)
    - Default organization branding
    - Organization display names
 
-5. **Actions**
+4. **Actions**
    - Redeploy any actions with namespace changes
 
-6. **CIBA `audience` parameter**
+5. **CIBA `audience` parameter**
 
-   The bc-authorize request in `src/app/api/ciba/initiate/route.ts` includes `audience: process.env.AUTH0_AUDIENCE`. Update `AUTH0_AUDIENCE` in `.env.local` to match the new brand's API identifier. Without it, Auth0 has no Resource Server context and will reject any RAR-related parameters.
+   The bc-authorize request in `src/app/api/ciba/initiate/route.ts` includes `audience: process.env.AUTH0_AUDIENCE`. Update `AUTH0_AUDIENCE` in `.env.local` to match the new brand's API identifier.
 
-   > **Note on `authorization_details` (RAR):** Auth0 Guardian requires custom RAR types to have a pre-registered JSON schema before they can be sent in a CIBA push request. Without that schema registration (which requires an Auth0 support/enterprise process), including `authorization_details` in the bc-authorize call produces the error _"authorization_details does not match the required schema for use with the Auth0 Guardian App"_. The token inspector in this app displays the authorized transaction details from the form instead.
+   > **Note on `authorization_details` (RAR):** Auth0 Guardian requires custom RAR types to have a pre-registered JSON schema. Without that schema registration, including `authorization_details` in the bc-authorize call produces the error _"authorization_details does not match the required schema for use with the Auth0 Guardian App"_. The token inspector in this app displays the authorized transaction details from the form instead.
 
 ---
 
@@ -265,39 +278,40 @@ After code changes, update in Auth0 Dashboard:
 
 After rebranding, verify:
 
-- [ ] Login page shows new branding
+- [ ] Login page shows new branding (Auth0 Dashboard → Branding)
 - [ ] Favicon appears correctly
-- [ ] Sidebar shows correct app name
-- [ ] Organization signup has new branding
+- [ ] Sidebar shows correct app name and icon
+- [ ] Organization signup has new branding and placeholder text
+- [ ] Billing page title and nav label match new brand
+- [ ] Dashboard KPI cards and activity reflect domain
 - [ ] JWT claims use new namespace (check in jwt.io)
 - [ ] All API routes read claims from new namespace
 - [ ] No console errors about missing claims
-- [ ] Email templates (if any) show new branding
 - [ ] CIBA flow completes and token inspector shows approved transaction details
-- [ ] Documentation is updated
 
 ---
 
-## Example: Full Rebrand from "Paw0" to "Authskye"
+## Example: Full Rebrand to a New Brand
 
 ```bash
 # 1. Update namespace in all files
-sed -i '' 's|paw0\.com|authskye.com|g' $(grep -rl "paw0\.com" src/ auth0-actions/)
+sed -i '' 's|authskye.com|newbrand.com|g' $(grep -rl "authskye.com" src/ auth0-actions/)
 
 # 2. Update brand name references
-sed -i '' 's|Paw0|Authskye|g' $(grep -rl "Paw0" src/)
-sed -i '' 's|paw0|authskye|g' $(grep -rl "paw0" src/)
+sed -i '' 's|Authskye|NewBrand|g' $(grep -rl "Authskye" src/)
 
 # 3. Update domain-specific content (manual review needed)
-grep -ri "kennel\|dog\|breed\|pedigree" src/
+# - src/app/page.tsx (WelcomePage + Dashboard)
+# - src/app/billing/page.tsx
+# - src/components/billing/billing-form.tsx
+# - src/components/organization/signup-form.tsx
+# - src/components/sidebar.tsx
 
 # 4. Update colors in globals.css (manual)
 
 # 5. Update icon.tsx (manual)
 
-# 6. Update Universal Login template (manual)
+# 6. Redeploy Auth0 Actions with new namespace
 
-# 7. Redeploy Auth0 Actions with new namespace
-
-# 8. Test login flow end-to-end
+# 7. Test login flow end-to-end
 ```

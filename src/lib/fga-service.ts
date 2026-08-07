@@ -172,8 +172,11 @@ export async function readTuples(object: string): Promise<FGATuple[]> {
  * @param userId - Auth0 user ID (e.g., "auth0|123")
  * @returns Formatted user string (e.g., "user:auth0|123")
  */
-export function formatUserId(userId: string): string {
-  return `user:${userId}`;
+export function formatUserId(identifier: string): string {
+  if (identifier.includes('@')) {
+    return `user:${identifier.split('@')[0]}`;
+  }
+  return `user:${identifier}`;
 }
 
 /**

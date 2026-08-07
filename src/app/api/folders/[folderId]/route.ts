@@ -34,7 +34,7 @@ export async function GET(
     const { folderId } = params;
 
     // Check if user can view this folder
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
     const canView = await checkPermission(fgaUserId, 'viewer', fgaFolderId);
 
@@ -100,7 +100,7 @@ export async function PUT(
     const { folderId } = params;
 
     // Check if user owns this folder (only owner can update)
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
     const isOwner = await checkPermission(fgaUserId, 'owner', fgaFolderId);
 
@@ -181,7 +181,7 @@ export async function DELETE(
     const { folderId } = params;
 
     // Check if user owns this folder (only owner can delete)
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
     const isOwner = await checkPermission(fgaUserId, 'owner', fgaFolderId);
 

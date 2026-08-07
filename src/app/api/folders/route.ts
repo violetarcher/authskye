@@ -29,7 +29,7 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
     }
 
     // Get all folders user can view from FGA
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const viewableFolderIds = await listObjects(fgaUserId, 'viewer', 'folder');
 
     // If no viewable folders, return empty array
@@ -103,7 +103,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
 
     // If parentId is provided, check if user can create files in that folder
     if (parentId) {
-      const fgaUserId = formatUserId(user.sub);
+      const fgaUserId = formatUserId(user.email ?? user.sub);
       const fgaFolderId = formatFolderId(parentId);
       const canCreateFile = await checkPermission(fgaUserId, 'can_create_file', fgaFolderId);
 
@@ -128,7 +128,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     const folderId = folderRef.id;
 
     // Write ownership tuple to FGA
-    const fgaUserId = formatUserId(user.sub);
+    const fgaUserId = formatUserId(user.email ?? user.sub);
     const fgaFolderId = formatFolderId(folderId);
 
     const tuples: FGATuple[] = [

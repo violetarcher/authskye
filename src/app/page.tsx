@@ -23,21 +23,21 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { AlertTriangle, Building2, Cross, FileText, Activity, Users, BarChart3, Shield, Lock, Pill } from "lucide-react"
+import { AlertTriangle, Building2, Activity, Shield, Lock, Users, FileText } from "lucide-react"
 
 const kpiData = [
-  { title: "Active Prescriptions", value: "127", change: "12 pending refills", icon: Pill, color: "text-teal-600" },
-  { title: "Pharmacy Staff", value: "8", change: "3 locations connected", icon: Users, color: "text-green-600" },
-  { title: "Rx Reports", value: "34", change: "6 new this month", icon: BarChart3, color: "text-purple-600" },
-  { title: "Patient Records", value: "2.4K", change: "of 5K plan", icon: Activity, color: "text-amber-500" },
+  { title: "Active Users", value: "1,284", change: "+12% this month", icon: Users, color: "text-blue-600" },
+  { title: "Organizations", value: "48", change: "3 new this week", icon: Building2, color: "text-green-600" },
+  { title: "Documents Shared", value: "5.2k", change: "Last 30 days", icon: FileText, color: "text-purple-600" },
+  { title: "API Requests", value: "98.2k", change: "↑ 8% from last month", icon: Activity, color: "text-amber-500" },
 ];
 
 const recentActivity = [
-  { id: "RX-001", action: "Rx refill approved", resource: "Metformin 500mg — Patient #4821", status: "Completed", time: "2 min ago" },
-  { id: "RX-002", action: "New prescription filed", resource: "Lisinopril 10mg — Dr. Chen", status: "Pending", time: "1 hour ago" },
-  { id: "RX-003", action: "Staff invited", resource: "sarah@rxnational.com — Pharmacist role", status: "Pending", time: "Yesterday" },
-  { id: "RX-004", action: "Access updated", resource: "Schedule II Vault — read-only", status: "Completed", time: "2 days ago" },
-  { id: "RX-005", action: "Location added", resource: "Downtown Branch — 12 staff", status: "Completed", time: "3 days ago" },
+  { id: "EVT-001", action: "Document shared", resource: "Q3 Security Report — finance-team", status: "Completed", time: "2 min ago" },
+  { id: "EVT-002", action: "User invited", resource: "sarah@acme.com — Acme Corp", status: "Active", time: "1 hour ago" },
+  { id: "EVT-003", action: "Organization created", resource: "Globex Corp — Enterprise plan", status: "Pending", time: "Yesterday" },
+  { id: "EVT-004", action: "MFA enrolled", resource: "john.doe@acme.com — TOTP authenticator", status: "Completed", time: "2 days ago" },
+  { id: "EVT-005", action: "Role assigned", resource: "admin@globex.com — Admin", status: "Active", time: "3 days ago" },
 ];
 
 export default function HomePage() {
@@ -95,15 +95,16 @@ function WelcomePage() {
       <nav className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center">
-              <Cross className="h-4 w-4 text-white" />
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
+              <Shield className="h-4 w-4 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">RxNational</span>
+            <span className="text-2xl font-bold text-gray-900">Authskye</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
             <a href="#" className="text-gray-700 hover:text-primary font-medium">Features</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">For Pharmacies</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Contact</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Pricing</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Docs</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Enterprise</a>
             <Button asChild variant="outline" className="border-primary text-primary hover:bg-blue-50">
               <a href="/api/auth/login">Sign In</a>
             </Button>
@@ -115,34 +116,37 @@ function WelcomePage() {
       <section className="bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="text-center">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-blue-100 px-3 py-1 rounded-full mb-6">
+              Collaboration Platform
+            </span>
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Secure Rx management<br />for every pharmacy
+              The digital platform<br />for modern collaboration.
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Manage prescriptions, patient records, and staff access — all in one HIPAA-compliant platform with push-based authorization.
+              Authskye brings your team, partners, and customers together in one secure platform — with fine-grained access control, SSO, and real-time collaboration built in.
             </p>
 
             {/* CTA Box */}
             <Card className="max-w-xl mx-auto shadow-xl border-2 border-blue-100">
               <CardContent className="pt-8 pb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Access your pharmacy portal
+                  Access your workspace
                 </h3>
                 <div className="space-y-3">
                   <Button asChild size="lg" className="w-full h-14 text-lg">
                     <a href="/api/auth/login">
-                      Sign In to RxNational
+                      Sign In to Authskye
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full h-14 text-lg border-2">
                     <Link href="/organizations/signup">
                       <Building2 className="mr-2 h-5 w-5" />
-                      Register Your Pharmacy
+                      Create an Organization
                     </Link>
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">
-                  HIPAA compliant. Your patient data is protected.
+                  SOC 2 Type II certified. GDPR &amp; CCPA compliant.
                 </p>
               </CardContent>
             </Card>
@@ -155,25 +159,25 @@ function WelcomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center mb-3">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
                 <Shield className="h-6 w-6 text-primary" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">HIPAA-Compliant Security</h4>
-              <p className="text-sm text-gray-600">End-to-end encryption with push-based Rx authorization</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Enterprise-Grade Security</h4>
+              <p className="text-sm text-gray-600">End-to-end encryption, audit trails, and push-based approval for sensitive operations</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                <Pill className="h-6 w-6 text-green-600" />
+                <Building2 className="h-6 w-6 text-green-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Prescription Management</h4>
-              <p className="text-sm text-gray-600">File, track, and refill prescriptions with full audit logs</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Multi-Tenant Organizations</h4>
+              <p className="text-sm text-gray-600">Manage users, roles, and SSO across every organization from a single control plane</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
                 <Lock className="h-6 w-6 text-purple-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Staff Access Control</h4>
-              <p className="text-sm text-gray-600">Role-based permissions for every pharmacist and location</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Fine-Grained Access Control</h4>
+              <p className="text-sm text-gray-600">Relationship-based permissions with Auth0 FGA — beyond roles, down to the resource level</p>
             </div>
           </div>
         </div>
@@ -185,13 +189,13 @@ function WelcomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center">
-                  <Cross className="h-3 w-3 text-white" />
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
+                  <Shield className="h-3 w-3 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">RxNational</span>
+                <span className="text-xl font-bold text-white">Authskye</span>
               </div>
               <p className="text-sm">
-                HIPAA-compliant Rx management for every pharmacy.
+                Identity-first platform for modern B2B SaaS.
               </p>
             </div>
             <div>
@@ -203,23 +207,24 @@ function WelcomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <h4 className="text-white font-semibold mb-4">Solutions</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQs</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">B2B SaaS</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Enterprise</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Developers</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2026 RxNational. All rights reserved.</p>
+            <p>&copy; 2026 Authskye. All rights reserved.</p>
           </div>
         </div>
       </footer>
@@ -233,10 +238,10 @@ function Dashboard({ user }: { user: any }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const [preferences, setPreferences] = useState({
-    autoSync: false,
     emailNotifications: false,
-    securityAlerts: false,
+    activityAlerts: false,
     usageReports: false,
+    apiWebhooks: false,
   });
 
   const fetchMetadata = async () => {
@@ -247,10 +252,10 @@ function Dashboard({ user }: { user: any }) {
         const metadata = data.user_metadata || {};
 
         setPreferences({
-          autoSync: metadata.auto_sync === true,
           emailNotifications: metadata.email_notifications === true,
-          securityAlerts: metadata.security_alerts === true,
+          activityAlerts: metadata.activity_alerts === true,
           usageReports: metadata.usage_reports === true,
+          apiWebhooks: metadata.api_webhooks === true,
         });
       }
     } catch (error) {
@@ -266,10 +271,10 @@ function Dashboard({ user }: { user: any }) {
 
   const handlePreferenceChange = async (key: string, value: boolean) => {
     const keyMap: { [key: string]: keyof typeof preferences } = {
-      'auto_sync': 'autoSync',
       'email_notifications': 'emailNotifications',
-      'security_alerts': 'securityAlerts',
+      'activity_alerts': 'activityAlerts',
       'usage_reports': 'usageReports',
+      'api_webhooks': 'apiWebhooks',
     };
 
     const frontendKey = keyMap[key];
@@ -319,7 +324,7 @@ function Dashboard({ user }: { user: any }) {
       <header>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! Here's a summary of your pharmacy activity.
+          Welcome back, {user.name || user.email}! Here's a summary of your workspace.
         </p>
       </header>
 
@@ -345,14 +350,14 @@ function Dashboard({ user }: { user: any }) {
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest actions and updates.</CardDescription>
+            <CardDescription>Your latest workspace activity.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Resource</TableHead>
+                  <TableHead>Activity</TableHead>
+                  <TableHead>Details</TableHead>
                   <TableHead>Time</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                 </TableRow>
@@ -380,7 +385,7 @@ function Dashboard({ user }: { user: any }) {
         {/* Preferences */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Preferences</CardTitle>
+            <CardTitle>Notification Preferences</CardTitle>
             <CardDescription>Manage your workspace notification settings.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -392,33 +397,11 @@ function Dashboard({ user }: { user: any }) {
               <>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="autoSync" className="text-sm font-medium">
-                      Auto Sync
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      Automatically sync documents across devices
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.autoSync ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.autoSync ? 'ON' : 'OFF'}
-                    </span>
-                    <Switch
-                      id="autoSync"
-                      checked={preferences.autoSync}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('auto_sync', checked)}
-                      disabled={isSaving}
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
                     <Label htmlFor="emailNotifications" className="text-sm font-medium">
                       Email Notifications
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive updates about shared documents and activity
+                      Receive email digests for activity in your workspace
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -436,21 +419,21 @@ function Dashboard({ user }: { user: any }) {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="securityAlerts" className="text-sm font-medium">
-                      Security Alerts
+                    <Label htmlFor="activityAlerts" className="text-sm font-medium">
+                      Activity Alerts
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Get notified of suspicious activity
+                      Real-time alerts for sign-ins and access changes
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.securityAlerts ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.securityAlerts ? 'ON' : 'OFF'}
+                    <span className={`text-xs font-medium ${preferences.activityAlerts ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.activityAlerts ? 'ON' : 'OFF'}
                     </span>
                     <Switch
-                      id="securityAlerts"
-                      checked={preferences.securityAlerts}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('security_alerts', checked)}
+                      id="activityAlerts"
+                      checked={preferences.activityAlerts}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('activity_alerts', checked)}
                       disabled={isSaving}
                     />
                   </div>
@@ -462,7 +445,7 @@ function Dashboard({ user }: { user: any }) {
                       Usage Reports
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive monthly workspace usage summaries
+                      Weekly summary of usage and security events
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
@@ -478,6 +461,28 @@ function Dashboard({ user }: { user: any }) {
                   </div>
                 </div>
 
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="apiWebhooks" className="text-sm font-medium">
+                      API Webhooks
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Forward workspace events to your endpoint
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs font-medium ${preferences.apiWebhooks ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.apiWebhooks ? 'ON' : 'OFF'}
+                    </span>
+                    <Switch
+                      id="apiWebhooks"
+                      checked={preferences.apiWebhooks}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('api_webhooks', checked)}
+                      disabled={isSaving}
+                    />
+                  </div>
+                </div>
+
                 {saveMessage && (
                   <Alert className={saveMessage.includes('success') ? 'border-green-500' : 'border-red-500'}>
                     <AlertDescription>{saveMessage}</AlertDescription>
@@ -486,7 +491,7 @@ function Dashboard({ user }: { user: any }) {
 
                 <div className="pt-4 border-t">
                   <p className="text-xs text-muted-foreground">
-                    Notification preferences are saved automatically.
+                    Preferences are saved automatically.
                   </p>
                 </div>
               </>

@@ -25,6 +25,8 @@ export interface McpTokenPayload {
   iat: number;
   scope?: string;
   permissions?: string[];
+  email?: string;
+  'https://test.app.com/email'?: string;
   [key: string]: unknown;
 }
 
@@ -36,11 +38,6 @@ export const TOOL_SCOPES: Record<string, string> = {
 };
 
 export function tokenHasScope(payload: McpTokenPayload, scope: string): boolean {
-  // RBAC-enabled APIs put granted permissions in `permissions`, not `scope`
-  const permissions = payload.permissions ?? [];
-  if (permissions.includes(scope)) return true;
-
-  // Fallback: check `scope` claim (non-RBAC APIs)
   const scopes = payload.scope?.split(' ') ?? [];
   return scopes.includes(scope);
 }
@@ -67,7 +64,7 @@ export async function validateMcpToken(authHeader: string | null, audience?: str
   const payload = jwt.verify(token, signingKey, {
     algorithms: ['RS256'],
     issuer: `https://${process.env.AUTH0_MGMT_DOMAIN}/`,
-    audience: audience ?? process.env.AUTH0_AUDIENCE,
+    audience: audience ?? process.env.AUTH0_MCP_AUDIENCE ?? process.env.AUTH0_AUDIENCE,
   }) as McpTokenPayload;
 
   return payload;

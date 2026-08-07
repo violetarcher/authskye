@@ -19,16 +19,25 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     console.log('📥 Received preference update:', body);
 
+    const ALLOWED_KEYS = ['refill_reminders', 'pickup_alerts', 'auto_refill', 'generic_substitution'];
+    const STALE_KEYS = ['auto_sync', 'email_notifications', 'security_alerts', 'usage_reports'];
+
+    const filtered = Object.fromEntries(
+      Object.entries(body).filter(([k]) => ALLOWED_KEYS.includes(k))
+    );
+
+    if (Object.keys(filtered).length === 0) {
+      return Response.json({ error: 'No valid preference keys provided' }, { status: 400 });
+    }
+
     // Get current user metadata
     const userDetails = await managementClient.users.get({ id: userId });
     const currentMetadata = userDetails.data.user_metadata || {};
     console.log('📋 Current metadata:', currentMetadata);
 
-    // Merge new preferences with existing metadata
-    const updatedMetadata = {
-      ...currentMetadata,
-      ...body,
-    };
+    // Merge new preferences, stripping stale keys
+    const updatedMetadata = { ...currentMetadata, ...filtered };
+    STALE_KEYS.forEach(k => delete updatedMetadata[k]);
     console.log('✅ Updated metadata:', updatedMetadata);
 
     // Update user_metadata in Auth0
