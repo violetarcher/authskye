@@ -56,7 +56,7 @@ export default function BillingPage() {
           Billing
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Submit and track payment requests
+          Place and track your bets
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export default function BillingPage() {
         {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">New Payment</CardTitle>
+            <CardTitle className="text-lg">Place a Bet</CardTitle>
             <CardDescription className="text-xs">
               Complete the form and authorize via mobile push notification
             </CardDescription>
@@ -87,14 +87,14 @@ export default function BillingPage() {
                   disabled={isClearing}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear All Transactions
+                  Clear Bet History
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Clear All Transactions?</DialogTitle>
+                  <DialogTitle>Clear Bet History?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All transactions in your account will be permanently deleted.
+                    This action cannot be undone. All bet records will be permanently deleted.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-2">
@@ -110,7 +110,7 @@ export default function BillingPage() {
                     onClick={handleClearAllTransactions}
                     disabled={isClearing}
                   >
-                    {isClearing ? 'Clearing...' : 'Clear All Transactions'}
+                    {isClearing ? 'Clearing...' : 'Clear Bet History'}
                   </Button>
                 </div>
               </DialogContent>

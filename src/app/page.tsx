@@ -23,21 +23,21 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import { AlertTriangle, Building2, Activity, Shield, Lock, Users, FileText } from "lucide-react"
+import { AlertTriangle, Building2, Activity, Shield, Lock, TrendingUp, Trophy } from "lucide-react"
 
 const kpiData = [
-  { title: "Active Users", value: "1,284", change: "+12% this month", icon: Users, color: "text-blue-600" },
-  { title: "Organizations", value: "48", change: "3 new this week", icon: Building2, color: "text-green-600" },
-  { title: "Documents Shared", value: "5.2k", change: "Last 30 days", icon: FileText, color: "text-purple-600" },
-  { title: "API Requests", value: "98.2k", change: "↑ 8% from last month", icon: Activity, color: "text-amber-500" },
+  { title: "Active Bets", value: "3", change: "$450 in action", icon: Activity, color: "text-green-600" },
+  { title: "Account Balance", value: "$2,450", change: "+$180 this week", icon: TrendingUp, color: "text-emerald-600" },
+  { title: "Win Rate", value: "58.3%", change: "Last 30 days", icon: Trophy, color: "text-amber-500" },
+  { title: "Live Lines", value: "247", change: "Across 12 sports", icon: Activity, color: "text-purple-600" },
 ];
 
 const recentActivity = [
-  { id: "EVT-001", action: "Document shared", resource: "Q3 Security Report — finance-team", status: "Completed", time: "2 min ago" },
-  { id: "EVT-002", action: "User invited", resource: "sarah@acme.com — Acme Corp", status: "Active", time: "1 hour ago" },
-  { id: "EVT-003", action: "Organization created", resource: "Globex Corp — Enterprise plan", status: "Pending", time: "Yesterday" },
-  { id: "EVT-004", action: "MFA enrolled", resource: "john.doe@acme.com — TOTP authenticator", status: "Completed", time: "2 days ago" },
-  { id: "EVT-005", action: "Role assigned", resource: "admin@globex.com — Admin", status: "Active", time: "3 days ago" },
+  { id: "BET-001", action: "Parlay settled — Won", resource: "NBA + NHL 3-leg — $340 payout", status: "Completed", time: "2 min ago" },
+  { id: "BET-002", action: "Bet placed", resource: "Chiefs -3.5 vs Raiders — $100", status: "Active", time: "1 hour ago" },
+  { id: "BET-003", action: "Deposit processed", resource: "$500 — Visa ending 4242", status: "Completed", time: "Yesterday" },
+  { id: "BET-004", action: "Bet graded — Push", resource: "Lakers -7.5 — stake returned", status: "Active", time: "2 days ago" },
+  { id: "BET-005", action: "Withdrawal requested", resource: "$250 — processing", status: "Pending", time: "3 days ago" },
 ];
 
 export default function HomePage() {
@@ -95,17 +95,17 @@ function WelcomePage() {
       <nav className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
-              <Shield className="h-4 w-4 text-white" />
+            <div className="w-8 h-8 rounded-md bg-gradient-to-br from-[#15803d] to-[#16a34a] flex items-center justify-center">
+              <Trophy className="h-4 w-4 text-white" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Authskye</span>
+            <span className="text-2xl font-bold text-gray-900">Sportsbook</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Features</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Pricing</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Docs</a>
-            <a href="#" className="text-gray-700 hover:text-primary font-medium">Enterprise</a>
-            <Button asChild variant="outline" className="border-primary text-primary hover:bg-blue-50">
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Sports</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Live Betting</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Parlays</a>
+            <a href="#" className="text-gray-700 hover:text-primary font-medium">Promotions</a>
+            <Button asChild variant="outline" className="border-primary text-primary hover:bg-green-50">
               <a href="/api/auth/login">Sign In</a>
             </Button>
           </div>
@@ -113,40 +113,40 @@ function WelcomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-blue-50 to-white">
+      <section className="bg-gradient-to-b from-green-50 to-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <div className="text-center">
-            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-blue-100 px-3 py-1 rounded-full mb-6">
-              Collaboration Platform
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-primary bg-green-100 px-3 py-1 rounded-full mb-6">
+              Sports Betting Platform
             </span>
             <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              The digital platform<br />for modern collaboration.
+              Your edge.<br />Every game.
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Authskye brings your team, partners, and customers together in one secure platform — with fine-grained access control, SSO, and real-time collaboration built in.
+              Sportsbook gives you real-time odds, smart parlays, and push-approval for every wager — built for serious bettors who demand security and speed.
             </p>
 
             {/* CTA Box */}
-            <Card className="max-w-xl mx-auto shadow-xl border-2 border-blue-100">
+            <Card className="max-w-xl mx-auto shadow-xl border-2 border-green-100">
               <CardContent className="pt-8 pb-8">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                  Access your workspace
+                  Access your account
                 </h3>
                 <div className="space-y-3">
                   <Button asChild size="lg" className="w-full h-14 text-lg">
                     <a href="/api/auth/login">
-                      Sign In to Authskye
+                      Sign In to Sportsbook
                     </a>
                   </Button>
                   <Button asChild size="lg" variant="outline" className="w-full h-14 text-lg border-2">
                     <Link href="/organizations/signup">
                       <Building2 className="mr-2 h-5 w-5" />
-                      Create an Organization
+                      Open an Account
                     </Link>
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-4">
-                  SOC 2 Type II certified. GDPR &amp; CCPA compliant.
+                  Must be 21+. Gambling problem? Call 1-800-GAMBLER.
                 </p>
               </CardContent>
             </Card>
@@ -159,25 +159,25 @@ function WelcomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                <Shield className="h-6 w-6 text-primary" />
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                <Activity className="h-6 w-6 text-primary" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Enterprise-Grade Security</h4>
-              <p className="text-sm text-gray-600">End-to-end encryption, audit trails, and push-based approval for sensitive operations</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Live Odds &amp; Lines</h4>
+              <p className="text-sm text-gray-600">Real-time lines across NFL, NBA, MLB, NHL, and 8 more sports — updated as the action happens</p>
             </div>
             <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                <Building2 className="h-6 w-6 text-green-600" />
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                <Shield className="h-6 w-6 text-emerald-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Multi-Tenant Organizations</h4>
-              <p className="text-sm text-gray-600">Manage users, roles, and SSO across every organization from a single control plane</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Secure Deposits &amp; Payouts</h4>
+              <p className="text-sm text-gray-600">Push-approval for every wager, instant deposits, and fast withdrawals with full audit trails</p>
             </div>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
                 <Lock className="h-6 w-6 text-purple-600" />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-1">Fine-Grained Access Control</h4>
-              <p className="text-sm text-gray-600">Relationship-based permissions with Auth0 FGA — beyond roles, down to the resource level</p>
+              <h4 className="font-semibold text-gray-900 mb-1">Responsible Gaming</h4>
+              <p className="text-sm text-gray-600">Deposit limits, self-exclusion, and spend tracking — your account, your rules</p>
             </div>
           </div>
         </div>
@@ -189,13 +189,13 @@ function WelcomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] flex items-center justify-center">
-                  <Shield className="h-3 w-3 text-white" />
+                <div className="w-6 h-6 rounded bg-gradient-to-br from-[#15803d] to-[#16a34a] flex items-center justify-center">
+                  <Trophy className="h-3 w-3 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">Authskye</span>
+                <span className="text-xl font-bold text-white">Sportsbook</span>
               </div>
               <p className="text-sm">
-                Identity-first platform for modern B2B SaaS.
+                Your edge. Every game.
               </p>
             </div>
             <div>
@@ -207,24 +207,24 @@ function WelcomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Solutions</h4>
+              <h4 className="text-white font-semibold mb-4">Betting</h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">B2B SaaS</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Enterprise</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Developers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Sports</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Live Betting</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Parlays</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
                 <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Responsible Gaming</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2026 Authskye. All rights reserved.</p>
+            <p>&copy; 2026 Sportsbook. All rights reserved. Must be 21+. Please play responsibly.</p>
           </div>
         </div>
       </footer>
@@ -238,10 +238,10 @@ function Dashboard({ user }: { user: any }) {
   const [isLoading, setIsLoading] = useState(true);
 
   const [preferences, setPreferences] = useState({
-    emailNotifications: false,
-    activityAlerts: false,
-    usageReports: false,
-    apiWebhooks: false,
+    betConfirmations: false,
+    winLossAlerts: false,
+    promotionalOffers: false,
+    responsibleGaming: false,
   });
 
   const fetchMetadata = async () => {
@@ -252,10 +252,10 @@ function Dashboard({ user }: { user: any }) {
         const metadata = data.user_metadata || {};
 
         setPreferences({
-          emailNotifications: metadata.email_notifications === true,
-          activityAlerts: metadata.activity_alerts === true,
-          usageReports: metadata.usage_reports === true,
-          apiWebhooks: metadata.api_webhooks === true,
+          betConfirmations: metadata.bet_confirmations === true,
+          winLossAlerts: metadata.win_loss_alerts === true,
+          promotionalOffers: metadata.promotional_offers === true,
+          responsibleGaming: metadata.responsible_gaming === true,
         });
       }
     } catch (error) {
@@ -271,10 +271,10 @@ function Dashboard({ user }: { user: any }) {
 
   const handlePreferenceChange = async (key: string, value: boolean) => {
     const keyMap: { [key: string]: keyof typeof preferences } = {
-      'email_notifications': 'emailNotifications',
-      'activity_alerts': 'activityAlerts',
-      'usage_reports': 'usageReports',
-      'api_webhooks': 'apiWebhooks',
+      'bet_confirmations': 'betConfirmations',
+      'win_loss_alerts': 'winLossAlerts',
+      'promotional_offers': 'promotionalOffers',
+      'responsible_gaming': 'responsibleGaming',
     };
 
     const frontendKey = keyMap[key];
@@ -324,7 +324,7 @@ function Dashboard({ user }: { user: any }) {
       <header>
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user.name || user.email}! Here's a summary of your workspace.
+          Welcome back, {user.name || user.email}! Here's your betting summary.
         </p>
       </header>
 
@@ -350,7 +350,7 @@ function Dashboard({ user }: { user: any }) {
         <Card className="lg:col-span-4">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest workspace activity.</CardDescription>
+            <CardDescription>Your latest bets and account activity.</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -385,8 +385,8 @@ function Dashboard({ user }: { user: any }) {
         {/* Preferences */}
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Notification Preferences</CardTitle>
-            <CardDescription>Manage your workspace notification settings.</CardDescription>
+            <CardTitle>Betting Preferences</CardTitle>
+            <CardDescription>Manage your account and notification settings.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {isLoading ? (
@@ -397,21 +397,21 @@ function Dashboard({ user }: { user: any }) {
               <>
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="emailNotifications" className="text-sm font-medium">
-                      Email Notifications
+                    <Label htmlFor="betConfirmations" className="text-sm font-medium">
+                      Bet Confirmations
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Receive email digests for activity in your workspace
+                      Receive confirmation for every bet placed
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.emailNotifications ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.emailNotifications ? 'ON' : 'OFF'}
+                    <span className={`text-xs font-medium ${preferences.betConfirmations ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.betConfirmations ? 'ON' : 'OFF'}
                     </span>
                     <Switch
-                      id="emailNotifications"
-                      checked={preferences.emailNotifications}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('email_notifications', checked)}
+                      id="betConfirmations"
+                      checked={preferences.betConfirmations}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('bet_confirmations', checked)}
                       disabled={isSaving}
                     />
                   </div>
@@ -419,21 +419,21 @@ function Dashboard({ user }: { user: any }) {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="activityAlerts" className="text-sm font-medium">
-                      Activity Alerts
+                    <Label htmlFor="winLossAlerts" className="text-sm font-medium">
+                      Win / Loss Alerts
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Real-time alerts for sign-ins and access changes
+                      Get notified when bets are graded
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.activityAlerts ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.activityAlerts ? 'ON' : 'OFF'}
+                    <span className={`text-xs font-medium ${preferences.winLossAlerts ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.winLossAlerts ? 'ON' : 'OFF'}
                     </span>
                     <Switch
-                      id="activityAlerts"
-                      checked={preferences.activityAlerts}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('activity_alerts', checked)}
+                      id="winLossAlerts"
+                      checked={preferences.winLossAlerts}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('win_loss_alerts', checked)}
                       disabled={isSaving}
                     />
                   </div>
@@ -441,21 +441,21 @@ function Dashboard({ user }: { user: any }) {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="usageReports" className="text-sm font-medium">
-                      Usage Reports
+                    <Label htmlFor="promotionalOffers" className="text-sm font-medium">
+                      Promotional Offers
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Weekly summary of usage and security events
+                      Odds boosts, free bets, and deposit bonuses
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.usageReports ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.usageReports ? 'ON' : 'OFF'}
+                    <span className={`text-xs font-medium ${preferences.promotionalOffers ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.promotionalOffers ? 'ON' : 'OFF'}
                     </span>
                     <Switch
-                      id="usageReports"
-                      checked={preferences.usageReports}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('usage_reports', checked)}
+                      id="promotionalOffers"
+                      checked={preferences.promotionalOffers}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('promotional_offers', checked)}
                       disabled={isSaving}
                     />
                   </div>
@@ -463,21 +463,21 @@ function Dashboard({ user }: { user: any }) {
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label htmlFor="apiWebhooks" className="text-sm font-medium">
-                      API Webhooks
+                    <Label htmlFor="responsibleGaming" className="text-sm font-medium">
+                      Responsible Gaming Reminders
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Forward workspace events to your endpoint
+                      Weekly spend summaries and limit reminders
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`text-xs font-medium ${preferences.apiWebhooks ? 'text-primary' : 'text-gray-400'}`}>
-                      {preferences.apiWebhooks ? 'ON' : 'OFF'}
+                    <span className={`text-xs font-medium ${preferences.responsibleGaming ? 'text-primary' : 'text-gray-400'}`}>
+                      {preferences.responsibleGaming ? 'ON' : 'OFF'}
                     </span>
                     <Switch
-                      id="apiWebhooks"
-                      checked={preferences.apiWebhooks}
-                      onCheckedChange={(checked: boolean) => handlePreferenceChange('api_webhooks', checked)}
+                      id="responsibleGaming"
+                      checked={preferences.responsibleGaming}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('responsible_gaming', checked)}
                       disabled={isSaving}
                     />
                   </div>

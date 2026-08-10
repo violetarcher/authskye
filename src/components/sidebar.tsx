@@ -14,7 +14,7 @@ export async function Sidebar() {
 
   const orgName = user?.[getClaimKey('org_name')] || '';
   const orgLogo = user?.[getClaimKey('org_logo')];
-  const companyName = orgName ? `Authskye | ${orgName}` : 'Authskye';
+  const companyName = orgName ? `Sportsbook | ${orgName}` : 'Sportsbook';
 
   return (
     <aside className="hidden w-64 flex-col border-r bg-background p-4 md:flex">
@@ -28,7 +28,7 @@ export async function Sidebar() {
             className="rounded-md"
           />
         ) : (
-          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br from-[#1d4ed8] to-[#3b82f6] text-white">
+          <div className="flex items-center justify-center w-8 h-8 rounded-md bg-gradient-to-br from-[#15803d] to-[#16a34a] text-white">
             <Shield className="h-4 w-4" />
           </div>
         )}

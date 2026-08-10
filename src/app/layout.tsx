@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'Authskye',
-  description: 'The digital platform for modern collaboration',
+  title: 'Sportsbook',
+  description: 'Your edge. Every game.',
 };
 
 export const viewport = {
-  themeColor: '#3b82f6',
+  themeColor: '#16a34a',
 };
 
 export default function RootLayout({

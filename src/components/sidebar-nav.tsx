@@ -1,4 +1,4 @@
-// src/components/sidebar-nav.tsx - Authskye Navigation
+// src/components/sidebar-nav.tsx - Sportsbook Navigation
 'use client';
 
 import Link from 'next/link';

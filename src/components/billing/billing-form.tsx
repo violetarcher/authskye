@@ -53,33 +53,33 @@ interface CIBAStatus {
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'Professional Services — Q3 2026',
+    itemName: 'NBA Parlay — Lakers/Celtics/Heat',
     invoiceNumber: 'RX-2024-8821',
-    billingCycle: 'Monthly',
+    billingCycle: 'Parlay',
     amount: '15.00',
-    description: 'Monthly subscription — Professional tier. Auto-renew enabled.',
+    description: '3-leg parlay. All three teams must cover spread.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'Platform License — Enterprise',
+    itemName: 'NFL Moneyline — Chiefs vs Raiders',
     invoiceNumber: 'RX-2024-4417',
-    billingCycle: 'Monthly',
+    billingCycle: 'Parlay',
     amount: '25.00',
-    description: 'Annual enterprise license renewal. Includes SSO and SCIM add-ons.',
+    description: 'Chiefs moneyline -150. Single game straight bet.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'Consulting Services — August',
+    itemName: 'Player Prop — LeBron Over 27.5 pts',
     invoiceNumber: 'RX-2024-6032',
     billingCycle: 'New',
     amount: '10.00',
-    description: 'Implementation consulting. Project: Auth0 FGA integration.',
+    description: 'Player prop bet. LeBron James points over/under.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
@@ -144,7 +144,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve payment requests via push notification.',
+      description: 'You can now approve bet requests via push notification.',
     });
   };
 
@@ -326,7 +326,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email transaction:pay',
-          binding_message: `Approve Payment: ${formData.amount} USD`,
+          binding_message: `Approve Bet: ${formData.amount} USD`,
         }),
       });
 
@@ -355,9 +355,9 @@ startxref
           authorization_details: [{
             type: 'payment_initiation',
             instructedAmount: { amount: Math.round(parseFloat(formData.amount) * 100), currency: 'USD' },
-            creditorName: 'Authskye',
+            creditorName: 'Sportsbook',
             creditorAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
-            remittanceInformationUnstructured: `Invoice ${formData.invoiceNumber}`,
+            remittanceInformationUnstructured: `Bet ${formData.invoiceNumber}`,
           }],
           access_token: pollResult.access_token,
           expires_in: pollResult.expires_in,
@@ -475,8 +475,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Payment authorization required', {
-        description: 'Please authorize the payment via Guardian app on your mobile device',
+      toast.info('Bet authorization required', {
+        description: 'Please authorize the bet via Guardian app on your mobile device',
       });
 
       const cibaResult = await initiateCIBA();
@@ -486,7 +486,7 @@ startxref
         return;
       }
 
-      // Step 2: Submit payment using CIBA access token as Bearer auth
+      // Step 2: Submit bet using CIBA access token as Bearer auth
       const formDataToSend = new FormData();
       formDataToSend.append('serviceDate', formData.paymentDate);
       formDataToSend.append('providerName', formData.itemName);
@@ -513,8 +513,8 @@ startxref
 
       const result = await response.json();
 
-      toast.success('Payment submitted!', {
-        description: `Transaction ID: ${result.claimId}`,
+      toast.success('Bet placed!', {
+        description: `Bet ID: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -539,7 +539,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit payment',
+        description: error.message || 'Failed to place bet',
       });
     } finally {
       setLoading(false);
@@ -568,7 +568,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Push approval not set up — required for payment submission
+              Push approval not set up — required for bet submission
             </span>
           </div>
           <Button
@@ -587,7 +587,7 @@ startxref
         <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Push approval ready — payment submission enabled
+            Push approval ready — bet submission enabled
           </span>
         </div>
       )}
@@ -612,9 +612,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
-            {cibaStatus.status === 'denied' && 'Payment denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for bet approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Placing bet...'}
+            {cibaStatus.status === 'denied' && 'Bet denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -741,7 +741,7 @@ startxref
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="Professional Services"
+            placeholder="NBA Parlay — Lakers/Heat"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -750,7 +750,7 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="invoiceNumber" className="text-xs">Invoice Number</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">Bet ID</Label>
             <Input
               id="invoiceNumber"
               name="invoiceNumber"
@@ -762,12 +762,12 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Plan Type</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Bet Type</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Monthly / Annual / One-time"
+              placeholder="Parlay / Moneyline / Prop"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -817,7 +817,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Payment Details (Push approval required)
+            Bet Details (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -880,7 +880,7 @@ startxref
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Submit Payment
+              Place Bet
             </>
           )}
         </Button>

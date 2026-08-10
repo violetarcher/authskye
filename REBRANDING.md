@@ -28,6 +28,32 @@ When reverting to default, the app should look like this:
 
 ---
 
+## Sportsbook Theme
+
+| Property | Value |
+|----------|-------|
+| Brand name | Sportsbook |
+| Tagline | "Your edge. Every game." |
+| Platform type | Sports betting platform |
+| Primary color | `#16a34a` (green) |
+| Gradient | `from-[#15803d] to-[#16a34a]` |
+| Icon | Trophy (lucide `Trophy`) |
+| Namespace | `https://authskye.com` |
+| Theme color (viewport) | `#16a34a` |
+
+### Sportsbook content
+
+- **KPI cards:** Active Bets, Account Balance, Win Rate, Live Lines
+- **Activity feed:** parlay settlements, bets placed, deposits, bet grades, withdrawals
+- **Preferences:** Bet Confirmations, Win/Loss Alerts, Promotional Offers, Responsible Gaming Reminders
+- **Billing demo items:** NBA Parlay, NFL Moneyline, Player Prop; CIBA binding message "Approve Bet: X USD"
+- **Billing labels:** Bet ID, Bet Type, Bet Details, Place Bet button
+- **Trust indicators:** Live Odds & Lines, Secure Deposits & Payouts, Responsible Gaming
+- **Footer:** Betting (Sports/Live Betting/Parlays), Company (About/Responsible Gaming/Privacy)
+- **Footer disclaimer:** Must be 21+. Please play responsibly.
+
+---
+
 ## Quick Reference
 
 When rebranding, you need to update:
