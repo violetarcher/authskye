@@ -226,6 +226,9 @@ Update demo data scenarios (`demoScenarios` array):
   - Amount label (line ~717): e.g. "Copay Amount" / "Deposit Amount"
   - Upload label (line ~793): e.g. "Insurance Card / Prescription" / "Supporting Document" / "Bank Statement"
   - Payment details section header (line ~820): e.g. "Insurance Information" / "Bank Details"
+  - Routing/Payer ID label (line ~825): e.g. "Payer ID" / "Routing Number"
+  - Account/Member ID label (line ~839): e.g. "Member ID" / "Account Number"
+  - Confirm account label (line ~853): e.g. "Confirm Member ID" / "Confirm Account Number"
 - Status/info panel colors (teal → primary, etc.)
 
 ### `src/components/billing/transactions-list.tsx`
@@ -246,6 +249,10 @@ Update:
 - Page subtitle
 - Card title ("New Payment" → domain equivalent)
 - Clear dialog title, description, and button label
+
+### ⚠️ Do NOT change Firestore collection names during a rebrand
+
+The three billing API routes (`submit`, `list`, `clear`) all use the Firestore collection `transactions`. This name is intentionally neutral and must stay consistent across all three files. Renaming it in one route without updating the others will silently break the deposit/transaction history — submissions will write to one collection while the list reads from another.
 
 ---
 

@@ -38,7 +38,7 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
 
     // Query claims for this user (simplified to avoid composite index requirement)
     const claimsSnapshot = await db
-      .collection('claims')
+      .collection('transactions')
       .where('userId', '==', user.sub)
       .limit(50)
       .get();

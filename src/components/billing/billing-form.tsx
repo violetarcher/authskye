@@ -781,7 +781,7 @@ startxref
             id="description"
             name="description"
             className="text-sm"
-            placeholder="Additional notes or prescriber instructions..."
+            placeholder="Additional notes..."
             rows={2}
             value={formData.description}
             onChange={handleInputChange}
@@ -822,7 +822,7 @@ startxref
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="routingNumber" className="text-xs">Payer ID *</Label>
+              <Label htmlFor="routingNumber" className="text-xs">Routing Number *</Label>
               <Input
                 id="routingNumber"
                 name="routingNumber"
@@ -836,13 +836,13 @@ startxref
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="accountNumber" className="text-xs">Member ID *</Label>
+              <Label htmlFor="accountNumber" className="text-xs">Account Number *</Label>
               <Input
                 id="accountNumber"
                 name="accountNumber"
                 type="text"
                 className="h-8 text-sm"
-                placeholder="Member ID"
+                placeholder="Account Number"
                 value={formData.accountNumber}
                 onChange={handleInputChange}
                 required
@@ -850,7 +850,7 @@ startxref
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="accountNumberConfirm" className="text-xs">Confirm Member ID *</Label>
+            <Label htmlFor="accountNumberConfirm" className="text-xs">Confirm Account Number *</Label>
             <Input
               id="accountNumberConfirm"
               name="accountNumberConfirm"

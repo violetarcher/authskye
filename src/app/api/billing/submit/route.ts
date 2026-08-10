@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     console.log('💾 Storing deposit in Firestore...');
 
-    const depositRef = await db.collection('deposits').add(depositData);
+    const depositRef = await db.collection('transactions').add(depositData);
 
     console.log('✅ Deposit submitted successfully:', depositRef.id);
 
