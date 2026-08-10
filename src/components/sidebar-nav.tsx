@@ -65,7 +65,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
       >
         <Link href="/billing">
           <CreditCard className="mr-2 h-4 w-4" />
-          Billing
+          Deposits
         </Link>
       </Button>
 

@@ -216,11 +216,11 @@ BT
 100 630 Td
 (Patient: ${user?.name || 'Demo Patient'}) Tj
 100 610 Td
-(Prescription Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
+(Transfer Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
 100 590 Td
-(Plan Type: ${demoData.billingCycle}) Tj
+(Transfer Type: ${demoData.billingCycle}) Tj
 100 570 Td
-(Copay: $${demoData.amount}) Tj
+(Amount: $${demoData.amount}) Tj
 ET
 endstream
 endobj
@@ -492,12 +492,13 @@ startxref
       formDataToSend.append('providerName', formData.itemName);
       formDataToSend.append('providerNPI', formData.invoiceNumber);
       formDataToSend.append('diagnosisCode', formData.billingCycle);
+      // field names kept for API compat; semantic meaning is deposit metadata
       formDataToSend.append('claimAmount', formData.amount);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('routingNumber', formData.routingNumber);
       formDataToSend.append('accountNumber', formData.accountNumber);
       if (receiptFile) {
-        formDataToSend.append('superbill', receiptFile);
+        formDataToSend.append('superbill', receiptFile); // field name kept for API compat
       }
 
       const response = await fetch('/api/billing/submit', {
