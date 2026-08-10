@@ -218,7 +218,14 @@ Update demo data scenarios (`demoScenarios` array):
 - `creditorName` value
 - Toast messages referencing brand or domain terms
 - Button label ("Submit Payment" → domain equivalent)
-- Field labels ("Invoice Number", "Plan Type", "Supporting Document")
+- **Visible field labels** — these are easy to miss and MUST be updated:
+  - Date field label (line ~706): e.g. "Prescription Date" / "Transfer Date"
+  - Description field label (line ~739): e.g. "Medication Name" / "Transfer Description"
+  - Invoice/reference number label (line ~754): e.g. "Rx Number" / "Reference Number" / "Bet ID"
+  - Billing cycle/type label (line ~765): e.g. "Refill Type" / "Plan Type" / "Bet Type" / "Transfer Type"
+  - Amount label (line ~717): e.g. "Copay Amount" / "Deposit Amount"
+  - Upload label (line ~793): e.g. "Insurance Card / Prescription" / "Supporting Document" / "Bank Statement"
+  - Payment details section header (line ~820): e.g. "Insurance Information" / "Bank Details"
 - Status/info panel colors (teal → primary, etc.)
 
 ### `src/components/billing/transactions-list.tsx`
