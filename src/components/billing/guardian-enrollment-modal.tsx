@@ -114,7 +114,7 @@ export function GuardianEnrollmentModal({
             Set Up Guardian Push
           </DialogTitle>
           <DialogDescription>
-            Enable push notifications to authorize bet requests securely from your phone.
+            Enable push notifications to authorize large deposit requests securely from your phone.
           </DialogDescription>
         </DialogHeader>
 

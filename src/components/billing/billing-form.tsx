@@ -53,44 +53,44 @@ interface CIBAStatus {
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'NBA Parlay — Lakers/Celtics/Heat',
-    invoiceNumber: 'RX-2024-8821',
-    billingCycle: 'Parlay',
-    amount: '15.00',
-    description: '3-leg parlay. All three teams must cover spread.',
+    itemName: 'Bank Transfer — Chase Checking',
+    invoiceNumber: 'DEP-2026-8821',
+    billingCycle: 'Bank Transfer',
+    amount: '15000.00',
+    description: 'Large deposit requiring step-up verification. Funds available after approval.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'NFL Moneyline — Chiefs vs Raiders',
-    invoiceNumber: 'RX-2024-4417',
-    billingCycle: 'Parlay',
-    amount: '25.00',
-    description: 'Chiefs moneyline -150. Single game straight bet.',
+    itemName: 'Wire Transfer — Wells Fargo',
+    invoiceNumber: 'DEP-2026-4417',
+    billingCycle: 'Bank Transfer',
+    amount: '5000.00',
+    description: 'Domestic wire transfer. Typically clears within 1 business day.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'Player Prop — LeBron Over 27.5 pts',
-    invoiceNumber: 'RX-2024-6032',
-    billingCycle: 'New',
-    amount: '10.00',
-    description: 'Player prop bet. LeBron James points over/under.',
+    itemName: 'ACH Transfer — Bank of America',
+    invoiceNumber: 'DEP-2026-6032',
+    billingCycle: 'ACH',
+    amount: '2500.00',
+    description: 'ACH bank transfer. 1-3 business days to process.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
     paymentDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
-    itemName: 'Amoxicillin 500mg — 10-day course',
-    invoiceNumber: 'RX-2024-9154',
-    billingCycle: 'Emergency',
-    amount: '8.00',
-    description: '10-day antibiotic course. Prescriber: Dr. Michael Torres.',
+    itemName: 'Crypto Deposit — USDC',
+    invoiceNumber: 'DEP-2026-9154',
+    billingCycle: 'Crypto',
+    amount: '1000.00',
+    description: 'Stablecoin deposit via supported wallet. Instant confirmation.',
     routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
@@ -144,7 +144,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve bet requests via push notification.',
+      description: "You can now approve large deposit requests via push notification."',
     });
   };
 
@@ -284,8 +284,8 @@ startxref
     }
 
     if (!receiptFile) {
-      toast.error('Invoice/receipt required', {
-        description: 'Please upload the invoice or receipt (PDF)',
+      toast.error('Bank statement required', {
+        description: 'Please upload a bank statement or void cheque (PDF)',
       });
       return false;
     }
@@ -326,7 +326,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email transaction:pay',
-          binding_message: `Approve Bet: ${formData.amount} USD`,
+          binding_message: `Approve Deposit: ${formData.amount} USD`,
         }),
       });
 
@@ -357,7 +357,7 @@ startxref
             instructedAmount: { amount: Math.round(parseFloat(formData.amount) * 100), currency: 'USD' },
             creditorName: 'Sportsbook',
             creditorAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
-            remittanceInformationUnstructured: `Bet ${formData.invoiceNumber}`,
+            remittanceInformationUnstructured: `Deposit ${formData.invoiceNumber}`,
           }],
           access_token: pollResult.access_token,
           expires_in: pollResult.expires_in,
@@ -475,8 +475,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Bet authorization required', {
-        description: 'Please authorize the bet via Guardian app on your mobile device',
+      toast.info('Deposit authorization required', {
+        description: 'Please authorize this deposit via Guardian app on your mobile device',
       });
 
       const cibaResult = await initiateCIBA();
@@ -486,7 +486,7 @@ startxref
         return;
       }
 
-      // Step 2: Submit bet using CIBA access token as Bearer auth
+      // Step 2: Submit deposit using CIBA access token as Bearer auth
       const formDataToSend = new FormData();
       formDataToSend.append('serviceDate', formData.paymentDate);
       formDataToSend.append('providerName', formData.itemName);
@@ -513,8 +513,8 @@ startxref
 
       const result = await response.json();
 
-      toast.success('Bet placed!', {
-        description: `Bet ID: ${result.claimId}`,
+      toast.success('Deposit submitted!', {
+        description: `Deposit ID: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -539,7 +539,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to place bet',
+        description: error.message || 'Failed to submit deposit',
       });
     } finally {
       setLoading(false);
@@ -568,7 +568,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Push approval not set up — required for bet submission
+              Push approval not set up — required for deposits over $10,000
             </span>
           </div>
           <Button
@@ -587,7 +587,7 @@ startxref
         <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Push approval ready — bet submission enabled
+            Push approval ready — large deposits enabled
           </span>
         </div>
       )}
@@ -612,9 +612,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for bet approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Placing bet...'}
-            {cibaStatus.status === 'denied' && 'Bet denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for deposit approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting deposit...'}
+            {cibaStatus.status === 'denied' && 'Deposit denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -714,7 +714,7 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="amount" className="text-xs">Copay Amount *</Label>
+            <Label htmlFor="amount" className="text-xs">Deposit Amount ($) *</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
               <Input
@@ -741,7 +741,7 @@ startxref
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="NBA Parlay — Lakers/Heat"
+            placeholder="Wire Transfer — Chase"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -750,7 +750,7 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="invoiceNumber" className="text-xs">Bet ID</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">Reference Number</Label>
             <Input
               id="invoiceNumber"
               name="invoiceNumber"
@@ -762,12 +762,12 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Bet Type</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Transfer Type</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Parlay / Moneyline / Prop"
+              placeholder="Wire / ACH / Bank Transfer"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -817,7 +817,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Bet Details (Push approval required)
+            Bank Details (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -880,7 +880,7 @@ startxref
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Place Bet
+              Submit Deposit
             </>
           )}
         </Button>

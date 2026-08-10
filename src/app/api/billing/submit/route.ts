@@ -4,23 +4,19 @@ import { db } from '@/lib/firebase-admin';
 import { validateMcpToken, tokenHasScope } from '@/lib/mcp-token-validator';
 
 /**
- * POST /api/claims/submit
+ * POST /api/billing/submit
  *
- * Submits an out-of-network claim for reimbursement.
- * This endpoint stores sensitive medical and financial data.
- *
- * Note: This endpoint should only be called after CIBA authentication has been approved.
+ * Submits a deposit request. Transfers require CIBA approval before processing.
  *
  * Request Body (FormData):
- * - serviceDate: string
- * - providerName: string
- * - providerNPI: string (optional)
- * - diagnosisCode: string (optional)
- * - claimAmount: number
+ * - transferDate: string
+ * - transferDescription: string
+ * - transferType: string (Wire / ACH / Bank Transfer)
+ * - depositAmount: number
  * - description: string (optional)
- * - routingNumber: string (encrypted)
- * - accountNumber: string (encrypted)
- * - superbill: File (PDF)
+ * - routingNumber: string
+ * - accountNumber: string
+ * - bankStatement: File (PDF, optional)
  *
  * Returns:
  * {
@@ -51,95 +47,75 @@ export async function POST(request: NextRequest) {
 
     const userId = tokenPayload.sub;
 
-    // Use session org_id for data storage — CIBA token audience is different and won't carry it
     const session = await getSession();
     const orgId = session?.user?.org_id || 'default-org';
 
-    console.log('📋 Receiving claim submission for user:', userId);
+    console.log('💰 Receiving deposit submission for user:', userId);
 
-    // Parse form data
     const formData = await request.formData();
 
-    const serviceDate = formData.get('serviceDate') as string;
-    const providerName = formData.get('providerName') as string;
-    const providerNPI = formData.get('providerNPI') as string;
-    const diagnosisCode = formData.get('diagnosisCode') as string;
-    const claimAmount = parseFloat(formData.get('claimAmount') as string);
+    const transferDate = formData.get('serviceDate') as string;
+    const transferDescription = formData.get('providerName') as string;
+    const transferType = formData.get('diagnosisCode') as string;
+    const depositAmount = parseFloat(formData.get('claimAmount') as string);
     const description = formData.get('description') as string;
     const routingNumber = formData.get('routingNumber') as string;
     const accountNumber = formData.get('accountNumber') as string;
-    const superbillFile = formData.get('superbill') as File;
+    const bankStatementFile = formData.get('superbill') as File | null;
 
-    // Validate required fields
-    if (!serviceDate || !providerName || !claimAmount || !routingNumber || !accountNumber) {
+    if (!transferDate || !transferDescription || !depositAmount || !routingNumber || !accountNumber) {
       return NextResponse.json(
         { error: 'Missing required fields', message: 'Please provide all required information' },
         { status: 400 }
       );
     }
 
-    if (!superbillFile) {
-      return NextResponse.json(
-        { error: 'Missing superbill', message: 'Please upload your superbill document' },
-        { status: 400 }
-      );
-    }
-
-    // In a real application, you would:
-    // 1. Upload superbill to secure storage (e.g., Firebase Storage with encryption)
-    // 2. Encrypt bank account information
-    // 3. Store claim in database with proper access controls
-
-    // For demo purposes, we'll store basic claim data
-    const claimData = {
+    const depositData = {
       userId,
       organizationId: orgId,
-      serviceDate,
-      providerName,
-      providerNPI: providerNPI || null,
-      diagnosisCode: diagnosisCode || null,
-      claimAmount,
+      transferDate,
+      transferDescription,
+      transferType: transferType || null,
+      depositAmount,
       description: description || null,
-      // In production: Store encrypted bank info or reference to secure vault
       bankInfo: {
         routingNumberLast4: routingNumber.slice(-4),
         accountNumberLast4: accountNumber.slice(-4),
-        // DO NOT store full account numbers in production without encryption!
       },
-      superbillInfo: {
-        fileName: superbillFile.name,
-        fileSize: superbillFile.size,
-        fileType: superbillFile.type,
-        // In production: Store reference to encrypted file in secure storage
-      },
+      ...(bankStatementFile && {
+        bankStatementInfo: {
+          fileName: bankStatementFile.name,
+          fileSize: bankStatementFile.size,
+          fileType: bankStatementFile.type,
+        },
+      }),
       status: 'pending',
       submittedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    console.log('💾 Storing claim in Firestore...');
+    console.log('💾 Storing deposit in Firestore...');
 
-    // Store claim in Firestore
-    const claimRef = await db.collection('claims').add(claimData);
+    const depositRef = await db.collection('deposits').add(depositData);
 
-    console.log('✅ Claim submitted successfully:', claimRef.id);
+    console.log('✅ Deposit submitted successfully:', depositRef.id);
 
     return NextResponse.json(
       {
         success: true,
-        claimId: claimRef.id,
-        submittedAt: claimData.submittedAt,
-        message: 'Claim submitted successfully',
+        claimId: depositRef.id,
+        submittedAt: depositData.submittedAt,
+        message: 'Deposit submitted successfully',
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('❌ Failed to submit claim:', error);
+    console.error('❌ Failed to submit deposit:', error);
 
     return NextResponse.json(
       {
-        error: 'Failed to submit claim',
+        error: 'Failed to submit deposit',
         message: error.message || 'An unexpected error occurred',
       },
       { status: 500 }
