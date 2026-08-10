@@ -703,7 +703,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="paymentDate" className="text-xs">Prescription Date *</Label>
+            <Label htmlFor="paymentDate" className="text-xs">Transfer Date *</Label>
             <Input
               id="paymentDate"
               name="paymentDate"
@@ -736,7 +736,7 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="itemName" className="text-xs flex items-center gap-1">
             <Package className="w-3 h-3" />
-            Medication Name *
+            Transfer Description *
           </Label>
           <Input
             id="itemName"
