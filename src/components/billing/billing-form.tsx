@@ -144,7 +144,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: "You can now approve large deposit requests via push notification."',
+      description: 'You can now approve large deposit requests via push notification.',
     });
   };
 
