@@ -8,9 +8,9 @@ import { Loader2, DollarSign, Calendar, FileText, Eye, CreditCard, Receipt } fro
 
 interface Transaction {
   id: string;
-  serviceDate: string;
-  providerName: string;
-  claimAmount: number;
+  transferDate: string;
+  transferDescription: string;
+  depositAmount: number;
   status: 'pending' | 'approved' | 'denied' | 'processing';
   submittedAt: string;
   description?: string;
@@ -136,7 +136,7 @@ export function TransactionsList({ userId }: TransactionsListProps) {
               <div className="flex-1">
                 <p className="text-sm font-medium flex items-center gap-1">
                   <CreditCard className="w-3 h-3 text-primary" />
-                  {txn.providerName}
+                  {txn.transferDescription}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   #{txn.id.substring(0, 8).toUpperCase()}
@@ -148,11 +148,11 @@ export function TransactionsList({ userId }: TransactionsListProps) {
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div>
                 <p className="text-muted-foreground">Date</p>
-                <p className="font-medium">{new Date(txn.serviceDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                <p className="font-medium">{new Date(txn.transferDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Amount</p>
-                <p className="font-medium">${txn.claimAmount.toFixed(2)}</p>
+                <p className="font-medium">${(txn.depositAmount ?? 0).toFixed(2)}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Submitted</p>
