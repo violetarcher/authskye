@@ -250,6 +250,12 @@ Update:
 - Card title ("New Payment" → domain equivalent)
 - Clear dialog title, description, and button label
 
+### ⚠️ Update `ALLOWED_KEYS` in the preferences API route
+
+`src/app/api/user/preferences/route.ts` has a hardcoded `ALLOWED_KEYS` allowlist. If the dashboard preference toggles change keys, this route must be updated too — otherwise every toggle silently returns `400 No valid preference keys provided`.
+
+Move the old keys into `STALE_KEYS` so they get cleaned off the Auth0 profile on the next save.
+
 ### ⚠️ Do NOT change Firestore collection names during a rebrand
 
 The three billing API routes (`submit`, `list`, `clear`) all use the Firestore collection `transactions`. This name is intentionally neutral and must stay consistent across all three files. Renaming it in one route without updating the others will silently break the deposit/transaction history — submissions will write to one collection while the list reads from another.
