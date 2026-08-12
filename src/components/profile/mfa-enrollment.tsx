@@ -210,9 +210,18 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
         const errorData = await response.json();
         console.error('❌ Token exchange failed:', errorData);
 
-        toast.error('Token exchange not configured', {
-          description: errorData.message || 'Please configure CTE Action and credentials',
-        });
+        if (errorData.requiresStepUp) {
+          toast.info('Step-up authentication required', {
+            description: 'Redirecting you to complete MFA — you will return here after.',
+          });
+          setTimeout(() => {
+            window.location.href = '/api/auth/login?stepup=true&returnTo=/profile';
+          }, 1500);
+        } else {
+          toast.error('Token exchange failed', {
+            description: errorData.message || 'Please configure CTE Action and credentials',
+          });
+        }
       }
     } catch (error) {
       console.error('❌ Failed to fetch My Account API token:', error);

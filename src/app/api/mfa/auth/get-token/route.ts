@@ -80,16 +80,18 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
         error: errorData,
       });
 
+      // My Account API Default Policy: step-up MFA required after 15 min
+      const requiresStepUp =
+        errorData.error === 'unmet_authentication_requirements' ||
+        errorData.error_description?.includes('unmet_authentication_requirements') ||
+        tokenResponse.status === 403;
+
       return NextResponse.json(
         {
           error: 'Token exchange failed',
           message: errorData.error_description || errorData.error,
+          requiresStepUp,
           details: errorData,
-          troubleshooting: {
-            checkCteAction: 'Ensure CTE Action is deployed and linked to Token Exchange Profile',
-            checkCredentials: 'Verify CTE_CLIENT_ID and CTE_CLIENT_SECRET are correct',
-            checkProfile: 'Ensure Token Exchange Profile is created and linked to your application',
-          }
         },
         { status: tokenResponse.status }
       );
