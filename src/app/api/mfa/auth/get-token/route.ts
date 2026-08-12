@@ -32,7 +32,11 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     // Check for required environment variables
     const cteClientId = process.env.CTE_CLIENT_ID;
     const cteClientSecret = process.env.CTE_CLIENT_SECRET;
-    const myAccountAudience = `${process.env.AUTH0_ISSUER_BASE_URL}/me/`;
+    // Must use the same domain for audience and API calls — use NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE
+    // if set, otherwise fall back to constructing from AUTH0_ISSUER_BASE_URL
+    const myAccountAudience =
+      process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE ||
+      `${process.env.AUTH0_ISSUER_BASE_URL}/me/`;
 
     if (!cteClientId || !cteClientSecret) {
       console.error('❌ Missing CTE credentials in environment variables');
@@ -80,11 +84,10 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
         error: errorData,
       });
 
-      // My Account API Default Policy: step-up MFA required after 15 min
+      // Only flag step-up when Auth0 explicitly returns unmet_authentication_requirements
       const requiresStepUp =
         errorData.error === 'unmet_authentication_requirements' ||
-        errorData.error_description?.includes('unmet_authentication_requirements') ||
-        tokenResponse.status === 403;
+        errorData.error_description?.includes('unmet_authentication_requirements');
 
       return NextResponse.json(
         {
