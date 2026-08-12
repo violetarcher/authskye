@@ -19,8 +19,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     console.log('📥 Received preference update:', body);
 
-    const ALLOWED_KEYS = ['bet_confirmations', 'win_loss_alerts', 'promotional_offers', 'responsible_gaming'];
-    const STALE_KEYS = ['refill_reminders', 'pickup_alerts', 'auto_refill', 'generic_substitution', 'auto_sync', 'email_notifications', 'security_alerts', 'usage_reports', 'activity_alerts', 'api_webhooks'];
+    const ALLOWED_KEYS = ['email_notifications', 'activity_alerts', 'usage_reports', 'api_webhooks'];
+    const STALE_KEYS = ['bet_confirmations', 'win_loss_alerts', 'promotional_offers', 'responsible_gaming', 'refill_reminders', 'pickup_alerts', 'auto_refill', 'generic_substitution', 'auto_sync', 'security_alerts'];
 
     const filtered = Object.fromEntries(
       Object.entries(body).filter(([k]) => ALLOWED_KEYS.includes(k))

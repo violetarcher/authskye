@@ -53,44 +53,44 @@ interface CIBAStatus {
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'Bank Transfer — Chase Checking',
-    invoiceNumber: 'DEP-2026-8821',
-    billingCycle: 'Bank Transfer',
-    amount: '15000.00',
-    description: 'Large deposit requiring step-up verification. Funds available after approval.',
+    itemName: 'Professional Services — Q3 2026',
+    invoiceNumber: 'INV-2026-8821',
+    billingCycle: 'Monthly',
+    amount: '285.00',
+    description: 'Monthly subscription — Professional tier. Auto-renew enabled.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'Wire Transfer — Wells Fargo',
-    invoiceNumber: 'DEP-2026-4417',
-    billingCycle: 'Bank Transfer',
-    amount: '5000.00',
-    description: 'Domestic wire transfer. Typically clears within 1 business day.',
+    itemName: 'Platform License — Enterprise',
+    invoiceNumber: 'INV-2026-4417',
+    billingCycle: 'Monthly',
+    amount: '150.00',
+    description: 'Annual enterprise license renewal. Includes SSO and SCIM add-ons.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'ACH Transfer — Bank of America',
-    invoiceNumber: 'DEP-2026-6032',
-    billingCycle: 'ACH',
-    amount: '2500.00',
-    description: 'ACH bank transfer. 1-3 business days to process.',
+    itemName: 'Consulting Services — August',
+    invoiceNumber: 'INV-2026-6032',
+    billingCycle: 'One-time',
+    amount: '75.00',
+    description: 'Implementation consulting. Project: Auth0 FGA integration.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
     paymentDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
-    itemName: 'Crypto Deposit — USDC',
-    invoiceNumber: 'DEP-2026-9154',
-    billingCycle: 'Crypto',
-    amount: '1000.00',
-    description: 'Stablecoin deposit via supported wallet. Instant confirmation.',
+    itemName: 'API Overage — July',
+    invoiceNumber: 'INV-2026-9154',
+    billingCycle: 'Usage',
+    amount: '45.00',
+    description: 'API usage overage for July. Billed at standard rate.',
     routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
@@ -144,7 +144,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve large deposit requests via push notification.',
+      description: 'You can now approve payment requests via push notification.',
     });
   };
 
@@ -326,7 +326,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email transaction:pay',
-          binding_message: `Approve Deposit: ${formData.amount} USD`,
+          binding_message: `Approve Payment: ${formData.amount} USD`,
         }),
       });
 
@@ -355,9 +355,9 @@ startxref
           authorization_details: [{
             type: 'payment_initiation',
             instructedAmount: { amount: Math.round(parseFloat(formData.amount) * 100), currency: 'USD' },
-            creditorName: 'Sportsbook',
+            creditorName: 'Authskye',
             creditorAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
-            remittanceInformationUnstructured: `Deposit ${formData.invoiceNumber}`,
+            remittanceInformationUnstructured: `Invoice ${formData.invoiceNumber}`,
           }],
           access_token: pollResult.access_token,
           expires_in: pollResult.expires_in,
@@ -475,8 +475,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Deposit authorization required', {
-        description: 'Please authorize this deposit via Guardian app on your mobile device',
+      toast.info('Payment authorization required', {
+        description: 'Please authorize the payment via Guardian app on your mobile device',
       });
 
       const cibaResult = await initiateCIBA();
@@ -514,8 +514,8 @@ startxref
 
       const result = await response.json();
 
-      toast.success('Deposit submitted!', {
-        description: `Deposit ID: ${result.claimId}`,
+      toast.success('Payment submitted!', {
+        description: `Transaction ID: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -540,7 +540,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit deposit',
+        description: error.message || 'Failed to submit payment',
       });
     } finally {
       setLoading(false);
@@ -569,7 +569,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Push approval not set up — required for deposits over $10,000
+              Push approval not set up — required for payment submission
             </span>
           </div>
           <Button
@@ -585,10 +585,10 @@ startxref
       )}
 
       {guardianEnrolled === true && cibaStatus.status === 'idle' && (
-        <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 flex items-center gap-2">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Push approval ready — large deposits enabled
+            Push approval ready — payment submission enabled
           </span>
         </div>
       )}
@@ -597,7 +597,7 @@ startxref
       {cibaStatus.status !== 'idle' && (
         <div className={`rounded-lg border px-3 py-2 flex items-center gap-2 ${
             cibaStatus.status === 'approved'
-              ? 'bg-green-50 border-green-200'
+              ? 'bg-blue-50 border-blue-200'
               : cibaStatus.status === 'pending'
               ? 'bg-blue-50 border-blue-200'
               : 'bg-orange-50 border-orange-200'
@@ -613,9 +613,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for deposit approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting deposit...'}
-            {cibaStatus.status === 'denied' && 'Deposit denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
+            {cibaStatus.status === 'denied' && 'Payment denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -703,7 +703,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="paymentDate" className="text-xs">Transfer Date *</Label>
+            <Label htmlFor="paymentDate" className="text-xs">Payment Date *</Label>
             <Input
               id="paymentDate"
               name="paymentDate"
@@ -715,7 +715,7 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="amount" className="text-xs">Deposit Amount ($) *</Label>
+            <Label htmlFor="amount" className="text-xs">Payment Amount ($) *</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
               <Input
@@ -742,7 +742,7 @@ startxref
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="Wire Transfer — Chase"
+            placeholder="Professional Services"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -763,12 +763,12 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Transfer Type</Label>
+            <Label htmlFor="billingCycle" className="text-xs">Plan Type</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Wire / ACH / Bank Transfer"
+              placeholder="Monthly / Annual / One-time"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -818,7 +818,7 @@ startxref
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Bank Details (Push approval required)
+            Payment Details (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
@@ -881,7 +881,7 @@ startxref
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Submit Deposit
+              Submit Payment
             </>
           )}
         </Button>

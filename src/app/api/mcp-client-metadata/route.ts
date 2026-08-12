@@ -9,7 +9,7 @@ export function GET() {
 
   const metadata = {
     client_id: `${baseUrl}/api/mcp-client-metadata`,
-    client_name: 'Sportsbook MCP Client',
+    client_name: 'Authskye MCP Client',
     description: 'Demo MCP client for Auth for MCP showcase',
     application_type: 'web',
     grant_types: ['authorization_code', 'refresh_token'],

@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-Sports betting platform demo using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA push-approval for wagers, step-up MFA, Kong API Gateway, AI Agents demo, and Auth for MCP.
+B2B + B2C digital collaboration platform demo using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA, step-up MFA, Kong API Gateway, AI Agents demo, and Auth for MCP.
 
-**Brand:** Sportsbook | **Namespace:** `https://authskye.com` | **Primary Color:** `#16a34a`
+**Brand:** Authskye | **Namespace:** `https://authskye.com` | **Primary Color:** `#3b82f6`
 
 ## Commands
 

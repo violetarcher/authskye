@@ -118,9 +118,9 @@ export function SignupForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Open a Sportsbook Account</CardTitle>
+        <CardTitle className="text-2xl">Create Your Organization</CardTitle>
         <CardDescription>
-          Join Sportsbook for live odds, parlays, and fast payouts.
+          Join Authskye to manage your team, documents, and access securely.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -139,7 +139,7 @@ export function SignupForm() {
             </Label>
             <Input
               id="organizationName"
-              placeholder="My Sports Group"
+              placeholder="Acme Corp"
               value={formData.organizationName}
               onChange={handleChange('organizationName')}
               disabled={isSubmitting}
@@ -158,7 +158,7 @@ export function SignupForm() {
             <Input
               id="adminEmail"
               type="email"
-              placeholder="bettor@example.com"
+              placeholder="admin@acme.com"
               value={formData.adminEmail}
               onChange={handleChange('adminEmail')}
               disabled={isSubmitting}

@@ -53,10 +53,10 @@ export default function BillingPage() {
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <FileText className="w-8 h-8 text-primary" />
-          Deposit Funds
+          Billing
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Securely transfer funds into your betting account. Transfers over $10,000 require push notification approval.
+          Submit and track payment requests
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export default function BillingPage() {
         {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">New Deposit</CardTitle>
+            <CardTitle className="text-lg">New Payment</CardTitle>
             <CardDescription className="text-xs">
               Complete the form and authorize via mobile push notification
             </CardDescription>
@@ -87,14 +87,14 @@ export default function BillingPage() {
                   disabled={isClearing}
                 >
                   <Trash2 className="w-4 h-4" />
-                  Clear Deposit History
+                  Clear All Transactions
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Clear Deposit History?</DialogTitle>
+                  <DialogTitle>Clear All Transactions?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. All deposit records will be permanently deleted.
+                    This action cannot be undone. All transactions in your account will be permanently deleted.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex justify-end gap-2">
@@ -110,7 +110,7 @@ export default function BillingPage() {
                     onClick={handleClearAllTransactions}
                     disabled={isClearing}
                   >
-                    {isClearing ? 'Clearing...' : 'Clear Deposit History'}
+                    {isClearing ? 'Clearing...' : 'Clear All Transactions'}
                   </Button>
                 </div>
               </DialogContent>

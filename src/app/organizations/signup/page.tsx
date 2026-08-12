@@ -1,19 +1,19 @@
 import { SignupForm } from '@/components/organization/signup-form';
 
 export const metadata = {
-  title: 'Open an Account | Sportsbook',
-  description: 'Create your account and start betting on all your favorite sports.',
+  title: 'Create Organization | Authskye',
+  description: 'Create your organization on Authskye and start managing users and access securely.',
 };
 
 export default function OrganizationSignupPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Sportsbook</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Authskye</h1>
           <p className="text-lg text-muted-foreground">
-            Create your account and start betting in minutes. Must be 21+.
+            Create your organization and start managing users and access securely in minutes
           </p>
         </div>
 
