@@ -67,8 +67,9 @@ export async function POST(
 
     console.log('✅ Verifying MFA method:', methodId, 'for user:', user.sub);
 
-    // Construct My Account API verification endpoint
-    const myAccountBaseUrl = process.env.AUTH0_ISSUER_BASE_URL!;
+    const myAccountBaseUrl =
+      (process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE?.replace(/\/me\/?$/, '')) ||
+      process.env.AUTH0_ISSUER_BASE_URL!;
     const verifyUrl = `${myAccountBaseUrl}/me/v1/authentication-methods/${encodeURIComponent(methodId)}/verify`;
 
     console.log('📤 Calling verification endpoint:', verifyUrl);

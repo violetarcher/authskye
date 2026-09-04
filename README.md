@@ -1,4 +1,4 @@
-# Authskye - Cloud Workspace Platform
+# ERPCore - Procurement & Operations Platform
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Auth0](https://img.shields.io/badge/Auth0-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
@@ -6,7 +6,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![OpenFGA](https://img.shields.io/badge/OpenFGA-FF6B6B?style=for-the-badge&logo=auth0&logoColor=white)
 
-**Authskye** is a comprehensive B2B/B2C cloud workspace platform demonstrating enterprise-grade identity, authorization, and security patterns using **Auth0** and **Auth0 FGA** (Fine-Grained Authorization).
+**ERPCore** is a comprehensive B2B ERP / procurement & operations platform demonstrating enterprise-grade identity, authorization, and security patterns using **Auth0** and **Auth0 FGA** (Fine-Grained Authorization).
 
 ## What This Demo Showcases
 

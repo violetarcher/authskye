@@ -1,4 +1,4 @@
-// src/components/sidebar-nav.tsx - Authskye Navigation
+// src/components/sidebar-nav.tsx - ERPCore Navigation
 'use client';
 
 import Link from 'next/link';
@@ -14,7 +14,7 @@ import {
   FolderOpen,
   Shield,
   User,
-  CreditCard,
+  ClipboardList,
   Building2,
   Bot,
   Plug,
@@ -53,7 +53,7 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
         >
           <Link href="/reports">
             <FileText className="mr-2 h-4 w-4" />
-            Reports
+            Expense Reports
           </Link>
         </Button>
       )}
@@ -64,8 +64,8 @@ export function SidebarNav({ roles, hasOrganization }: SidebarNavProps) {
         className="w-full justify-start"
       >
         <Link href="/billing">
-          <CreditCard className="mr-2 h-4 w-4" />
-          Billing
+          <ClipboardList className="mr-2 h-4 w-4" />
+          Purchase Orders
         </Link>
       </Button>
 

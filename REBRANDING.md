@@ -54,6 +54,35 @@ When reverting to default, the app should look like this:
 
 ---
 
+## ERPCore Theme
+
+| Property | Value |
+|----------|-------|
+| Brand name | ERPCore |
+| Tagline | "One system for supply, spend, and scale." |
+| Platform type | ERP / procurement & operations platform |
+| Primary color | `#0070f2` (SAP-style blue) |
+| Gradient | `from-[#003366] to-[#0070f2]` |
+| Icon | Boxes (lucide `Boxes`) |
+| Namespace | `https://authskye.com` (unchanged — this rebrand skipped the namespace swap) |
+| Theme color (viewport) | `#0070f2` |
+
+### ERPCore content
+
+- **KPI cards:** Open Purchase Orders, Inventory Value, Vendor Spend (MTD), On-Time Delivery Rate
+- **Activity feed:** PO submitted, PO approved via push, vendor added, inventory adjustment, budget threshold alert
+- **Preferences:** PO Approval Alerts, Budget Threshold Alerts, Vendor Update Notifications, Inventory Reports
+- **Billing demo items:** Raw Materials (Acme Supply Co), IT Equipment (TechDist Inc), Office Supplies (Vendor Co), Freight & Logistics (Meridian Freight); CIBA binding message "Approve PO #{poNumber}: X USD"
+- **Billing labels:** PO Number, PO Type, Vendor & Line Item, Cost Center Code, GL Account Number, Submit PO button
+- **Trust indicators:** Procurement Controls, Multi-Entity Operations, Full Audit Trail
+- **Footer nav columns:** Product (Procurement/Inventory/Reporting), Solutions (Manufacturing/Distribution/Services), Company (About/Security/Privacy)
+- **Nav bar:** "Features" link renamed to "Modules"
+- **Reports:** "Reports" nav item and page renamed to "Expense Reports" (report-dashboard.tsx already described its create/edit dialog as "the expense report" — this makes the surrounding UI text match)
+
+**CIBA design note:** this theme uses the *same self-approval pattern* as the baseline payment flow — the PO submitter receives the push and approves their own submission over a demo threshold. It does not model delegated/manager approval (a different user approving someone else's PO), which would require an `approver` relation in FGA and resolving a second user's `sub` for the CIBA `login_hint`.
+
+---
+
 ## Quick Reference
 
 When rebranding, you need to update:

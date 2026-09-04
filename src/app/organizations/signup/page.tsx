@@ -1,8 +1,8 @@
 import { SignupForm } from '@/components/organization/signup-form';
 
 export const metadata = {
-  title: 'Create Organization | Authskye',
-  description: 'Create your organization on Authskye and start managing users and access securely.',
+  title: 'Create Organization | ERPCore',
+  description: 'Create your organization on ERPCore and start managing users and access securely.',
 };
 
 export default function OrganizationSignupPage() {
@@ -11,7 +11,7 @@ export default function OrganizationSignupPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to Authskye</h1>
+          <h1 className="text-4xl font-bold text-primary mb-2">Welcome to ERPCore</h1>
           <p className="text-lg text-muted-foreground">
             Create your organization and start managing users and access securely in minutes
           </p>

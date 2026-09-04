@@ -1,0 +1,61 @@
+- generic [active] [ref=e1]:
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - heading "Rx Refills" [level=1] [ref=e6]
+        - paragraph [ref=e10]: Request and track prescription refills
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - generic [ref=e13]:
+            - generic [ref=e14]: New Rx Refill Request
+            - generic [ref=e15]: Complete the form and authorize via mobile push notification
+          - generic [ref=e17]:
+            - button "Fill Demo (1/4)" [ref=e19]
+            - generic [ref=e23]:
+              - generic [ref=e24]:
+                - generic [ref=e25]:
+                  - text: Prescription Date *
+                  - textbox "Prescription Date *" [ref=e26]
+                - generic [ref=e27]:
+                  - text: Copay Amount *
+                  - spinbutton "Copay Amount *" [ref=e31]
+              - generic [ref=e32]:
+                - generic [ref=e33]: Medication Name *
+                - textbox "Medication Name *" [ref=e38]:
+                  - /placeholder: Metformin 500mg
+              - generic [ref=e39]:
+                - generic [ref=e40]:
+                  - text: Rx Number
+                  - textbox "Rx Number" [ref=e41]:
+                    - /placeholder: RX-2024-0001
+                - generic [ref=e42]:
+                  - text: Refill Type
+                  - textbox "Refill Type" [ref=e43]:
+                    - /placeholder: Refill / New / Emergency
+              - generic [ref=e44]:
+                - text: Notes / Instructions
+                - textbox "Notes / Instructions" [ref=e45]:
+                  - /placeholder: Additional notes or prescriber instructions...
+              - generic [ref=e46]:
+                - generic [ref=e47]: Insurance Card / Prescription (PDF) *
+                - generic [ref=e52]:
+                  - text: Click to upload
+                  - button "Insurance Card / Prescription (PDF) * Click to upload" [ref=e53]
+              - generic [ref=e54]:
+                - paragraph [ref=e55]: Insurance Information (Push approval required)
+                - generic [ref=e58]:
+                  - generic [ref=e59]:
+                    - text: Payer ID *
+                    - textbox "Payer ID *" [ref=e60]:
+                      - /placeholder: "123456789"
+                  - generic [ref=e61]:
+                    - text: Member ID *
+                    - textbox "Member ID *" [ref=e62]:
+                      - /placeholder: Member ID
+                - generic [ref=e63]:
+                  - text: Confirm Member ID *
+                  - textbox "Confirm Member ID *" [ref=e64]:
+                    - /placeholder: Re-enter
+            - button "Submit Rx Refill" [ref=e66]
+        - button "Clear All Rx Records" [ref=e75]
+  - region "Notifications alt+T"

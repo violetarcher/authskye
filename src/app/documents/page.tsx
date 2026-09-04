@@ -74,6 +74,7 @@ function DocumentsContent() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [shareEmail, setShareEmail] = useState('');
   const [shareUserId, setShareUserId] = useState('');
+  const [shareUserCanonicalEmail, setShareUserCanonicalEmail] = useState('');
   const [shareUserName, setShareUserName] = useState('');
   const [sharePermission, setSharePermission] = useState<'viewer' | 'owner'>('viewer');
   const [lookingUpUser, setLookingUpUser] = useState(false);
@@ -388,6 +389,7 @@ function DocumentsContent() {
     }
     setShareEmail('');
     setShareUserId('');
+    setShareUserCanonicalEmail('');
     setShareUserName('');
     setShareTarget('user');
     setSelectedGroupId('');
@@ -413,18 +415,21 @@ function DocumentsContent() {
       if (response.ok) {
         const data = await response.json();
         setShareUserId(data.user_id);
+        setShareUserCanonicalEmail(data.email);
         setShareUserName(data.name || data.email);
         toast.success(`Found user: ${data.name || data.email}`);
       } else {
         const error = await response.json();
         toast.error(error.error || 'User not found');
         setShareUserId('');
+        setShareUserCanonicalEmail('');
         setShareUserName('');
       }
     } catch (error) {
       console.error('Error looking up user:', error);
       toast.error('Failed to lookup user');
       setShareUserId('');
+      setShareUserCanonicalEmail('');
       setShareUserName('');
     } finally {
       setLookingUpUser(false);
@@ -481,7 +486,9 @@ function DocumentsContent() {
           ? `/api/documents/${itemId}/share`
           : `/api/folders/${itemId}/share`;
         body = {
-          userId: shareUserId,
+          // FGA subjects are keyed by email-username (see formatUserId in fga-service.ts),
+          // not the raw Auth0 user_id — must send the canonical email here, not shareUserId.
+          userId: shareUserCanonicalEmail,
           permission: sharePermission,
         };
       } else {

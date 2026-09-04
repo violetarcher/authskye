@@ -332,8 +332,12 @@ export function MFAEnrollment({ user: initialUser }: MFAEnrollmentProps) {
         });
       } else {
         const errorData = await response.json().catch(() => ({}));
-        setEnrolledMethodsError(errorData.message || 'Failed to load enrolled methods');
+        const errorMsg = errorData.message || 'Failed to load enrolled methods';
+        // Log the full details object so you can see the raw Auth0 error/error_description
         console.error('❌ Failed to fetch enrolled methods:', response.status, errorData);
+        setEnrolledMethodsError(errorData.details
+          ? `${errorMsg} (${errorData.details.error || errorData.details.error_description || JSON.stringify(errorData.details)})`
+          : errorMsg);
       }
     } catch (error) {
       setEnrolledMethodsError('Network error loading methods');

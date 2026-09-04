@@ -88,16 +88,16 @@ export function ReportDashboard({ permissions }: ReportDashboardProps) {
     });
 
     if (response.ok) {
-      toast.success(currentReport?.id ? "Report Updated" : "Report Created");
+      toast.success(currentReport?.id ? "Expense Report Updated" : "Expense Report Created");
       setIsDialogOpen(false);
       fetchReports();
     } else {
-      toast.error("Failed to save report.");
+      toast.error("Failed to save expense report.");
     }
   };
 
   const startDeleteFlow = (report: Report) => {
-    if (confirm(`To delete "${report.title}", you will need to re-authenticate for security.`)) {
+    if (confirm(`To delete expense report "${report.title}", you will need to re-authenticate for security.`)) {
       const action = { actionType: 'delete', reportId: report.id, reportTitle: report.title };
       sessionStorage.setItem('post_stepup_action', JSON.stringify(action));
       
@@ -130,12 +130,12 @@ export function ReportDashboard({ permissions }: ReportDashboardProps) {
   const performDelete = async (reportId: string, reportTitle: string) => {
   const response = await fetch(`/api/reports/${reportId}`, { method: 'DELETE' });
   if (response.ok) {
-    toast.success("Report Deleted", { description: `"${reportTitle}" has been deleted.` });
+    toast.success("Expense Report Deleted", { description: `"${reportTitle}" has been deleted.` });
     fetchReports();
   } else {
     const error = await response.json();
     // Corrected to use error.error
-    toast.error("Failed to delete report.", { description: error?.error || 'An unknown error occurred.'});
+    toast.error("Failed to delete expense report.", { description: error?.error || 'An unknown error occurred.'});
   }
 };
 
@@ -143,7 +143,7 @@ export function ReportDashboard({ permissions }: ReportDashboardProps) {
     <div>
       <div className="flex justify-end mb-4">
         {permissions.includes('create:reports') && (
-          <Button onClick={handleCreate}>Create Report</Button>
+          <Button onClick={handleCreate}>Create Expense Report</Button>
         )}
       </div>
       <div className="rounded-md border">
@@ -179,7 +179,7 @@ export function ReportDashboard({ permissions }: ReportDashboardProps) {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{currentReport?.id ? 'Edit Report' : 'Create New Report'}</DialogTitle>
+            <DialogTitle>{currentReport?.id ? 'Edit Expense Report' : 'Create New Expense Report'}</DialogTitle>
             <DialogDescription>Fill in the details for the expense report.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>

@@ -41,25 +41,32 @@ export async function GET(
 
     const groupData = group.data();
 
-    // Get member user IDs from FGA
-    const memberUserIds = await getGroupMembers(groupId);
+    // Get member usernames from FGA (email-local-part, e.g. "data.analyst" — see formatUserId)
+    const memberUsernames = await getGroupMembers(groupId);
 
-    // Fetch user details from Auth0
+    // Resolve usernames back to real users by matching against the org's member list —
+    // FGA only stores the email-local-part, not a full Auth0 user_id, so auth0.users.get()
+    // (which requires a full user_id) can't be used here.
     const auth0 = managementClient;
     const members = [];
 
-    for (const userId of memberUserIds) {
-      try {
-        const userDetails = await auth0.users.get({ id: userId });
-        members.push({
-          userId: userDetails.data.user_id,
-          email: userDetails.data.email,
-          name: userDetails.data.name,
-          addedAt: new Date().toISOString(), // We don't track this in FGA, but could be added
-        });
-      } catch (error) {
-        console.error(`Error fetching user ${userId}:`, error);
-        // Continue even if one user fails
+    if (user.org_id && memberUsernames.length > 0) {
+      const orgMembers = await auth0.organizations.getMembers({ id: user.org_id });
+
+      for (const username of memberUsernames) {
+        const match = orgMembers.data?.find(
+          (member: any) => member.email?.split('@')[0]?.toLowerCase() === username.toLowerCase()
+        );
+        if (match) {
+          members.push({
+            userId: match.user_id,
+            email: match.email,
+            name: match.name,
+            addedAt: new Date().toISOString(), // We don't track this in FGA, but could be added
+          });
+        } else {
+          console.error(`Could not resolve group member username: ${username}`);
+        }
       }
     }
 
@@ -134,7 +141,7 @@ export async function POST(
       id: user.org_id,
     });
 
-    const memberExists = orgMembers.data.some((member: any) => member.user_id === userId);
+    const memberExists = orgMembers.data.some((member: any) => member.email?.toLowerCase() === userId.toLowerCase());
     if (!memberExists) {
       return NextResponse.json(
         { error: 'User not found in organization' },

@@ -181,11 +181,13 @@ export function GroupManager() {
       const userData = await lookupResponse.json();
 
       // Add the user to the group
+      // FGA subjects are keyed by email-username (see formatUserId in fga-service.ts),
+      // not the raw Auth0 user_id — must send the canonical email here.
       const addResponse = await fetch(`/api/groups/${selectedGroup.id}/members`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: userData.user_id,
+          userId: userData.email,
         }),
       });
 
@@ -213,7 +215,7 @@ export function GroupManager() {
     }
   };
 
-  const handleRemoveMember = async (userId: string) => {
+  const handleRemoveMember = async (email: string) => {
     if (!selectedGroup) return;
 
     if (!confirm('Are you sure you want to remove this member from the group?')) {
@@ -221,15 +223,17 @@ export function GroupManager() {
     }
 
     try {
+      // FGA subjects are keyed by email-username (see formatUserId in fga-service.ts) —
+      // must send the email here, not the Auth0 user_id.
       const response = await fetch(`/api/groups/${selectedGroup.id}/members`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId: email }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        setGroupMembers(groupMembers.filter((m) => m.userId !== userId));
+        setGroupMembers(groupMembers.filter((m) => m.email !== email));
         toast.success('Member removed from group');
 
         // Show tuple modal if tuple info is available
@@ -397,7 +401,7 @@ export function GroupManager() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleRemoveMember(member.userId)}
+                              onClick={() => handleRemoveMember(member.email)}
                               className="text-destructive hover:text-destructive"
                             >
                               Remove

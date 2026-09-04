@@ -53,10 +53,10 @@ export default function BillingPage() {
       <header className="mb-4">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <FileText className="w-8 h-8 text-primary" />
-          Billing
+          Purchase Orders
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Submit and track payment requests
+          Submit and track purchase order approvals
         </p>
       </header>
 
@@ -64,7 +64,7 @@ export default function BillingPage() {
         {/* Left column - Payment Form */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">New Payment</CardTitle>
+            <CardTitle className="text-lg">New Purchase Order</CardTitle>
             <CardDescription className="text-xs">
               Complete the form and authorize via mobile push notification
             </CardDescription>

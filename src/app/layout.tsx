@@ -8,12 +8,12 @@ import { ConditionalLayout } from "@/components/conditional-layout";
 import './globals.css';
 
 export const metadata = {
-  title: 'Authskye',
-  description: 'The digital platform for modern collaboration',
+  title: 'ERPCore',
+  description: 'One system for supply, spend, and scale.',
 };
 
 export const viewport = {
-  themeColor: '#3b82f6',
+  themeColor: '#0070f2',
 };
 
 export default function RootLayout({

@@ -120,7 +120,7 @@ export function SignupForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Create Your Organization</CardTitle>
         <CardDescription>
-          Join Authskye to manage your team, documents, and access securely.
+          Join ERPCore to manage your team, purchase orders, and access securely.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>

@@ -43,9 +43,9 @@ export async function DELETE(
 
     console.log('🗑️ Deleting MFA method via My Account API:', methodId, 'for user:', user.sub);
 
-    // Construct My Account API endpoint URL - use CUSTOM domain (must match token audience)
-    // Token audience is https://login.authskye.org/me/, so API calls must use same domain
-    const myAccountBaseUrl = process.env.AUTH0_ISSUER_BASE_URL!;
+    const myAccountBaseUrl =
+      (process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE?.replace(/\/me\/?$/, '')) ||
+      process.env.AUTH0_ISSUER_BASE_URL!;
     const myAccountUrl = `${myAccountBaseUrl}/me/v1/authentication-methods/${methodId}`;
 
     // Call My Account API

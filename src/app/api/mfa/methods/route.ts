@@ -37,9 +37,21 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
 
     console.log('📋 Fetching enrolled MFA methods via My Account API for user:', user.sub);
 
-    // Construct My Account API endpoint URL
-    const myAccountDomain = process.env.AUTH0_ISSUER_BASE_URL!.replace('https://', '');
-    const myAccountUrl = `https://${myAccountDomain}/me/v1/authentication-methods`;
+    // Decode token to log audience/scopes — helps diagnose 401 mismatches
+    try {
+      const parts = accessToken.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+        console.log('🎫 CTE token claims:', { aud: payload.aud, scope: payload.scope, sub: payload.sub });
+      }
+    } catch { /* non-fatal */ }
+
+    // Base URL must match the token audience domain — derive from NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE
+    // if set (same logic as get-token), otherwise fall back to AUTH0_ISSUER_BASE_URL.
+    const myAccountBase =
+      (process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE?.replace(/\/me\/?$/, '')) ||
+      process.env.AUTH0_ISSUER_BASE_URL!;
+    const myAccountUrl = `${myAccountBase}/me/v1/authentication-methods`;
 
     // Call My Account API
     const response = await fetch(myAccountUrl, {
@@ -52,9 +64,8 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('❌ My Account API error:', response.status, errorData);
+      console.error('❌ My Account API error:', response.status, errorData, { url: myAccountUrl });
 
-      // If 404, My Account API might not be activated
       if (response.status === 404) {
         return NextResponse.json(
           {
@@ -69,7 +80,9 @@ export const GET = withApiAuthRequired(async function GET(request: NextRequest) 
       return NextResponse.json(
         {
           error: 'Failed to fetch MFA methods',
-          message: errorData.message || errorData.error || 'An unexpected error occurred',
+          // Auth0 401 responses use error/error_description, not message
+          message: errorData.message || errorData.error_description || errorData.error || 'An unexpected error occurred',
+          details: errorData,
           statusCode: response.status,
         },
         { status: response.status }
@@ -254,9 +267,10 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
         );
     }
 
-    // Construct My Account API endpoint URL
-    const myAccountDomain = process.env.AUTH0_ISSUER_BASE_URL!.replace('https://', '');
-    const myAccountUrl = `https://${myAccountDomain}/me/v1/authentication-methods`;
+    const myAccountBase =
+      (process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE?.replace(/\/me\/?$/, '')) ||
+      process.env.AUTH0_ISSUER_BASE_URL!;
+    const myAccountUrl = `${myAccountBase}/me/v1/authentication-methods`;
 
     console.log('📤 Calling My Account API:', myAccountUrl);
     console.log('📦 Request body:', enrollmentRequest);

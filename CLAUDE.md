@@ -2,9 +2,9 @@
 
 ## Project Overview
 
-B2B + B2C digital collaboration platform demo using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA, step-up MFA, Kong API Gateway, AI Agents demo, and Auth for MCP.
+B2B ERP / procurement & operations platform demo using **Auth0 Organizations**, **Auth0 FGA**, and **Next.js 14 App Router**. Features multi-tenancy, CIBA-based PO approval, step-up MFA, Kong API Gateway, AI Agents demo, and Auth for MCP.
 
-**Brand:** Authskye | **Namespace:** `https://authskye.com` | **Primary Color:** `#3b82f6`
+**Brand:** ERPCore | **Namespace:** `https://authskye.com` (unchanged) | **Primary Color:** `#0070f2`
 
 ## Commands
 
@@ -68,7 +68,7 @@ await writeTuple({ user: formatUserId(user.email ?? user.sub), relation: 'owner'
 await writeTuple({ user: formatGroupMember(groupId), relation: 'viewer', object: formatDocId(docId) });
 ```
 
-**FGA User ID mapping:** `formatUserId` extracts the local part of an email (`violet.archer@okta.com` → `user:violet.archer`). Falls back to raw value if no `@` present. Always prefer `user.email ?? user.sub` as the input — never pass `user.sub` alone.
+**FGA User ID mapping:** `formatUserId` extracts the local part of an email (`violet.archer@okta.com` → `user:violet.archer`), and also strips any `+alias` suffix (`violet.archer+admin@okta.com` → `user:violet.archer`) since FGA tuples can't store `+`. Falls back to raw value if no `@` present. Always prefer `user.email ?? user.sub` as the input — never pass `user.sub` alone.
 
 **FGA Object Types:** `user:{id}`, `group:{id}`, `folder:{id}`, `doc:{id}`, `agent:{id}`, `project:{id}`
 
@@ -144,6 +144,14 @@ MCP server at `/api/mcp` uses CIMD (Client ID Metadata Document) for client regi
 Token validation uses `AUTH0_MCP_AUDIENCE`. Scopes are checked via `scope` claim only (not RBAC `permissions`). FGA `can_call` gates tool discovery and execution as a second layer.
 
 **Critical:** The MCP Tools API (`http://localhost:3001/`) must have RBAC (`enforce_policies`) **disabled** for scope-based consent to work.
+
+**On-Behalf-Of (OBO) token exchange:** `/mcp` has a dedicated, full-width "4. On-Behalf-Of (OBO) Token Exchange" section, deliberately separate from the generic tool console (Panel 3) and from CIMD/consent scopes entirely. The left side is a small chat window ("Procurement Agent") — type something like *"Submit a PO for Acme Supply Co for $1500"* and a rule-based parser (`parsePurchaseOrderRequest` in `src/app/mcp/page.tsx` — intentionally not an LLM call; the point of this demo is the OBO mechanics, not conversational NLU) extracts vendor/amount and calls the `submit_purchase_order` tool using the *same already-connected MCP token*, which intentionally never carries `transaction:pay` and never requests it via consent. Because that scope is missing, the MCP server performs an RFC 8693 OBO exchange (`src/lib/obo-token-exchange.ts` — `exchangeTokenOnBehalfOf(subjectToken, audience, scope)`) for a new token scoped to `CIBA_AUDIENCE` with `transaction:pay`, then calls the real `/api/billing/submit` with it. The chat gets a plain-language summary; the right side shows the full technical Exchange Log.
+
+**Do not** add an OBO-only tool's required scope to `TOOL_SCOPES` or to the CIMD `scope` field / the `/mcp` page's own `/authorize` request — that would defeat the point. The whole value of OBO is that the original token deliberately lacks the downstream scope; the server bridges the gap on demand, not via upfront user consent.
+
+Requires `AUTH0_MCP_CLIENT_ID` / `AUTH0_MCP_CLIENT_SECRET` — the credentials of a **Custom API Client** (`app_type: resource_server`) tied to the MCP Tools API resource server, associated with a registered **Agent** (Agents as Principal, EA) so Auth0 stamps the real `agent_id` into the exchanged token's `act.sub` claim automatically — no agent picker needed in the UI, the acting agent is intrinsic to which client performed the exchange. Also requires a user-delegated client grant to the downstream audience and the On-Behalf-Of Token Exchange toggle enabled in the Dashboard. Every exchange step (and the downstream call) is logged to a structured `_obo` array; `acting_agent_id` (pulled from `act.sub`) is surfaced prominently above the Exchange Log.
+
+`submit_purchase_order` is also excluded from the generic tool dropdown (Panel 3) and is listed in `FGA_EXEMPT_TOOLS` (`src/app/api/mcp/route.ts`), skipping the FGA `can_call` layer entirely — this tool's authorization is the downstream `transaction:pay` scope check alone, demonstrating the "OBO only" case, while the other three tools demonstrate FGA gating. No FGA tuple is needed. Also note this tool has no CIBA/Guardian push-approval step — OBO issues the downstream token immediately, unlike the interactive CIBA flow the rest of the billing demo uses.
 
 ## Do's and Don'ts
 

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1400" />
+  <title>Sportsbook</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 1400px;
+      height: 800px;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #030f07;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Radial glow */
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+    }
+    .glow-1 { width: 700px; height: 700px; background: rgba(22,163,74,0.18); top: -150px; left: -100px; }
+    .glow-2 { width: 500px; height: 500px; background: rgba(21,128,61,0.12); bottom: -100px; right: 200px; }
+    .glow-3 { width: 300px; height: 300px; background: rgba(74,222,128,0.08); top: 200px; right: 100px; }
+
+    /* Grid lines */
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(22,163,74,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(22,163,74,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Main layout */
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      height: 100%;
+      align-items: center;
+      padding: 0 100px;
+      gap: 80px;
+    }
+
+    /* Left side */
+    .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22,163,74,0.12);
+      border: 1px solid rgba(22,163,74,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      width: fit-content;
+    }
+    .badge-dot { width: 7px; height: 7px; background: #16a34a; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
+    }
+    .badge span { font-size: 11px; font-weight: 600; color: #4ade80; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 30px rgba(22,163,74,0.4);
+    }
+    .logo-icon svg { width: 28px; height: 28px; fill: white; }
+    .logo-name { font-size: 22px; font-weight: 700; color: #f0fdf4; letter-spacing: -0.01em; }
+
+    .headline {
+      font-size: 72px;
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: #f0fdf4;
+    }
+    .headline .accent { color: #16a34a; }
+
+    .sub {
+      font-size: 18px;
+      color: #6b7280;
+      line-height: 1.6;
+      max-width: 420px;
+      font-weight: 400;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 32px;
+      margin-top: 8px;
+    }
+    .stat { display: flex; flex-direction: column; gap: 4px; }
+    .stat-val { font-size: 26px; font-weight: 800; color: #f0fdf4; letter-spacing: -0.02em; }
+    .stat-label { font-size: 11px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 500; }
+    .stat-divider { width: 1px; background: rgba(255,255,255,0.07); }
+
+    /* Right side — odds board */
+    .right {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .board-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #4b5563;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .odds-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+    .odds-card.live { border-color: rgba(22,163,74,0.25); background: rgba(22,163,74,0.04); }
+
+    .card-left { display: flex; flex-direction: column; gap: 3px; }
+    .card-sport { font-size: 10px; color: #4b5563; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+    .card-teams { font-size: 14px; color: #e5e7eb; font-weight: 600; }
+    .card-time { font-size: 11px; color: #6b7280; }
+    .live-tag {
+      font-size: 9px; font-weight: 700; color: #16a34a;
+      background: rgba(22,163,74,0.15);
+      border: 1px solid rgba(22,163,74,0.3);
+      border-radius: 4px; padding: 2px 6px;
+      text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    .card-right { display: flex; gap: 8px; }
+    .odds-btn {
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 6px 12px;
+      gap: 1px;
+      min-width: 52px;
+    }
+    .odds-btn.selected { background: rgba(22,163,74,0.15); border-color: rgba(22,163,74,0.4); }
+    .odds-label { font-size: 9px; color: #6b7280; font-weight: 500; }
+    .odds-val { font-size: 14px; font-weight: 700; color: #d1fae5; }
+    .odds-val.negative { color: #fca5a5; }
+
+    /* Bottom bar */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255,255,255,0.02);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 100px;
+      gap: 40px;
+      z-index: 20;
+    }
+    .bottom-item { display: flex; align-items: center; gap: 8px; }
+    .bottom-dot { width: 6px; height: 6px; background: #16a34a; border-radius: 50%; }
+    .bottom-text { font-size: 11px; color: #4b5563; font-weight: 500; }
+    .bottom-divider { width: 1px; height: 16px; background: rgba(255,255,255,0.06); }
+    .responsible { margin-left: auto; font-size: 10px; color: #374151; font-weight: 400; }
+  </style>
+</head>
+<body>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+  <div class="glow glow-3"></div>
+  <div class="grid-lines"></div>
+
+  <div class="container">
+    <!-- Left -->
+    <div class="left">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span>247 Live Lines Available</span>
+      </div>
+
+      <div class="logo-row">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 4h10l1.5 5H5.5L7 4zM5.5 9H18.5l-1.5 5H7L5.5 9zM7 14h10l-2 4H9l-2-4zM10 18h4v2h-4v-2z"/>
+          </svg>
+        </div>
+        <span class="logo-name">Sportsbook</span>
+      </div>
+
+      <div class="headline">
+        Your edge.<br /><span class="accent">Every game.</span>
+      </div>
+
+      <div class="sub">
+        Real-time odds, smart parlays, and push-approval for every wager — built for serious bettors.
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <span class="stat-val">12+</span>
+          <span class="stat-label">Sports</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-val">247</span>
+          <span class="stat-label">Live lines</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-val">&lt;2s</span>
+          <span class="stat-label">Payouts</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-val">21+</span>
+          <span class="stat-label">Only</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right — Odds board -->
+    <div class="right">
+      <div class="board-title">Live &amp; Upcoming</div>
+
+      <div class="odds-card live">
+        <div class="card-left">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="card-sport">NBA</span>
+            <span class="live-tag">● Live Q3</span>
+          </div>
+          <div class="card-teams">Lakers vs Celtics</div>
+          <div class="card-time">LAL 84 — BOS 79</div>
+        </div>
+        <div class="card-right">
+          <div class="odds-btn">
+            <span class="odds-label">LAL</span>
+            <span class="odds-val">-110</span>
+          </div>
+          <div class="odds-btn selected">
+            <span class="odds-label">BOS</span>
+            <span class="odds-val">+115</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odds-card">
+        <div class="card-left">
+          <span class="card-sport">NFL · Sun 4:25 PM</span>
+          <div class="card-teams">Chiefs vs Raiders</div>
+          <div class="card-time">Spread · Moneyline · Total</div>
+        </div>
+        <div class="card-right">
+          <div class="odds-btn selected">
+            <span class="odds-label">KC -3.5</span>
+            <span class="odds-val">-110</span>
+          </div>
+          <div class="odds-btn">
+            <span class="odds-label">LV +3.5</span>
+            <span class="odds-val">-110</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odds-card">
+        <div class="card-left">
+          <span class="card-sport">MLB · Tonight 7:10 PM</span>
+          <div class="card-teams">Yankees vs Red Sox</div>
+          <div class="card-time">Moneyline · Run line · Total</div>
+        </div>
+        <div class="card-right">
+          <div class="odds-btn">
+            <span class="odds-label">NYY</span>
+            <span class="odds-val">-145</span>
+          </div>
+          <div class="odds-btn">
+            <span class="odds-label">BOS</span>
+            <span class="odds-val">+122</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="odds-card">
+        <div class="card-left">
+          <span class="card-sport">NBA · Player Prop</span>
+          <div class="card-teams">LeBron James — Points</div>
+          <div class="card-time">Lakers vs Celtics</div>
+        </div>
+        <div class="card-right">
+          <div class="odds-btn">
+            <span class="odds-label">Over 27.5</span>
+            <span class="odds-val">-115</span>
+          </div>
+          <div class="odds-btn">
+            <span class="odds-label">Under 27.5</span>
+            <span class="odds-val">-105</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">NFL</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">NBA</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">MLB</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">NHL</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">NBA Parlays</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">Same-Game Parlays</span></div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-item"><div class="bottom-dot"></div><span class="bottom-text">Player Props</span></div>
+    <span class="responsible">Must be 21+. Gambling problem? Call 1-800-GAMBLER.</span>
+  </div>
+</body>
+</html>

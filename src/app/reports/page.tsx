@@ -8,7 +8,7 @@ export default withPageAuthRequired(async function ReportsPage() {
   return (
     <div>
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">Reports</h1>
+        <h1 className="text-3xl font-bold">Expense Reports</h1>
         <p className="text-lg text-muted-foreground">Welcome, {session?.user.name}</p>
       </header>
 

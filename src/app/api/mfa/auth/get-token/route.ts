@@ -32,11 +32,14 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     // Check for required environment variables
     const cteClientId = process.env.CTE_CLIENT_ID;
     const cteClientSecret = process.env.CTE_CLIENT_SECRET;
-    // Must use the same domain for audience and API calls — use NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE
-    // if set, otherwise fall back to constructing from AUTH0_ISSUER_BASE_URL
+    // Auth0 requires the same domain for both the audience and the token endpoint.
+    // NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE uses the custom domain (login.authskye.org),
+    // so derive the token endpoint from the same base.
     const myAccountAudience =
       process.env.NEXT_PUBLIC_MY_ACCOUNT_AUDIENCE ||
       `${process.env.AUTH0_ISSUER_BASE_URL}/me/`;
+    // Strip trailing /me/ to get the base domain, then add /oauth/token
+    const tokenEndpoint = myAccountAudience.replace(/\/me\/?$/, '') + '/oauth/token';
 
     if (!cteClientId || !cteClientSecret) {
       console.error('❌ Missing CTE credentials in environment variables');
@@ -67,7 +70,7 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
     };
 
     const tokenResponse = await fetch(
-      `${process.env.AUTH0_ISSUER_BASE_URL}/oauth/token`,
+      tokenEndpoint,
       {
         method: 'POST',
         headers: {
@@ -84,9 +87,11 @@ export const POST = withApiAuthRequired(async function POST(request: NextRequest
         error: errorData,
       });
 
-      // Only flag step-up when Auth0 explicitly returns unmet_authentication_requirements
+      // Flag step-up when Auth0 requires MFA to complete the token exchange
       const requiresStepUp =
+        errorData.error === 'mfa_required' ||
         errorData.error === 'unmet_authentication_requirements' ||
+        errorData.error_description?.includes('Multifactor authentication required') ||
         errorData.error_description?.includes('unmet_authentication_requirements');
 
       return NextResponse.json(

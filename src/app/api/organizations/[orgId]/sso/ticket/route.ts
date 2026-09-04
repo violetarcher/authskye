@@ -312,7 +312,6 @@ export async function POST(
           show_as_button: true
         }
       ],
-      enabled_clients: [process.env.AUTH0_CLIENT_ID!],
       ttl_sec: 432000 // 5 days
     };
 

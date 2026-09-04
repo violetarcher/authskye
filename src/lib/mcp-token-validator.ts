@@ -35,6 +35,9 @@ export const TOOL_SCOPES: Record<string, string> = {
   list_projects: 'mcp:list_projects',
   get_issue: 'mcp:get_issue',
   comment_on_issue: 'mcp:comment_on_issue',
+  // submit_purchase_order intentionally has NO required scope here — the whole
+  // point of the OBO demo is that the agent's token does NOT carry transaction:pay
+  // and never needs to; the MCP server exchanges for that scope on demand.
 };
 
 export function tokenHasScope(payload: McpTokenPayload, scope: string): boolean {

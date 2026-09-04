@@ -171,10 +171,16 @@ export async function readTuples(object: string): Promise<FGATuple[]> {
  * Helper function to format a user ID for FGA
  * @param userId - Auth0 user ID (e.g., "auth0|123")
  * @returns Formatted user string (e.g., "user:auth0|123")
+ *
+ * Email plus-aliases (e.g. "violet.archer+admin@x.com") are collapsed to the
+ * base username ("violet.archer") — FGA tuples can't store "+", and this lets
+ * every alias of the same person resolve to the same FGA subject.
  */
 export function formatUserId(identifier: string): string {
   if (identifier.includes('@')) {
-    return `user:${identifier.split('@')[0]}`;
+    const localPart = identifier.split('@')[0];
+    const username = localPart.split('+')[0];
+    return `user:${username}`;
   }
   return `user:${identifier}`;
 }

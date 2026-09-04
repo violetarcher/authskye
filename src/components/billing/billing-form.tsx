@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import {
   Upload,
   DollarSign,
-  CreditCard,
+  ClipboardCheck,
   Shield,
   CheckCircle2,
   Loader2,
@@ -53,44 +53,44 @@ interface CIBAStatus {
 const DEMO_DATA_SETS = [
   {
     paymentDate: new Date().toISOString().split('T')[0],
-    itemName: 'Professional Services — Q3 2026',
-    invoiceNumber: 'INV-2026-8821',
-    billingCycle: 'Monthly',
-    amount: '285.00',
-    description: 'Monthly subscription — Professional tier. Auto-renew enabled.',
+    itemName: 'Acme Supply Co — Raw Materials',
+    invoiceNumber: 'PO-2026-1042',
+    billingCycle: 'Standard',
+    amount: '4250.00',
+    description: 'Raw materials restock for Line 3 production run. Approved vendor.',
     routingNumber: '121000248',
     accountNumber: '9876543210',
     accountNumberConfirm: '9876543210',
   },
   {
     paymentDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
-    itemName: 'Platform License — Enterprise',
-    invoiceNumber: 'INV-2026-4417',
-    billingCycle: 'Monthly',
-    amount: '150.00',
-    description: 'Annual enterprise license renewal. Includes SSO and SCIM add-ons.',
+    itemName: 'TechDist Inc — IT Equipment',
+    invoiceNumber: 'PO-2026-1039',
+    billingCycle: 'Blanket',
+    amount: '15800.00',
+    description: 'Laptop refresh for Engineering — 22 units. NET-30 terms.',
     routingNumber: '026009593',
     accountNumber: '5551234567',
     accountNumberConfirm: '5551234567',
   },
   {
     paymentDate: new Date(Date.now() - 172800000).toISOString().split('T')[0],
-    itemName: 'Consulting Services — August',
-    invoiceNumber: 'INV-2026-6032',
+    itemName: 'Vendor Co — Office Supplies',
+    invoiceNumber: 'PO-2026-1031',
     billingCycle: 'One-time',
-    amount: '75.00',
-    description: 'Implementation consulting. Project: Auth0 FGA integration.',
+    amount: '620.00',
+    description: 'Quarterly office supplies replenishment — HQ facility.',
     routingNumber: '071000013',
     accountNumber: '8882229999',
     accountNumberConfirm: '8882229999',
   },
   {
     paymentDate: new Date(Date.now() - 259200000).toISOString().split('T')[0],
-    itemName: 'API Overage — July',
-    invoiceNumber: 'INV-2026-9154',
-    billingCycle: 'Usage',
-    amount: '45.00',
-    description: 'API usage overage for July. Billed at standard rate.',
+    itemName: 'Meridian Freight — Logistics',
+    invoiceNumber: 'PO-2026-1024',
+    billingCycle: 'Contract',
+    amount: '2100.00',
+    description: 'Freight & logistics — August shipment batch, West region.',
     routingNumber: '111000025',
     accountNumber: '7773331111',
     accountNumberConfirm: '7773331111',
@@ -144,7 +144,7 @@ export function BillingForm({ user, onPaymentSubmitted }: BillingFormProps) {
   const handleEnrollmentComplete = () => {
     setGuardianEnrolled(true);
     toast.success('Guardian enrolled successfully!', {
-      description: 'You can now approve payment requests via push notification.',
+      description: 'You can now approve purchase orders via push notification.',
     });
   };
 
@@ -209,16 +209,16 @@ stream
 BT
 /F1 24 Tf
 100 700 Td
-(RXNATIONAL - PRESCRIPTION) Tj
+(ERPCORE - PURCHASE ORDER) Tj
 /F1 12 Tf
 100 650 Td
-(Item: ${demoData.itemName}) Tj
+(PO Number: ${demoData.invoiceNumber}) Tj
 100 630 Td
-(Patient: ${user?.name || 'Demo Patient'}) Tj
+(Vendor: ${demoData.itemName}) Tj
 100 610 Td
-(Transfer Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
+(PO Date: ${new Date(demoData.paymentDate).toLocaleDateString()}) Tj
 100 590 Td
-(Transfer Type: ${demoData.billingCycle}) Tj
+(PO Type: ${demoData.billingCycle}) Tj
 100 570 Td
 (Amount: $${demoData.amount}) Tj
 ET
@@ -284,29 +284,29 @@ startxref
     }
 
     if (!receiptFile) {
-      toast.error('Bank statement required', {
-        description: 'Please upload a bank statement or void cheque (PDF)',
+      toast.error('Vendor quote required', {
+        description: 'Please upload a vendor quote or supporting document (PDF)',
       });
       return false;
     }
 
     if (!formData.routingNumber || formData.routingNumber.length !== 9) {
-      toast.error('Invalid routing number', {
-        description: 'Routing number must be 9 digits',
+      toast.error('Invalid cost center code', {
+        description: 'Cost center code must be 9 digits',
       });
       return false;
     }
 
     if (!formData.accountNumber || formData.accountNumber.length < 4) {
-      toast.error('Invalid account number', {
-        description: 'Please enter a valid account number',
+      toast.error('Invalid GL account number', {
+        description: 'Please enter a valid GL account number',
       });
       return false;
     }
 
     if (formData.accountNumber !== formData.accountNumberConfirm) {
-      toast.error('Account numbers do not match', {
-        description: 'Please confirm your account number',
+      toast.error('GL account numbers do not match', {
+        description: 'Please confirm your GL account number',
       });
       return false;
     }
@@ -326,7 +326,7 @@ startxref
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scope: 'openid profile email transaction:pay',
-          binding_message: `Approve Payment: ${formData.amount} USD`,
+          binding_message: `Approve PO #${formData.invoiceNumber || 'pending'}: ${formData.amount} USD`,
         }),
       });
 
@@ -353,11 +353,12 @@ startxref
         setCibaStatus({ status: 'approved', message: 'Authentication approved!' });
         setCibaTokenData({
           authorization_details: [{
-            type: 'payment_initiation',
+            type: 'purchase_order_approval',
             instructedAmount: { amount: Math.round(parseFloat(formData.amount) * 100), currency: 'USD' },
-            creditorName: 'Authskye',
-            creditorAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
-            remittanceInformationUnstructured: `Invoice ${formData.invoiceNumber}`,
+            poNumber: formData.invoiceNumber,
+            vendor: formData.itemName,
+            glAccount: `xxxxxxxxxxx${(formData.accountNumber || '0000').slice(-4)}`,
+            remittanceInformationUnstructured: `PO ${formData.invoiceNumber}`,
           }],
           access_token: pollResult.access_token,
           expires_in: pollResult.expires_in,
@@ -475,8 +476,8 @@ startxref
 
     try {
       // Step 1: Initiate CIBA authentication
-      toast.info('Payment authorization required', {
-        description: 'Please authorize the payment via Guardian app on your mobile device',
+      toast.info('PO approval required', {
+        description: 'Please authorize the purchase order via Guardian app on your mobile device',
       });
 
       const cibaResult = await initiateCIBA();
@@ -509,13 +510,13 @@ startxref
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to submit payment');
+        throw new Error(error.message || 'Failed to submit PO');
       }
 
       const result = await response.json();
 
-      toast.success('Payment submitted!', {
-        description: `Transaction ID: ${result.claimId}`,
+      toast.success('PO submitted!', {
+        description: `PO Confirmation: ${result.claimId}`,
       });
 
       // Trigger transactions list refresh
@@ -540,7 +541,7 @@ startxref
     } catch (error: any) {
       console.error('Submit error:', error);
       toast.error('Submission failed', {
-        description: error.message || 'Failed to submit payment',
+        description: error.message || 'Failed to submit PO',
       });
     } finally {
       setLoading(false);
@@ -569,7 +570,7 @@ startxref
           <div className="flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-amber-600 flex-shrink-0" />
             <span className="text-xs font-medium text-amber-800">
-              Push approval not set up — required for payment submission
+              Push approval not set up — required for PO submission
             </span>
           </div>
           <Button
@@ -588,7 +589,7 @@ startxref
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
           <span className="text-xs font-medium text-green-800">
-            Push approval ready — payment submission enabled
+            Push approval ready — PO submission enabled
           </span>
         </div>
       )}
@@ -613,9 +614,9 @@ startxref
             <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0" />
           )}
           <span className="text-xs font-medium">
-            {cibaStatus.status === 'pending' && 'Waiting for payment approval on Guardian app'}
-            {cibaStatus.status === 'approved' && 'Approved! Submitting payment...'}
-            {cibaStatus.status === 'denied' && 'Payment denied'}
+            {cibaStatus.status === 'pending' && 'Waiting for PO approval on Guardian app'}
+            {cibaStatus.status === 'approved' && 'Approved! Submitting PO...'}
+            {cibaStatus.status === 'denied' && 'PO denied'}
             {cibaStatus.status === 'expired' && 'Request expired'}
           </span>
         </div>
@@ -703,7 +704,7 @@ startxref
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="paymentDate" className="text-xs">Payment Date *</Label>
+            <Label htmlFor="paymentDate" className="text-xs">PO Date *</Label>
             <Input
               id="paymentDate"
               name="paymentDate"
@@ -715,7 +716,7 @@ startxref
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="amount" className="text-xs">Payment Amount ($) *</Label>
+            <Label htmlFor="amount" className="text-xs">PO Amount ($) *</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-muted-foreground" />
               <Input
@@ -724,7 +725,7 @@ startxref
                 type="number"
                 step="0.01"
                 className="pl-7 h-8 text-sm"
-                placeholder="29.00"
+                placeholder="1500.00"
                 value={formData.amount}
                 onChange={handleInputChange}
                 required
@@ -736,13 +737,13 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="itemName" className="text-xs flex items-center gap-1">
             <Package className="w-3 h-3" />
-            Transfer Description *
+            Vendor & Line Item *
           </Label>
           <Input
             id="itemName"
             name="itemName"
             className="h-8 text-sm"
-            placeholder="Professional Services"
+            placeholder="Acme Supply Co — Raw Materials"
             value={formData.itemName}
             onChange={handleInputChange}
             required
@@ -751,24 +752,24 @@ startxref
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="invoiceNumber" className="text-xs">Reference Number</Label>
+            <Label htmlFor="invoiceNumber" className="text-xs">PO Number</Label>
             <Input
               id="invoiceNumber"
               name="invoiceNumber"
               className="h-8 text-sm"
-              placeholder="RX-2024-0001"
+              placeholder="PO-2026-0001"
               maxLength={20}
               value={formData.invoiceNumber}
               onChange={handleInputChange}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="billingCycle" className="text-xs">Plan Type</Label>
+            <Label htmlFor="billingCycle" className="text-xs">PO Type</Label>
             <Input
               id="billingCycle"
               name="billingCycle"
               className="h-8 text-sm"
-              placeholder="Monthly / Annual / One-time"
+              placeholder="Standard / Blanket / Contract"
               value={formData.billingCycle}
               onChange={handleInputChange}
             />
@@ -792,7 +793,7 @@ startxref
         <div className="space-y-1">
           <Label htmlFor="receipt" className="text-xs flex items-center gap-1">
             <Upload className="w-3 h-3" />
-            Supporting Document (PDF) *
+            Vendor Quote / Supporting Document (PDF) *
           </Label>
           <div className="border-2 border-dashed rounded p-3 text-center hover:border-primary/50 transition-colors">
             <Label htmlFor="receipt" className="cursor-pointer text-xs text-primary">
@@ -814,15 +815,15 @@ startxref
           </div>
         </div>
 
-        {/* Payment Info - Compact */}
+        {/* Budget & Approval Info - Compact */}
         <div className="pt-2 border-t space-y-2">
           <p className="text-xs font-medium flex items-center gap-1">
             <Shield className="w-3 h-3" />
-            Payment Details (Push approval required)
+            Budget & Approval Details (Push approval required)
           </p>
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="routingNumber" className="text-xs">Routing Number *</Label>
+              <Label htmlFor="routingNumber" className="text-xs">Cost Center Code *</Label>
               <Input
                 id="routingNumber"
                 name="routingNumber"
@@ -836,13 +837,13 @@ startxref
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="accountNumber" className="text-xs">Account Number *</Label>
+              <Label htmlFor="accountNumber" className="text-xs">GL Account Number *</Label>
               <Input
                 id="accountNumber"
                 name="accountNumber"
                 type="text"
                 className="h-8 text-sm"
-                placeholder="Account Number"
+                placeholder="GL Account Number"
                 value={formData.accountNumber}
                 onChange={handleInputChange}
                 required
@@ -850,7 +851,7 @@ startxref
             </div>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="accountNumberConfirm" className="text-xs">Confirm Account Number *</Label>
+            <Label htmlFor="accountNumberConfirm" className="text-xs">Confirm GL Account Number *</Label>
             <Input
               id="accountNumberConfirm"
               name="accountNumberConfirm"
@@ -880,8 +881,8 @@ startxref
             </>
           ) : (
             <>
-              <CreditCard className="mr-2 h-4 w-4" />
-              Submit Payment
+              <ClipboardCheck className="mr-2 h-4 w-4" />
+              Submit PO
             </>
           )}
         </Button>
