@@ -70,16 +70,31 @@ export async function exchangeTokenOnBehalfOf(
     throw new OboExchangeError('OBO token exchange is not configured (missing AUTH0_MCP_CLIENT_ID/AUTH0_MCP_CLIENT_SECRET)', log);
   }
 
-  log.push({ step: 'exchange_request', status: 'info', audience, scope: scope ?? null });
+  // Log the exact RFC 8693 request parameters we're about to send (minus the
+  // secret and the raw subject_token itself) — same field names as the wire
+  // request, so the demo shows the real request shape, not a paraphrase.
+  const grantType = 'urn:ietf:params:oauth:grant-type:token-exchange';
+  const subjectTokenType = 'urn:ietf:params:oauth:token-type:access_token';
+  const requestedTokenType = 'urn:ietf:params:oauth:token-type:access_token';
+
+  log.push({
+    step: 'exchange_request',
+    status: 'info',
+    grant_type: grantType,
+    subject_token_type: subjectTokenType,
+    requested_token_type: requestedTokenType,
+    audience,
+    scope: scope ?? null,
+  });
   console.log(`🔁 [OBO] Requesting token exchange — audience=${audience} scope=${scope ?? '(none)'}`);
 
   const params = new URLSearchParams({
-    grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
+    grant_type: grantType,
     client_id: clientId,
     client_secret: clientSecret,
     subject_token: subjectToken,
-    subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
-    requested_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+    subject_token_type: subjectTokenType,
+    requested_token_type: requestedTokenType,
     audience,
   });
   if (scope) params.append('scope', scope);
@@ -115,11 +130,13 @@ export async function exchangeTokenOnBehalfOf(
   log.push({
     step: 'exchange_success',
     status: 'success',
-    aud: claims.aud ?? null,
+    iss: claims.iss ?? null,
     sub: claims.sub ?? null,
-    acting_agent_id: actingAgentId,
+    aud: claims.aud ?? null,
     act: claims.act ?? null,
+    scope: claims.scope ?? null,
     exp: claims.exp ?? null,
+    acting_agent_id: actingAgentId,
     expires_in: data.expires_in,
   });
   console.log(`✅ [OBO] Token issued — aud=${JSON.stringify(claims.aud)} acting_agent_id=${actingAgentId} act=${JSON.stringify(claims.act)}`);

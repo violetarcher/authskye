@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Plug,
   Shield,
@@ -76,6 +77,90 @@ async function generatePkce(): Promise<{ verifier: string; challenge: string }> 
     .replace(/=/g, '');
 
   return { verifier, challenge };
+}
+
+// ---- OBO Exchange Log formatting helpers ----
+// Turn the raw _obo log entries (see src/lib/obo-token-exchange.ts) into
+// clearly-labeled rows instead of a raw JSON dump, so the delegation chain
+// reads plainly for a live demo audience.
+
+type OboEntry = { step: string; status: 'info' | 'success' | 'error'; [key: string]: unknown };
+
+const OBO_STEP_LABELS: Record<string, string> = {
+  exchange_request: 'Requesting token exchange',
+  exchange_success: 'Token issued',
+  exchange_failed: 'Token exchange failed',
+  downstream_call: 'Calling downstream API',
+};
+
+// act claims nest (act.act.act...) to preserve the full delegation chain —
+// flatten to an ordered list of actor ids, most recent actor first.
+function flattenActChain(act: unknown): string[] {
+  const chain: string[] = [];
+  let current = act as { sub?: string; act?: unknown } | undefined;
+  while (current?.sub) {
+    chain.push(current.sub);
+    current = current.act as typeof current;
+  }
+  return chain;
+}
+
+function formatEpochTime(value: unknown): string | null {
+  return typeof value === 'number' ? new Date(value * 1000).toLocaleTimeString() : null;
+}
+
+// Labels lead with the official RFC 8693 / JWT claim or request-parameter
+// name, with a short plain-language description alongside it — e.g.
+// "sub (User)" not "User (sub)" — so the real wire/claim vocabulary is what
+// a reader sees first, not a paraphrase.
+function oboStepFields(entry: OboEntry): { label: string; value: string }[] {
+  if (entry.step === 'exchange_request') {
+    return [
+      { label: 'grant_type (Exchange Grant Type)', value: String(entry.grant_type ?? '—') },
+      { label: 'subject_token_type (Token Being Exchanged)', value: String(entry.subject_token_type ?? '—') },
+      { label: 'requested_token_type (Token Being Requested)', value: String(entry.requested_token_type ?? '—') },
+      { label: 'audience (Requested Downstream Audience)', value: String(entry.audience ?? '—') },
+      { label: 'scope (Requested Scope)', value: entry.scope ? String(entry.scope) : '(none)' },
+    ];
+  }
+  if (entry.step === 'exchange_success') {
+    const fields = [
+      { label: 'iss (Issuer)', value: String(entry.iss ?? '—') },
+      { label: 'sub (User)', value: String(entry.sub ?? '—') },
+      { label: 'aud (New Token Audience)', value: String(entry.aud ?? '—') },
+    ];
+    const chain = flattenActChain(entry.act);
+    if (chain.length > 0) {
+      fields.push({ label: 'act (Delegation Chain, most recent actor first)', value: chain.join('  →  ') });
+    }
+    if (entry.scope) fields.push({ label: 'scope (Granted Scope)', value: String(entry.scope) });
+    const exp = formatEpochTime(entry.exp);
+    if (exp) fields.push({ label: 'exp (Expires At)', value: exp });
+    if (entry.acting_agent_id) {
+      fields.push({ label: 'acting_agent_id (derived from act.sub)', value: String(entry.acting_agent_id) });
+    }
+    return fields;
+  }
+  if (entry.step === 'downstream_call') {
+    const status = entry.http_status;
+    const ok = typeof status === 'number' && status >= 200 && status < 300;
+    return [
+      { label: 'Request', value: `${entry.method ?? ''} ${entry.endpoint ?? ''}`.trim() },
+      { label: 'Response', value: `${status ?? '—'} ${ok ? '(success)' : '(error)'}` },
+    ];
+  }
+  if (entry.step === 'exchange_failed') {
+    return [
+      { label: 'error', value: String(entry.error ?? 'unknown_error') },
+      { label: 'error_description', value: entry.error_description ? String(entry.error_description) : '—' },
+    ];
+  }
+  // Generic fallback so future/unrecognized steps still render legibly
+  const { step: _step, status: _status, ...rest } = entry;
+  return Object.entries(rest).map(([label, value]) => ({
+    label,
+    value: typeof value === 'object' ? JSON.stringify(value) : String(value),
+  }));
 }
 
 export default function McpDemoPage() {
@@ -339,7 +424,7 @@ export default function McpDemoPage() {
 
     setOboChatMessages(prev => [...prev, {
       role: 'agent',
-      text: `Got it — a purchase order to ${parsed.vendor} for $${parsed.amount}. My token doesn't have transaction:pay, so I need to exchange it on your behalf first (on-behalf-of, RFC 8693)...`,
+      text: `Got it — a purchase order to ${parsed.vendor} for $${parsed.amount}. The token I'm holding for you doesn't include transaction:pay, so I'll exchange it on your behalf for one that does (on-behalf-of, RFC 8693)...`,
     }]);
 
     const summary = await handleSimulateObo(parsed.vendor, parsed.amount);
@@ -362,6 +447,13 @@ export default function McpDemoPage() {
         </p>
       </header>
 
+      <Tabs defaultValue="cimd-fga" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="cimd-fga">CIMD & FGA</TabsTrigger>
+          <TabsTrigger value="obo">OBO Flow</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="cimd-fga" className="mt-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Panel 1: Auth Flow */}
         <Card className="flex flex-col">
@@ -691,9 +783,11 @@ export default function McpDemoPage() {
           </CardContent>
         </Card>
       </div>
+        </TabsContent>
 
-      {/* Panel 4: OBO Token Exchange — full width, deliberately separate from the
-          generic tool console above. This represents a request that would
+        <TabsContent value="obo" className="mt-4">
+      {/* Panel 4: OBO Token Exchange — its own tab, deliberately separate from
+          the CIMD/FGA tool console. This represents a request that would
           realistically come from an agent, not a manual tool invocation. */}
       <Card>
         <CardHeader className="pb-3">
@@ -722,7 +816,7 @@ export default function McpDemoPage() {
                   </p>
                 </div>
 
-                <div className="border rounded-lg flex flex-col h-72">
+                <div className="border rounded-lg flex flex-col h-[420px]">
                   <div className="flex-shrink-0 border-b px-3 py-2 bg-muted/30">
                     <p className="text-xs font-medium flex items-center gap-1.5">
                       <Bot className="h-3.5 w-3.5" />
@@ -778,13 +872,12 @@ export default function McpDemoPage() {
               </div>
 
               {/* Right: exchange log + downstream result */}
-              <div className="border rounded-lg overflow-hidden min-h-[220px] flex flex-col">
+              <div className="border rounded-lg overflow-hidden min-h-[420px] flex flex-col">
                 {isSimulatingObo ? (
                   <div className="flex-1 flex items-center justify-center">
                     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                   </div>
                 ) : oboResult ? (() => {
-                  type OboEntry = { step: string; status: 'info' | 'success' | 'error'; [key: string]: unknown };
                   let oboLog: OboEntry[] = [];
                   let displayResult: unknown = null;
                   const resp = oboResult.response;
@@ -804,38 +897,108 @@ export default function McpDemoPage() {
                   }
 
                   const actingAgentId = (oboLog.find(e => e.step === 'exchange_success')?.acting_agent_id as string | undefined) ?? null;
+                  const actorChain = flattenActChain(oboLog.find(e => e.step === 'exchange_success')?.act);
+
+                  const resultObj = displayResult && typeof displayResult === 'object' ? displayResult as Record<string, unknown> : null;
+                  const isError = !!resultObj && 'error' in resultObj;
 
                   return (
-                    <>
+                    <div className="flex-1 overflow-y-auto divide-y">
                       {actingAgentId && (
-                        <div className="flex-shrink-0 border-b bg-purple-50 px-3 py-2">
-                          <p className="text-[10px] text-purple-700 font-medium uppercase tracking-wide">Acting Agent (act.sub — Agents as Principal)</p>
-                          <code className="text-xs font-mono text-purple-900 break-all">{actingAgentId}</code>
+                        <div className="px-4 py-3 bg-purple-50">
+                          <p className="text-[11px] text-purple-700 font-semibold uppercase tracking-wide mb-1">
+                            act.sub (Acting Agent — Agents as Principal)
+                          </p>
+                          <p className="text-sm font-mono text-purple-900 break-all">{actingAgentId}</p>
+                          {actorChain.length > 1 && (
+                            <p className="text-[11px] text-purple-700 mt-1 break-all">
+                              act (Delegation Chain, most recent first): {actorChain.join('  →  ')}
+                            </p>
+                          )}
                         </div>
                       )}
-                      <div className="flex-shrink-0 border-b bg-muted/20 px-3 py-2 space-y-1.5 max-h-40 overflow-y-auto">
-                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Exchange Log</p>
+
+                      <div className="px-4 py-3 space-y-3">
+                        <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wide">Exchange Log</p>
                         {oboLog.length === 0 ? (
-                          <p className="text-[10px] text-muted-foreground">No log entries returned.</p>
-                        ) : oboLog.map((entry, i) => {
-                          const { step, status, ...details } = entry;
-                          return (
-                            <div key={i} className="flex items-start gap-2 text-[10px] font-mono">
-                              {status === 'success'
-                                ? <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0 mt-0.5" />
-                                : status === 'error'
-                                ? <XCircle className="h-3 w-3 text-red-500 flex-shrink-0 mt-0.5" />
-                                : <RefreshCw className="h-3 w-3 text-blue-500 flex-shrink-0 mt-0.5" />}
-                              <span className="font-semibold flex-shrink-0">{step}</span>
-                              <span className="text-muted-foreground break-all">{JSON.stringify(details)}</span>
-                            </div>
-                          );
-                        })}
+                          <p className="text-xs text-muted-foreground">No log entries returned.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {oboLog.map((entry, i) => (
+                              <div key={i} className="rounded-md border p-2.5 space-y-1.5 bg-background">
+                                <div className="flex items-center gap-2">
+                                  {entry.status === 'success'
+                                    ? <CheckCircle2 className="h-3.5 w-3.5 text-green-600 flex-shrink-0" />
+                                    : entry.status === 'error'
+                                    ? <XCircle className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />
+                                    : <RefreshCw className="h-3.5 w-3.5 text-blue-500 flex-shrink-0" />}
+                                  <span className="text-xs font-semibold">{OBO_STEP_LABELS[entry.step] ?? entry.step}</span>
+                                </div>
+                                <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-[11px] pl-6">
+                                  {oboStepFields(entry).map((f, j) => (
+                                    <div key={j} className="contents">
+                                      <span className="text-muted-foreground">{f.label}</span>
+                                      <span className="font-mono break-all">{f.value}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                      <pre className="flex-1 text-[10px] font-mono p-3 overflow-auto leading-relaxed bg-background text-foreground">
-                        {JSON.stringify(displayResult, null, 2)}
-                      </pre>
-                    </>
+
+                      <div className="px-4 py-3">
+                        <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wide mb-2">Result</p>
+                        {isError ? (
+                          <div className="flex items-start gap-2">
+                            <XCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-sm font-semibold text-red-700">Request Failed</p>
+                              <p className="text-xs text-muted-foreground break-all">{String(resultObj?.error)}</p>
+                            </div>
+                          </div>
+                        ) : resultObj ? (
+                          <div className="flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                            <div className="space-y-1.5 flex-1">
+                              <p className="text-sm font-semibold text-green-700">Purchase Order Submitted</p>
+                              <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs">
+                                {resultObj.claimId != null && (
+                                  <div className="contents">
+                                    <span className="text-muted-foreground">Confirmation</span>
+                                    <span className="font-mono">{String(resultObj.claimId)}</span>
+                                  </div>
+                                )}
+                                {resultObj.vendor != null && (
+                                  <div className="contents">
+                                    <span className="text-muted-foreground">Vendor</span>
+                                    <span>{String(resultObj.vendor)}</span>
+                                  </div>
+                                )}
+                                {resultObj.amount != null && (
+                                  <div className="contents">
+                                    <span className="text-muted-foreground">Amount</span>
+                                    <span>${String(resultObj.amount)}</span>
+                                  </div>
+                                )}
+                                {resultObj.submittedAt != null && (
+                                  <div className="contents">
+                                    <span className="text-muted-foreground">Submitted</span>
+                                    <span>{new Date(String(resultObj.submittedAt)).toLocaleString()}</span>
+                                  </div>
+                                )}
+                              </div>
+                              {resultObj.message != null && (
+                                <p className="text-[11px] text-muted-foreground pt-0.5">{String(resultObj.message)}</p>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">No result data.</p>
+                        )}
+                      </div>
+                    </div>
                   );
                 })() : (
                   <div className="flex-1 flex items-center justify-center border-dashed">
@@ -847,6 +1010,8 @@ export default function McpDemoPage() {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+      </Tabs>
 
     </div>
   );
